@@ -1,26 +1,162 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Light Mode Palette */
+  --bg-primary: #F5F6F8;
+  --bg-surface: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  --bg-glass-elevated: rgba(255, 255, 255, 0.90);
+  --text-primary: #111318;
+  --text-secondary: #656B76;
+  --text-tertiary: #8E95A2;
+  --border-glass: rgba(0, 0, 0, 0.08);
+  --border-highlight: rgba(255, 255, 255, 0.9);
+  --accent: #2457D6;
+  --accent-soft: rgba(36, 87, 214, 0.10);
+  --accent-hover: #1D46B0;
+  --success: #2E8B57;
+  --success-soft: rgba(46, 139, 87, 0.10);
+  --error: #C94A4A;
+  --error-soft: rgba(201, 74, 74, 0.10);
+  --warning: #D97706;
+  --warning-soft: rgba(217, 119, 6, 0.10);
+  --shadow-sm: 0 2px 8px -1px rgba(0, 0, 0, 0.04), 0 1px 3px -1px rgba(0, 0, 0, 0.02);
+  --shadow-glass: 0 12px 32px -4px rgba(0, 0, 0, 0.06), 0 4px 12px -2px rgba(0, 0, 0, 0.03);
+  --shadow-glass-hover: 0 20px 40px -8px rgba(0, 0, 0, 0.10), 0 8px 16px -4px rgba(0, 0, 0, 0.04);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.dark, [data-theme="dark"] {
+  /* Dark Mode Palette */
+  --bg-primary: #0D0F12;
+  --bg-surface: #15181D;
+  --bg-glass: rgba(21, 24, 29, 0.72);
+  --bg-glass-elevated: rgba(26, 30, 37, 0.88);
+  --text-primary: #F4F5F7;
+  --text-secondary: #A5ABB5;
+  --text-tertiary: #6E7582;
+  --border-glass: rgba(255, 255, 255, 0.08);
+  --border-highlight: rgba(255, 255, 255, 0.14);
+  --accent: #6E91FF;
+  --accent-soft: rgba(110, 145, 255, 0.12);
+  --accent-hover: #8AA7FF;
+  --success: #59B889;
+  --success-soft: rgba(89, 184, 137, 0.12);
+  --error: #E07171;
+  --error-soft: rgba(224, 113, 113, 0.12);
+  --warning: #FBBF24;
+  --warning-soft: rgba(251, 191, 36, 0.12);
+  --shadow-sm: 0 2px 8px -1px rgba(0, 0, 0, 0.3);
+  --shadow-glass: 0 16px 36px -6px rgba(0, 0, 0, 0.45), 0 4px 14px -2px rgba(0, 0, 0, 0.3);
+  --shadow-glass-hover: 0 24px 48px -8px rgba(0, 0, 0, 0.55), 0 8px 20px -4px rgba(0, 0, 0, 0.4);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Devanagari", sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  transition: background-color 250ms ease, color 250ms ease;
+  overflow-x: hidden;
+}
+
+/* 3D Liquid Glass Core Classes */
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-glass);
+  border-top: 1px solid var(--border-highlight);
+  box-shadow: var(--shadow-glass);
+  border-radius: 1.25rem;
+}
+
+.glass-panel-elevated {
+  background: var(--bg-glass-elevated);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  border: 1px solid var(--border-glass);
+  border-top: 1px solid var(--border-highlight);
+  box-shadow: var(--shadow-glass-hover);
+  border-radius: 1.25rem;
+}
+
+.glass-card-interactive {
+  transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+              background 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, box-shadow;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .glass-card-interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glass-hover);
+  }
+}
+
+.glass-button-interactive:active {
+  transform: scale(0.98);
+  transition: transform 100ms ease-out;
+}
+
+.glass-input {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  border-radius: 0.75rem;
+  transition: all 180ms ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* Subtle Civic Neutral Ambient Background Depth */
+.civic-ambient-depth {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 600px;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.45;
+  background: radial-gradient(circle at 50% -10%, rgba(36, 87, 214, 0.08) 0%, transparent 70%);
+}
+
+.dark .civic-ambient-depth {
+  opacity: 0.25;
+  background: radial-gradient(circle at 50% -10%, rgba(110, 145, 255, 0.12) 0%, transparent 70%);
+}
+
+/* Reduced Motion and Reduced Transparency Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .glass-card-interactive:hover {
+    transform: none !important;
+  }
+  .glass-button-interactive:active {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-panel,
+  .glass-panel-elevated {
+    background: var(--bg-surface) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }
