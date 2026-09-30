@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
+import { SupportButton } from '@/components/support/SupportButton';
 import { ShieldCheck, Lock, CheckCircle2 } from 'lucide-react';
 
 export function Footer() {
@@ -47,6 +48,9 @@ export function Footer() {
                 <CheckCircle2 className="w-3.5 h-3.5 text-[var(--success)]" />
                 {language === 'hi' ? 'सामूहिक सार्वजनिक परिणाम' : 'Aggregate Live Results'}
               </span>
+            </div>
+            <div className="pt-1">
+              <SupportButton variant="pill" />
             </div>
           </div>
 

@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
+import { SupportButton } from '@/components/support/SupportButton';
 import { Menu, X, BarChart3, Vote, HelpCircle, ShieldCheck, HeartHandshake } from 'lucide-react';
 
 export function GlassNavbar() {
@@ -80,8 +81,9 @@ export function GlassNavbar() {
           })}
         </div>
 
-        {/* Controls: Language, Theme & Mobile Toggle */}
+        {/* Controls: Language, Theme, Ko-fi Support & Mobile Toggle */}
         <div className="flex items-center gap-2 sm:gap-3">
+          <SupportButton variant="compact" className="hidden sm:inline-flex" />
           <LanguageSwitcher />
           <ThemeSwitcher className="hidden sm:inline-flex" />
 
@@ -120,6 +122,9 @@ export function GlassNavbar() {
                 </Link>
               );
             })}
+          </div>
+          <div className="pt-2">
+            <SupportButton variant="pill" className="w-full justify-center" />
           </div>
           <div className="pt-3 border-t border-[var(--border-glass)] flex items-center justify-between">
             <span className="text-xs text-[var(--text-secondary)] font-medium">

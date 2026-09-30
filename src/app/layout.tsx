@@ -6,6 +6,7 @@ import { TopSloganBanner } from '@/components/layout/TopSloganBanner';
 import { GlassNavbar } from '@/components/layout/GlassNavbar';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { Footer } from '@/components/layout/Footer';
+import { FloatingSupportWidget } from '@/components/support/FloatingSupportWidget';
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://meravote.in'),
@@ -61,6 +62,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
               {children}
             </main>
+
+            {/* Floating Ko-fi Support Widget */}
+            <FloatingSupportWidget />
 
             {/* Footer */}
             <Footer />

@@ -1,0 +1,75 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Coffee } from 'lucide-react';
+import { useI18n } from '@/lib/i18n/context';
+import { SupportModal } from './SupportModal';
+
+interface SupportButtonProps {
+  className?: string;
+  variant?: 'primary' | 'secondary' | 'compact' | 'pill';
+}
+
+export function SupportButton({
+  className = '',
+  variant = 'primary',
+}: SupportButtonProps) {
+  const { language } = useI18n();
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const label =
+    language === 'hi'
+      ? 'समर्थन करें'
+      : 'Support Developer';
+
+  const titleText =
+    language === 'hi'
+      ? 'इस वेबसाइट को जीवित रखने के लिए डेवलपर का समर्थन करें'
+      : 'Support developer for make alive this website';
+
+  if (variant === 'compact') {
+    return (
+      <>
+        <button
+          onClick={() => setModalOpen(true)}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 transition-all cursor-pointer ${className}`}
+          title={titleText}
+        >
+          <Coffee className="w-3.5 h-3.5" />
+          <span>{label}</span>
+        </button>
+        <SupportModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      </>
+    );
+  }
+
+  if (variant === 'pill') {
+    return (
+      <>
+        <button
+          onClick={() => setModalOpen(true)}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all cursor-pointer ${className}`}
+          title={titleText}
+        >
+          <Coffee className="w-4 h-4" />
+          <span>{label}</span>
+        </button>
+        <SupportModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <button
+        onClick={() => setModalOpen(true)}
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-700 dark:text-amber-300 text-xs sm:text-sm font-bold transition-all cursor-pointer ${className}`}
+        title={titleText}
+      >
+        <Coffee className="w-4 h-4" />
+        <span>{titleText}</span>
+      </button>
+      <SupportModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
+    </>
+  );
+}
