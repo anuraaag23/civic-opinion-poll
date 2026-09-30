@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
@@ -18,15 +17,6 @@ export function DuplicateState({ pollSlug }: DuplicateStateProps) {
   return (
     <div className="max-w-lg mx-auto py-8 text-center animate-in fade-in duration-300">
       <GlassCard elevated className="space-y-6">
-        <div className="flex items-center justify-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-xs">
-            <Image src="/meravote-logo.png" alt="Mera Vote" width={28} height={28} className="w-full h-full object-contain" />
-          </div>
-          <span className="text-xs font-black tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20">
-            {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
-          </span>
-        </div>
-
         <div className="w-16 h-16 rounded-full bg-[var(--warning-soft)] text-[var(--warning)] flex items-center justify-center mx-auto shadow-sm">
           <AlertCircle className="w-10 h-10" />
         </div>

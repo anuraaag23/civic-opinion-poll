@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -12,31 +11,19 @@ export default function TermsAndMethodologyPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10 py-4">
-      {/* Header with Mera Vote Logo */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shrink-0 shadow-md overflow-hidden">
-          <Image
-            src="/meravote-logo.png"
-            alt="Mera Vote Logo"
-            width={64}
-            height={64}
-            className="w-full h-full object-contain"
-            priority
-          />
-        </div>
-        <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)] px-3 py-1 rounded-full bg-[var(--accent-soft)]">
-            {language === 'hi' ? 'मेरा वोट • शर्तें एवं कार्यप्रणाली' : 'Mera Vote • Governance & Standards'}
-          </span>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[var(--text-primary)]">
-            {language === 'hi' ? 'पद्धति, नियम एवं कानूनी सीमाएं' : 'Methodology, Terms & Accessibility'}
-          </h1>
-          <p className="text-base text-[var(--text-secondary)] leading-relaxed">
-            {language === 'hi'
-              ? 'इस नागरिक मंच के संचालन सिद्धांत, व्याख्या की सीमाएं और निष्पक्षता दिशानिर्देश।'
-              : 'Operating principles, sample interpretation boundaries, and accessibility commitments.'}
-          </p>
-        </div>
+      {/* Header */}
+      <div className="space-y-3">
+        <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)] px-3 py-1 rounded-full bg-[var(--accent-soft)]">
+          {language === 'hi' ? 'शर्तें एवं कार्यप्रणाली' : 'Governance & Standards'}
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[var(--text-primary)]">
+          {language === 'hi' ? 'पद्धति, नियम एवं कानूनी सीमाएं' : 'Methodology, Terms & Accessibility'}
+        </h1>
+        <p className="text-base text-[var(--text-secondary)] leading-relaxed">
+          {language === 'hi'
+            ? 'इस नागरिक मंच के संचालन सिद्धांत, व्याख्या की सीमाएं और निष्पक्षता दिशानिर्देश।'
+            : 'Operating principles, sample interpretation boundaries, and accessibility commitments.'}
+        </p>
       </div>
 
       <DisclaimerBanner />

@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Lock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Lock, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 export function VoterAssuranceCard() {
   const { language } = useI18n();
@@ -13,14 +12,8 @@ export function VoterAssuranceCard() {
     <GlassCard elevated className="border-l-4 border-l-[var(--success)] space-y-4 bg-[var(--bg-glass-elevated)]">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[var(--border-glass)]">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
-            <Image
-              src="/meravote-logo.png"
-              alt="Mera Vote Logo"
-              width={44}
-              height={44}
-              className="w-full h-full object-contain"
-            />
+          <div className="w-10 h-10 rounded-xl bg-[var(--success-soft)] text-[var(--success)] flex items-center justify-center shrink-0 shadow-xs">
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <div>
             <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
@@ -35,8 +28,8 @@ export function VoterAssuranceCard() {
             </p>
           </div>
         </div>
-        <span className="text-[11px] font-bold text-[var(--accent)] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] self-start sm:self-auto">
-          {language === 'hi' ? 'मेरा वोट गारंटी' : 'Mera Vote Guarantee'}
+        <span className="text-[11px] font-bold text-[var(--success)] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[var(--success-soft)] self-start sm:self-auto">
+          {language === 'hi' ? '100% सत्यापित गोपनीयता' : '100% Privacy Assured'}
         </span>
       </div>
 

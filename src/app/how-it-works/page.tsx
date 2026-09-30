@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { KeyGuaranteesSection } from '@/components/home/KeyGuaranteesSection';
@@ -16,22 +15,10 @@ export default function HowItWorksPage() {
 
   return (
     <div className="space-y-12 sm:space-y-16 py-4">
-      {/* Header with Mera Vote Logo */}
+      {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4">
-        <div className="flex flex-col items-center justify-center gap-2">
-          <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shadow-md overflow-hidden">
-            <Image
-              src="/meravote-logo.png"
-              alt="Mera Vote Logo"
-              width={64}
-              height={64}
-              className="w-full h-full object-contain"
-              priority
-            />
-          </div>
-          <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)] px-3 py-1 rounded-full bg-[var(--accent-soft)]">
-            {language === 'hi' ? 'मेरा वोट • तकनीकी वास्तुकला' : 'Mera Vote • Cryptographic Architecture'}
-          </span>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-semibold">
+          <span>{language === 'hi' ? 'तकनीकी वास्तुकला एवं कार्यप्रणाली' : 'Cryptographic Architecture & Workflow'}</span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[var(--text-primary)]">
           {t.howItWorks.title}

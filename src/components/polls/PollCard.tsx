@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Poll } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -33,15 +32,10 @@ export function PollCard({ poll }: PollCardProps) {
     <GlassCard interactive className="flex flex-col justify-between space-y-6">
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-white dark:bg-white/95 border border-[var(--border-glass)] p-0.5 flex items-center justify-center shrink-0 shadow-xs">
-              <Image src="/meravote-logo.png" alt="Mera Vote" width={24} height={24} className="w-full h-full object-contain" />
-            </div>
-            <GlassBadge variant={statusVariant}>
-              {isLive && <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />}
-              {statusLabel}
-            </GlassBadge>
-          </div>
+          <GlassBadge variant={statusVariant}>
+            {isLive && <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />}
+            {statusLabel}
+          </GlassBadge>
           <span className="text-xs text-[var(--text-tertiary)] font-mono">
             {poll.slug}
           </span>

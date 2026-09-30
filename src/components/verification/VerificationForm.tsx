@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
@@ -14,6 +13,7 @@ import {
   Search,
   CheckSquare,
   ArrowRight,
+  ShieldCheck,
 } from 'lucide-react';
 
 interface VerificationFormProps {
@@ -96,20 +96,8 @@ export function VerificationForm({
       <GlassCard elevated className="space-y-7 p-6 sm:p-8">
         {/* Neutral Verification Header */}
         <div className="text-center space-y-3">
-          <div className="flex flex-col items-center justify-center gap-2 mb-1">
-            <div className="w-14 h-14 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shrink-0 shadow-md overflow-hidden">
-              <Image
-                src="/meravote-logo.png"
-                alt="Mera Vote Logo"
-                width={56}
-                height={56}
-                className="w-full h-full object-contain"
-                priority
-              />
-            </div>
-            <span className="text-xs font-black tracking-wide uppercase px-3 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30">
-              {language === 'hi' ? 'मेरा वोट • स्व-सत्यापन' : 'Mera Vote • Self-Verification'}
-            </span>
+          <div className="w-12 h-12 rounded-2xl bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20 flex items-center justify-center mx-auto shadow-xs mb-1">
+            <ShieldCheck className="w-6 h-6" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
             {t.verification.title}

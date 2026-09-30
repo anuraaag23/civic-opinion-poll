@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -68,41 +67,26 @@ export default function AdminPage() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 py-4">
-      {/* Header with Mera Vote Logo */}
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
-        <div className="flex items-start sm:items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shrink-0 shadow-md overflow-hidden">
-            <Image
-              src="/meravote-logo.png"
-              alt="Mera Vote Logo"
-              width={56}
-              height={56}
-              className="w-full h-full object-contain"
-              priority
-            />
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <GlassBadge variant="neutral">
+              <Lock className="w-3.5 h-3.5 text-[var(--accent)]" />
+              <span>{language === 'hi' ? 'गोपनीयता-संरक्षित' : 'Privacy-Preserving'}</span>
+            </GlassBadge>
+            <GlassBadge variant="success">
+              <span>RBAC Active</span>
+            </GlassBadge>
           </div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)] px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)]">
-                {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
-              </span>
-              <GlassBadge variant="neutral">
-                <Lock className="w-3.5 h-3.5 text-[var(--accent)]" />
-                <span>{language === 'hi' ? 'गोपनीयता-संरक्षित' : 'Privacy-Preserving'}</span>
-              </GlassBadge>
-              <GlassBadge variant="success">
-                <span>RBAC Active</span>
-              </GlassBadge>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
-              {language === 'hi' ? 'प्रशासन एवं अखंडता निगरानी' : 'Platform Administration & Integrity'}
-            </h1>
-            <p className="text-sm text-[var(--text-secondary)]">
-              {language === 'hi'
-                ? 'सामूहिक मेट्रिक्स और पोल प्रबंधन। व्यक्तिगत मतदाता डेटा तक पहुंच शून्य है।'
-                : 'Aggregate metrics and poll governance. Zero access to individual voter ballots or identities.'}
-            </p>
-          </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
+            {language === 'hi' ? 'प्रशासन एवं अखंडता निगरानी' : 'Platform Administration & Integrity'}
+          </h1>
+          <p className="text-sm text-[var(--text-secondary)]">
+            {language === 'hi'
+              ? 'सामूहिक मेट्रिक्स और पोल प्रबंधन। व्यक्तिगत मतदाता डेटा तक पहुंच शून्य है।'
+              : 'Aggregate metrics and poll governance. Zero access to individual voter ballots or identities.'}
+          </p>
         </div>
 
         <GlassButton variant="secondary" size="sm" onClick={refreshStats} className="gap-1.5 self-start">

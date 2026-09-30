@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -12,29 +11,17 @@ export default function PrivacyPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-10 py-4">
-      {/* Header with Mera Vote Logo */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shrink-0 shadow-md overflow-hidden">
-          <Image
-            src="/meravote-logo.png"
-            alt="Mera Vote Logo"
-            width={64}
-            height={64}
-            className="w-full h-full object-contain"
-            priority
-          />
-        </div>
-        <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-[var(--success)] px-3 py-1 rounded-full bg-[var(--success-soft)]">
-            {language === 'hi' ? 'मेरा वोट • गोपनीयता नीति एवं वास्तुकला' : 'Mera Vote • Privacy Architecture'}
-          </span>
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[var(--text-primary)]">
-            {t.privacy.title}
-          </h1>
-          <p className="text-base text-[var(--text-secondary)] leading-relaxed">
-            {t.privacy.subtitle}
-          </p>
-        </div>
+      {/* Header */}
+      <div className="space-y-3">
+        <span className="text-xs font-bold uppercase tracking-wider text-[var(--success)] px-3 py-1 rounded-full bg-[var(--success-soft)]">
+          {language === 'hi' ? 'गोपनीयता नीति एवं वास्तुकला' : 'Privacy Architecture & Guarantees'}
+        </span>
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[var(--text-primary)]">
+          {t.privacy.title}
+        </h1>
+        <p className="text-base text-[var(--text-secondary)] leading-relaxed">
+          {t.privacy.subtitle}
+        </p>
       </div>
 
       <DisclaimerBanner />

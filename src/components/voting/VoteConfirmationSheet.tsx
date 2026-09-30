@@ -1,11 +1,11 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { Party } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassModal } from '@/components/ui/GlassModal';
 import { GlassButton } from '@/components/ui/GlassButton';
+import { ShieldCheck } from 'lucide-react';
 
 interface VoteConfirmationSheetProps {
   isOpen: boolean;
@@ -70,16 +70,16 @@ export function VoteConfirmationSheet({
           </div>
         </div>
 
-        {/* Privacy Note with Mera Vote guarantee */}
+        {/* Privacy Note */}
         <div className="p-3.5 rounded-xl bg-[var(--accent-soft)] text-xs text-[var(--accent)] font-medium flex items-center gap-2.5 border border-[var(--accent)]/15">
-          <div className="w-6 h-6 rounded-md bg-white p-0.5 shrink-0 flex items-center justify-center shadow-xs">
-            <Image src="/meravote-logo.png" alt="Mera Vote" width={22} height={22} className="w-full h-full object-contain" />
-          </div>
+          <ShieldCheck className="w-5 h-5 text-[var(--accent)] shrink-0" />
           <div className="space-y-0.5 min-w-0">
             <span className="font-bold block text-[var(--text-primary)]">
-              {language === 'hi' ? 'मेरा वोट गारंटी:' : 'Mera Vote Guarantee:'}
+              {t.common.privacyGuaranteed}
             </span>
-            <span>{t.common.privacyGuaranteed}</span>
+            <span className="text-[var(--text-secondary)]">
+              {t.polls.rule2}
+            </span>
           </div>
         </div>
 

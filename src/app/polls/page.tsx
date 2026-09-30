@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { Poll } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { PollCard } from '@/components/polls/PollCard';
@@ -33,31 +32,19 @@ export default function PollsPage() {
 
   return (
     <div className="space-y-10 sm:space-y-14 py-4">
-      {/* Page Header with Mera Vote Logo */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shrink-0 shadow-md overflow-hidden">
-          <Image
-            src="/meravote-logo.png"
-            alt="Mera Vote Logo"
-            width={64}
-            height={64}
-            className="w-full h-full object-contain"
-            priority
-          />
+      {/* Page Header */}
+      <div className="space-y-3">
+        <div className="inline-flex items-center gap-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)] px-3 py-1 rounded-full bg-[var(--accent-soft)]">
+            {language === 'hi' ? 'नागरिक सर्वेक्षण' : 'Civic Inquiry'}
+          </span>
         </div>
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)] px-3 py-1 rounded-full bg-[var(--accent-soft)]">
-              {language === 'hi' ? 'मेरा वोट • नागरिक सर्वेक्षण' : 'Mera Vote • Civic Inquiry'}
-            </span>
-          </div>
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-            {t.polls.title}
-          </h1>
-          <p className="text-base text-[var(--text-secondary)] max-w-2xl">
-            {t.polls.subtitle}
-          </p>
-        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+          {t.polls.title}
+        </h1>
+        <p className="text-base text-[var(--text-secondary)] max-w-2xl">
+          {t.polls.subtitle}
+        </p>
       </div>
 
       {/* Mandatory Disclaimer */}
@@ -84,19 +71,9 @@ export default function PollsPage() {
 
       {/* Participation Guidelines Card */}
       <GlassCard className="bg-[var(--bg-glass-elevated)] space-y-4">
-        <div className="flex items-center justify-between gap-2 flex-wrap pb-2 border-b border-[var(--border-glass)]">
-          <div className="flex items-center gap-2.5 text-sm font-bold text-[var(--text-primary)]">
-            <div className="w-8 h-8 rounded-xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-xs">
-              <Image src="/meravote-logo.png" alt="Mera Vote" width={28} height={28} className="w-full h-full object-contain" />
-            </div>
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-4 h-4 text-[var(--success)]" />
-              <span>{t.polls.rulesTitle}</span>
-            </div>
-          </div>
-          <span className="text-[11px] font-bold text-[var(--accent)] uppercase tracking-wider px-2 py-0.5 rounded-full bg-[var(--accent-soft)]">
-            {language === 'hi' ? 'मेरा वोट दिशानिर्देश' : 'Mera Vote Guidelines'}
-          </span>
+        <div className="flex items-center gap-2 text-sm font-bold text-[var(--text-primary)]">
+          <ShieldCheck className="w-5 h-5 text-[var(--success)]" />
+          <h3>{t.polls.rulesTitle}</h3>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-[var(--text-secondary)] leading-relaxed">
           <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">

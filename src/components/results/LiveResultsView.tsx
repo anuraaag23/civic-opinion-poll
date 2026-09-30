@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { OptionResult, PollStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { ResultBar } from './ResultBar';
@@ -138,15 +137,12 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
       {/* Live Counting Broadcast Badge */}
       <div className="flex items-center justify-between p-3 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] shadow-sm">
         <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded-lg bg-white dark:bg-white/95 border border-[var(--border-glass)] p-0.5 flex items-center justify-center shrink-0 shadow-xs">
-            <Image src="/meravote-logo.png" alt="Mera Vote" width={20} height={20} className="w-full h-full object-contain" />
-          </div>
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--success)] opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--success)]"></span>
           </span>
           <span className="text-xs font-black uppercase tracking-wider text-[var(--success)]">
-            {language === 'hi' ? 'मेरा वोट • लाइव मतगणना' : 'MERA VOTE • LIVE COUNTING'}
+            {language === 'hi' ? 'लाइव जनमत गणना' : 'LIVE PUBLIC COUNTING'}
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] font-mono">
@@ -155,38 +151,24 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
         </div>
       </div>
 
-      {/* Page Header with Mera Vote Logo */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-        <div className="w-14 h-14 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shrink-0 shadow-md overflow-hidden">
-          <Image
-            src="/meravote-logo.png"
-            alt="Mera Vote Logo"
-            width={56}
-            height={56}
-            className="w-full h-full object-contain"
-          />
+      {/* Page Header */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <GlassBadge variant="accent">
+            <BarChart3 className="w-3.5 h-3.5" />
+            <span>{t.results.title}</span>
+          </GlassBadge>
+          <GlassBadge variant={pollStatus === 'LIVE' ? 'success' : 'neutral'}>
+            <span>{pollStatus}</span>
+          </GlassBadge>
         </div>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 flex-wrap">
-            <GlassBadge variant="accent">
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>{t.results.title}</span>
-            </GlassBadge>
-            <GlassBadge variant={pollStatus === 'LIVE' ? 'success' : 'neutral'}>
-              <span>{pollStatus}</span>
-            </GlassBadge>
-            <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)] px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)]">
-              {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
-            </span>
-          </div>
 
-          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
-            {pollTitle || t.results.title}
-          </h1>
-          <p className="text-sm text-[var(--text-secondary)]">
-            {t.results.subtitle}
-          </p>
-        </div>
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
+          {pollTitle || t.results.title}
+        </h1>
+        <p className="text-sm text-[var(--text-secondary)]">
+          {t.results.subtitle}
+        </p>
       </div>
 
       {/* Mandatory Non-Affiliation Disclaimer */}

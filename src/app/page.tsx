@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { LiquidGlassHeroVisual } from '@/components/home/LiquidGlassHeroVisual';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
@@ -25,32 +24,17 @@ export default function HomePage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Left Column: Hero Typography & CTAs */}
           <div className="lg:col-span-7 space-y-6 text-left">
-            {/* Prominent Mera Vote Logo & Live Badges */}
-            <div className="flex items-center gap-3">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl p-1.5 bg-white dark:bg-white/95 border border-[var(--border-glass)] shadow-md flex items-center justify-center overflow-hidden shrink-0">
-                <Image
-                  src="/meravote-logo.png"
-                  alt="Mera Vote Logo"
-                  width={64}
-                  height={64}
-                  className="w-full h-full object-contain"
-                  priority
-                />
-              </div>
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-2 flex-wrap">
-                  <GlassBadge variant="accent">
-                    <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-ping" />
-                    {t.common.liveBadge}
-                  </GlassBadge>
-                  <GlassBadge variant="success">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[var(--success)]" />
-                    <span>{language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage Guaranteed'}</span>
-                  </GlassBadge>
-                </div>
-                <div className="text-[11px] font-bold text-[var(--accent)] tracking-wide uppercase">
-                  {language === 'hi' ? 'मेरा वोट • स्वतंत्र नागरिक जनमत' : 'Mera Vote • Independent Civic Platform'}
-                </div>
+            {/* Live Badges */}
+            <div className="space-y-1">
+              <div className="inline-flex items-center gap-2 flex-wrap">
+                <GlassBadge variant="accent">
+                  <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-ping" />
+                  {t.common.liveBadge}
+                </GlassBadge>
+                <GlassBadge variant="success">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[var(--success)]" />
+                  <span>{language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage Guaranteed'}</span>
+                </GlassBadge>
               </div>
             </div>
 
@@ -200,29 +184,21 @@ export default function HomePage() {
 
         <GlassCard elevated className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-glass)]">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl p-1 bg-white dark:bg-white/95 border border-[var(--border-glass)] shadow-xs flex items-center justify-center shrink-0">
-                <Image src="/meravote-logo.png" alt="Mera Vote Logo" width={48} height={48} className="w-full h-full object-contain" />
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <GlassBadge variant="success">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)]" />
+                  {t.common.liveBadge}
+                </GlassBadge>
+                <span className="text-xs text-[var(--text-tertiary)] font-mono">
+                  ID: POLL-2029-NAT
+                </span>
               </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-[var(--accent)] px-2 py-0.5 rounded-full bg-[var(--accent-soft)]">
-                    {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
-                  </span>
-                  <GlassBadge variant="success">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)]" />
-                    {t.common.liveBadge}
-                  </GlassBadge>
-                  <span className="text-xs text-[var(--text-tertiary)]">
-                    ID: POLL-2029-NAT
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold text-[var(--text-primary)]">
-                  {language === 'hi'
-                    ? '2029 राष्ट्रीय नागरिक जनमत सर्वेक्षण'
-                    : '2029 National Civic Opinion Poll'}
-                </h3>
-              </div>
+              <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
+                {language === 'hi'
+                  ? '2029 राष्ट्रीय नागरिक जनमत सर्वेक्षण'
+                  : '2029 National Civic Opinion Poll'}
+              </h3>
             </div>
             <div className="flex items-center gap-2">
               <Link href="/polls/national-opinion-poll-2029">
