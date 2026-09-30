@@ -92,7 +92,7 @@ export const translations = {
       rateLimited: 'Too many verification attempts. Please wait a few moments before trying again.',
       serviceUnavailable: 'Verification service is temporarily unavailable. Please try again shortly.',
       testModeNotice:
-        'Development Environment: Enter any standard format EPIC (e.g. TEST1234567) for mock eligibility verification.',
+        'Development Environment: Enter any standard format EPIC (e.g. TST1234567 or ABC1234567) for mock eligibility verification.',
     },
     voting: {
       headerProgress: 'Step 1 of 1',
@@ -241,7 +241,7 @@ export const translations = {
       rateLimited: 'सत्यापन के बहुत अधिक प्रयास किए गए। कृपया कुछ क्षण प्रतीक्षा करें।',
       serviceUnavailable: 'सत्यापन सेवा अभी अस्थायी रूप से उपलब्ध नहीं है। कृपया थोड़ी देर बाद प्रयास करें।',
       testModeNotice:
-        'डेवलपमेंट मोड: परीक्षण पात्रता सत्यापन के लिए कोई भी मानक EPIC (उदा. TEST1234567) दर्ज करें।',
+        'डेवलपमेंट मोड: परीक्षण पात्रता सत्यापन के लिए कोई भी मानक 3-अक्षर + 7-अंक EPIC (उदा. TST1234567 या ABC1234567) दर्ज करें।',
     },
     voting: {
       headerProgress: 'चरण 1 का 1',
