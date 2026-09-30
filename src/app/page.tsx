@@ -36,9 +36,12 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[var(--text-primary)] leading-[1.12]">
-              {language === 'hi'
-                ? 'स्वतंत्र नागरिक जनमत सर्वेक्षण'
-                : 'Independent India Civic Opinion Polls'}
+              <span className="text-[var(--accent)]">{language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}</span>
+              <span className="block text-2xl sm:text-4xl lg:text-5xl mt-1 text-[var(--text-primary)]">
+                {language === 'hi'
+                  ? 'स्वतंत्र नागरिक जनमत सर्वेक्षण'
+                  : 'Independent India Civic Opinion Polls'}
+              </span>
             </h1>
 
             <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl font-normal">
@@ -109,13 +112,13 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center">1</span>
               <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                {language === 'hi' ? '1. वोटर आईडी (EPIC) दर्ज करें' : '1. Enter Voter ID (EPIC)'}
+                {language === 'hi' ? '1. ECI पोर्टल पर पंजीकरण जांचें' : '1. Check Registration on ECI'}
               </h3>
             </div>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
               {language === 'hi'
-                ? 'पात्रता की पुष्टि केवल मेमोरी में होती है। आपका आईडी कहीं भी सेव नहीं होता।'
-                : 'Checked strictly in RAM to confirm eligibility. Discarded immediately.'}
+                ? 'आधिकारिक ECI पोर्टल पर सीधे अपनी स्थिति जांचें और स्व-सत्यापन पूरा करें। 100% शून्य आईडी भंडारण।'
+                : 'Check registration directly on official ECI portal and confirm. Zero ID stored.'}
             </p>
           </GlassCard>
 

@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     common: {
-      siteName: 'CivicPoll India',
+      siteName: 'Mera Vote',
       tagline: 'Independent Civic Opinion Polls',
       officialDisclaimer:
         'Independent civic opinion-poll platform. Not operated by, affiliated with, or endorsed by the Election Commission of India (ECI) or the Government of India. Participation does not constitute an official election vote.',
@@ -157,7 +157,7 @@ export const translations = {
     },
     footer: {
       independentBadge: 'Independent Civic Tech Platform',
-      copyright: 'Independent Civic Opinion Poll Platform. Free & Open Civic Technology.',
+      copyright: 'Mera Vote — Independent Civic Opinion Poll Platform. Free & Open Civic Technology.',
       disclaimer:
         'Not affiliated with, operated by, or authorized by the Election Commission of India (ECI) or the Government of India. This application is an independent public opinion polling instrument and does not conduct legal, official, or binding elections.',
       persistentStatement:
@@ -166,7 +166,7 @@ export const translations = {
   },
   hi: {
     common: {
-      siteName: 'सिविक पोल इंडिया',
+      siteName: 'मेरा वोट (Mera Vote)',
       tagline: 'स्वतंत्र नागरिक जनमत सर्वेक्षण',
       officialDisclaimer:
         'स्वतंत्र नागरिक जनमत सर्वेक्षण मंच। यह भारत निर्वाचन आयोग (ECI) या भारत सरकार द्वारा संचालित, उससे संबद्ध या समर्थित नहीं है। इसमें भागीदारी आधिकारिक चुनावी मतदान नहीं है।',
@@ -322,7 +322,7 @@ export const translations = {
     },
     footer: {
       independentBadge: 'स्वतंत्र नागरिक तकनीक मंच',
-      copyright: 'स्वतंत्र नागरिक जनमत सर्वेक्षण मंच। निःशुल्क एवं खुला नागरिक मंच।',
+      copyright: 'मेरा वोट — स्वतंत्र नागरिक जनमत सर्वेक्षण मंच। निःशुल्क एवं खुला नागरिक मंच।',
       disclaimer:
         'भारत निर्वाचन आयोग (ECI) या भारत सरकार द्वारा संचालित, अधिकृत या उससे संबद्ध नहीं है। यह एप्लिकेशन एक स्वतंत्र जनमत सर्वेक्षण उपकरण है और कोई कानूनी या आधिकारिक चुनाव आयोजित नहीं करता है।',
       persistentStatement:

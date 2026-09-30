@@ -60,7 +60,7 @@ export function AboutCreatorSection() {
                   आज की राजनीति में आम नागरिक केवल एक &quot;वोट बैंक&quot; बनकर रह गया है। मुख्यधारा के मीडिया सर्वे अक्सर पहले से तय राजनीतिक एजेंडे को सच बताकर जनता पर थोपते हैं। नागरिकों के पास ऐसा कोई पारदर्शी, निष्पक्ष और सुरक्षित मंच नहीं था जहाँ वे बिना किसी डर, बिना किसी पहचान के लीक होने के, अपनी सच्ची राजनीतिक पसंद दर्ज कर सकें।
                 </p>
                 <p>
-                  इसलिए मैंने अपने कोडिंग ज्ञान का उपयोग करके यह मंच खड़ा किया। मैंने जानबूझकर अपना नाम और पहचान पूरी तरह गुप्त रखी है — क्योंकि यह मंच मेरे बारे में नहीं है, यह <strong>आपकी स्वतंत्र नागरिक राय</strong> के बारे में है।
+                  इसलिए मैंने अपने कोडिंग ज्ञान का उपयोग करके <strong>&quot;मेरा वोट&quot; (Mera Vote)</strong> खड़ा किया। यहाँ मतदाता पंजीकरण की जांच सीधे ECI पोर्टल पर होती है और आपकी राय 100% गुमनाम रहती है। मैंने जानबूझकर अपना नाम और पहचान पूरी तरह गुप्त रखी है — क्योंकि यह मंच मेरे बारे में नहीं है, यह <strong>आपकी स्वतंत्र नागरिक राय</strong> के बारे में है।
                 </p>
               </>
             ) : (
@@ -72,7 +72,7 @@ export function AboutCreatorSection() {
                   In modern political discourse, everyday citizens are treated as mere statistics and vote banks. People are afraid to voice their true opinions because of tracking, social stigma, or surveillance. I wanted to prove that modern web engineering and cryptography can solve this problem once and for all.
                 </p>
                 <p>
-                  Here, your voter identity is verified in-memory and immediately destroyed. No database records your EPIC alongside your chosen party. I choose to remain completely anonymous because this project is not about personal credit or fame — it is about giving India a real, uncorrupted, untampered citizen mirror.
+                  That is why I created <strong>Mera Vote</strong>. Electoral registration checks are performed directly by you on the official ECI portal, and our database never receives or stores your EPIC. I choose to remain completely anonymous because this project is not about personal credit or fame — it is about giving India a real, uncorrupted, untampered citizen mirror.
                 </p>
               </>
             )}

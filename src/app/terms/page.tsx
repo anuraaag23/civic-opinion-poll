@@ -38,7 +38,9 @@ export default function TermsAndMethodologyPage() {
             <h2>{language === 'hi' ? 'कानूनी सीमाएं और गैर-संबद्धता' : 'Legal Boundaries & Non-Affiliation'}</h2>
           </div>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            This platform is an independent civic research and public opinion instrument. It is not affiliated with, operated by, or commissioned by the Election Commission of India (ECI) or any department of the Government of India.
+            {language === 'hi'
+              ? 'मेरा वोट (Mera Vote) एक स्वतंत्र नागरिक अनुसंधान और जनमत सर्वेक्षण मंच है। यह भारत निर्वाचन आयोग (ECI) या भारत सरकार के किसी भी विभाग से संबद्ध, संचालित या समर्थित नहीं है।'
+              : 'Mera Vote ("मेरा वोट") is an independent civic research and public opinion platform. It is not affiliated with, operated by, or commissioned by the Election Commission of India (ECI) or any department of the Government of India.'}
           </p>
           <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] space-y-2">
             <p className="font-semibold text-[var(--text-primary)]">

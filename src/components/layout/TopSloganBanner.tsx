@@ -10,9 +10,18 @@ export function TopSloganBanner() {
   return (
     <div className="w-full bg-gradient-to-r from-[var(--accent)] via-[#1D46B0] to-[var(--accent)] text-white py-2 px-4 shadow-sm border-b border-white/10 select-none">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-4 text-center sm:text-left">
-        {/* Main Slogan */}
+        {/* Main Slogan with Mera Vote Brand */}
         <div className="flex items-center justify-center gap-2">
-          <Sparkles className="w-4 h-4 text-amber-300 shrink-0 animate-pulse" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/meravote-logo.png"
+            alt="Mera Vote Logo"
+            className="w-5 h-5 rounded-full object-contain shrink-0 shadow-xs ring-1 ring-white/30"
+          />
+          <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/30 shrink-0">
+            {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
+          </span>
+          <Sparkles className="w-3.5 h-3.5 text-amber-300 shrink-0 animate-pulse hidden sm:inline" />
           <p className="text-xs sm:text-sm font-black tracking-wide">
             {language === 'hi'
               ? 'आपकी राय, आपका मत — जिसे यहां कभी बदला, दबाया या ट्रेस नहीं किया जा सकता।'

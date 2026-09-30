@@ -17,6 +17,14 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
   return (
     <div className="max-w-lg mx-auto py-8 text-center animate-in fade-in duration-300">
       <GlassCard elevated className="space-y-6">
+        <div className="flex items-center justify-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/meravote-logo.png" alt="Mera Vote" className="w-6 h-6 rounded-full object-contain" />
+          <span className="text-xs font-black tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20">
+            {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
+          </span>
+        </div>
+
         <div className="w-16 h-16 rounded-full bg-[var(--success-soft)] text-[var(--success)] flex items-center justify-center mx-auto shadow-sm">
           <CheckCircle2 className="w-10 h-10" />
         </div>

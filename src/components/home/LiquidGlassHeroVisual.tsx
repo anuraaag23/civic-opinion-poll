@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { ShieldCheck, Lock, Vote, CheckCircle2 } from 'lucide-react';
 
 export function LiquidGlassHeroVisual() {
@@ -23,26 +24,22 @@ export function LiquidGlassHeroVisual() {
             boxShadow: '0 12px 30px -6px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
           }}
         >
-          {/* Central Neutral Civic Consensus Seal */}
-          <div className="w-14 h-14 rounded-2xl bg-[var(--accent)] text-white flex items-center justify-center shadow-md mb-3 transform transition-transform duration-300 hover:scale-105">
-            <svg
-              className="w-7 h-7 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
+          {/* Central 3D Liquid Glass Mera Vote Logo */}
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-gradient-to-tr from-white/20 via-white/10 to-transparent border border-white/40 p-2 flex items-center justify-center shadow-xl mb-2.5 transform transition-transform duration-300 hover:scale-110 overflow-hidden backdrop-blur-md">
+            <Image
+              src="/meravote-logo.png"
+              alt="Mera Vote Logo"
+              width={80}
+              height={80}
+              className="w-full h-full object-contain drop-shadow-md"
+              priority
+            />
           </div>
-          <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)]">
-            Verified & Anonymous
+          <span className="text-sm sm:text-base font-black tracking-tight text-[var(--text-primary)]">
+            Mera Vote
           </span>
-          <span className="text-[11px] text-[var(--text-secondary)] mt-0.5 font-medium">
-            Cryptographic Separation
+          <span className="text-[11px] text-[var(--accent)] mt-0.5 font-bold uppercase tracking-wider">
+            मेरा वोट • Bharat
           </span>
         </div>
       </div>

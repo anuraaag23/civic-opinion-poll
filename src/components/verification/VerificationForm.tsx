@@ -96,6 +96,13 @@ export function VerificationForm({
       <GlassCard elevated className="space-y-7 p-6 sm:p-8">
         {/* Neutral Verification Header */}
         <div className="text-center space-y-2.5">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/meravote-logo.png" alt="Mera Vote" className="w-6 h-6 rounded-full object-contain shadow-xs" />
+            <span className="text-xs font-black tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20">
+              {language === 'hi' ? 'मेरा वोट स्व-सत्यापन' : 'Mera Vote Self-Verification'}
+            </span>
+          </div>
           <div className="w-12 h-12 rounded-2xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center mx-auto mb-2 shadow-sm">
             <ShieldCheck className="w-6 h-6" />
           </div>

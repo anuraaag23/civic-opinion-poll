@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { ShieldCheck, Lock, CheckCircle2 } from 'lucide-react';
 
@@ -15,20 +16,17 @@ export function Footer() {
           {/* Brand & Purpose */}
           <div className="md:col-span-2 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-[var(--accent)] flex items-center justify-center text-white">
-                <svg
-                  className="w-4 h-4 text-white"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.2"
-                >
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="m9 12 2 2 4-4" />
-                </svg>
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md overflow-hidden backdrop-blur-md shrink-0">
+                <Image
+                  src="/meravote-logo.png"
+                  alt="Mera Vote Logo"
+                  width={36}
+                  height={36}
+                  className="w-full h-full object-contain"
+                />
               </div>
-              <span className="text-base font-bold text-[var(--text-primary)]">
-                {language === 'hi' ? 'सिविक पोल इंडिया' : 'CivicPoll India'}
+              <span className="text-lg font-black tracking-tight text-[var(--text-primary)]">
+                {language === 'hi' ? 'मेरा वोट (Mera Vote)' : 'Mera Vote'}
               </span>
             </div>
             <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-md">
@@ -133,7 +131,7 @@ export function Footer() {
             </p>
           </div>
           <div className="mt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-[var(--text-tertiary)] gap-2">
-            <span>© 2026 CivicPoll India. {t.footer.copyright}</span>
+            <span>© 2026 Mera Vote. {t.footer.copyright}</span>
             <span>{language === 'hi' ? 'गोपनीयता-प्रथम वास्तुकला' : 'Privacy-First Architecture'}</span>
           </div>
         </div>

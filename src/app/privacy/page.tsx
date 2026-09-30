@@ -40,8 +40,8 @@ export default function PrivacyPage() {
           </div>
           <p className="text-sm text-[var(--text-primary)] font-semibold leading-relaxed">
             {language === 'hi'
-              ? 'हम आपसे इस प्लेटफॉर्म पर आपका EPIC नंबर जमा करने के लिए नहीं कहते। मतदाता पंजीकरण की जांच सीधे आपके द्वारा आधिकारिक ECI वेबसाइट पर की जाती है।'
-              : 'We do not ask you to submit your EPIC number to this platform. Electoral-registration checks are performed directly by you on the official ECI website.'}
+              ? 'हम आपसे \'मेरा वोट\' (Mera Vote) पर आपका EPIC नंबर या कोई भी पहचान पत्र जमा करने के लिए कभी नहीं कहते। मतदाता पंजीकरण की जांच सीधे आपके द्वारा आधिकारिक ECI वेबसाइट पर की जाती है।'
+              : 'We never ask you to submit your EPIC number or any personal identity proof to Mera Vote. Electoral-registration checks are performed directly by you on the official ECI website.'}
           </p>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
             {language === 'hi'

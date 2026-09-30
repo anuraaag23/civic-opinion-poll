@@ -20,16 +20,16 @@ export function GlassButton({
   ...props
 }: GlassButtonProps) {
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs font-medium rounded-lg',
-    md: 'px-5 py-2.5 text-sm font-semibold rounded-xl',
-    lg: 'px-7 py-3.5 text-base font-semibold rounded-2xl',
+    sm: 'px-3.5 py-1.5 text-xs font-semibold rounded-full',
+    md: 'px-5 py-2.5 text-sm font-semibold rounded-full',
+    lg: 'px-7 py-3 text-base font-bold rounded-full',
   };
 
   const variantClasses = {
     primary:
-      'bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-sm border border-transparent',
+      'bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-md border border-white/20',
     secondary:
-      'bg-[var(--bg-surface)] hover:bg-[var(--bg-glass)] text-[var(--text-primary)] border border-[var(--border-glass)] shadow-sm',
+      'bg-[var(--bg-glass)] hover:bg-[var(--bg-glass-elevated)] text-[var(--text-primary)] border border-[var(--border-glass)] backdrop-blur-md shadow-sm',
     outline:
       'bg-transparent hover:bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]',
     ghost:

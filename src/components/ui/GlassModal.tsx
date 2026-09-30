@@ -59,6 +59,9 @@ export function GlassModal({
           isBottomSheetOnMobile ? 'max-sm:fixed max-sm:bottom-0 max-sm:rounded-b-none' : ''
         } ${className}`}
       >
+        {isBottomSheetOnMobile && (
+          <div className="w-10 h-1.5 rounded-full bg-[var(--text-tertiary)]/40 mx-auto mb-3 sm:hidden" />
+        )}
         <div className="flex items-center justify-between pb-4 mb-4 border-b border-[var(--border-glass)]">
           {title && (
             <h3 className="text-lg font-semibold text-[var(--text-primary)] tracking-tight">

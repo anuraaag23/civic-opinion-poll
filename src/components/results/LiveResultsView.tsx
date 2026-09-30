@@ -137,12 +137,14 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
       {/* Live Counting Broadcast Badge */}
       <div className="flex items-center justify-between p-3 rounded-2xl bg-[var(--bg-glass-elevated)] border border-[var(--border-glass)] shadow-sm">
         <div className="flex items-center gap-2.5">
-          <span className="relative flex h-3 w-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/meravote-logo.png" alt="Mera Vote" className="w-5 h-5 rounded-full object-contain shadow-xs" />
+          <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--success)] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--success)]"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--success)]"></span>
           </span>
           <span className="text-xs font-black uppercase tracking-wider text-[var(--success)]">
-            {language === 'hi' ? 'लाइव मतगणना सक्रिय' : 'LIVE COUNTING ACTIVE'}
+            {language === 'hi' ? 'मेरा वोट • लाइव मतगणना' : 'MERA VOTE • LIVE COUNTING'}
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] font-mono">

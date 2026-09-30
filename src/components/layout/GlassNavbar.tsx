@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
 import { LanguageSwitcher } from './LanguageSwitcher';
@@ -35,30 +36,26 @@ export function GlassNavbar() {
           href="/"
           className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl"
         >
-          {/* Original Neutral Civic Logo */}
-          <div className="w-9 h-9 rounded-xl bg-[var(--accent)] flex items-center justify-center text-white shadow-sm transition-transform duration-200 group-hover:scale-105">
-            <svg
-              className="w-5 h-5 text-white"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="9" />
-              <path d="m9 12 2 2 4-4" />
-            </svg>
+          {/* Authentic 3D Liquid Glass Mera Vote Logo */}
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md transition-transform duration-200 group-hover:scale-105 overflow-hidden backdrop-blur-md shrink-0">
+            <Image
+              src="/meravote-logo.png"
+              alt="Mera Vote Logo"
+              width={40}
+              height={40}
+              className="w-full h-full object-contain drop-shadow"
+              priority
+            />
           </div>
           <div className="flex flex-col">
-            <span className="text-base font-bold tracking-tight text-[var(--text-primary)]">
-              {language === 'hi' ? 'सिविक पोल' : 'CivicPoll'}
-              <span className="text-[var(--accent)] font-semibold text-xs ml-1 px-1.5 py-0.5 rounded-md bg-[var(--accent-soft)]">
-                {language === 'hi' ? 'भारत' : 'India'}
+            <span className="text-base sm:text-lg font-black tracking-tight text-[var(--text-primary)] flex items-center gap-1.5">
+              <span>{language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}</span>
+              <span className="text-[var(--accent)] font-bold text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/30">
+                {language === 'hi' ? 'Mera Vote' : 'भारत'}
               </span>
             </span>
             <span className="text-[10px] tracking-wide text-[var(--text-secondary)] font-medium">
-              {language === 'hi' ? 'स्वतंत्र जनमत' : 'Independent Civic Opinion'}
+              {language === 'hi' ? 'स्वतंत्र नागरिक जनमत' : 'Independent Civic Polls'}
             </span>
           </div>
         </Link>

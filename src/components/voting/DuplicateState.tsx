@@ -17,6 +17,14 @@ export function DuplicateState({ pollSlug }: DuplicateStateProps) {
   return (
     <div className="max-w-lg mx-auto py-8 text-center animate-in fade-in duration-300">
       <GlassCard elevated className="space-y-6">
+        <div className="flex items-center justify-center gap-2">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/meravote-logo.png" alt="Mera Vote" className="w-6 h-6 rounded-full object-contain" />
+          <span className="text-xs font-black tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20">
+            {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
+          </span>
+        </div>
+
         <div className="w-16 h-16 rounded-full bg-[var(--warning-soft)] text-[var(--warning)] flex items-center justify-center mx-auto shadow-sm">
           <AlertCircle className="w-10 h-10" />
         </div>

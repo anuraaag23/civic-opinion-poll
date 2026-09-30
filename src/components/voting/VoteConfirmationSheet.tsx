@@ -5,7 +5,6 @@ import { Party } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassModal } from '@/components/ui/GlassModal';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { Lock } from 'lucide-react';
 
 interface VoteConfirmationSheetProps {
   isOpen: boolean;
@@ -70,10 +69,16 @@ export function VoteConfirmationSheet({
           </div>
         </div>
 
-        {/* Privacy Note */}
-        <div className="p-3 rounded-xl bg-[var(--accent-soft)] text-xs text-[var(--accent)] font-medium flex items-center gap-2">
-          <Lock className="w-4 h-4 shrink-0" />
-          <span>{t.common.privacyGuaranteed}</span>
+        {/* Privacy Note with Mera Vote guarantee */}
+        <div className="p-3.5 rounded-xl bg-[var(--accent-soft)] text-xs text-[var(--accent)] font-medium flex items-center gap-2.5 border border-[var(--accent)]/15">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/meravote-logo.png" alt="Mera Vote" className="w-5 h-5 rounded-full object-contain shrink-0" />
+          <div className="space-y-0.5 min-w-0">
+            <span className="font-bold block text-[var(--text-primary)]">
+              {language === 'hi' ? 'मेरा वोट गारंटी:' : 'Mera Vote Guarantee:'}
+            </span>
+            <span>{t.common.privacyGuaranteed}</span>
+          </div>
         </div>
 
         {/* Action Buttons */}
