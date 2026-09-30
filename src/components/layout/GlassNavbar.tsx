@@ -30,15 +30,15 @@ export function GlassNavbar() {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full px-4 sm:px-6 lg:px-8 pt-3 pb-2">
-      <nav className="max-w-7xl mx-auto glass-panel px-4 sm:px-6 py-3 flex items-center justify-between transition-all">
+    <header className="sticky top-0 z-40 w-full px-3 sm:px-6 lg:px-8 pt-2 sm:pt-3 pb-1 sm:pb-2">
+      <nav className="max-w-7xl mx-auto glass-panel px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between transition-all">
         {/* Logo and Brand */}
         <Link
           href="/"
-          className="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl"
+          className="flex items-center gap-2.5 sm:gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl min-w-0"
         >
           {/* Authentic 3D Liquid Glass Mera Vote Logo */}
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md transition-transform duration-200 group-hover:scale-105 overflow-hidden backdrop-blur-md shrink-0">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md transition-transform duration-200 group-hover:scale-105 overflow-hidden backdrop-blur-md shrink-0">
             <Image
               src="/meravote-logo.png"
               alt="Mera Vote Logo"
@@ -48,14 +48,14 @@ export function GlassNavbar() {
               priority
             />
           </div>
-          <div className="flex flex-col">
-            <span className="text-base sm:text-lg font-black tracking-tight text-[var(--text-primary)] flex items-center gap-1.5">
+          <div className="flex flex-col min-w-0">
+            <span className="text-sm sm:text-lg font-black tracking-tight text-[var(--text-primary)] flex items-center gap-1.5 truncate">
               <span>{language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}</span>
-              <span className="text-[var(--accent)] font-bold text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/30">
+              <span className="hidden sm:inline-block text-[var(--accent)] font-bold text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/30 shrink-0">
                 {language === 'hi' ? 'Mera Vote' : 'भारत'}
               </span>
             </span>
-            <span className="text-[10px] tracking-wide text-[var(--text-secondary)] font-medium">
+            <span className="text-[9px] sm:text-[10px] tracking-wide text-[var(--text-secondary)] font-medium truncate">
               {language === 'hi' ? 'स्वतंत्र नागरिक जनमत' : 'Independent Civic Polls'}
             </span>
           </div>
@@ -82,15 +82,15 @@ export function GlassNavbar() {
         </div>
 
         {/* Controls: Language, Theme, Ko-fi Support & Mobile Toggle */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           <SupportButton variant="compact" className="hidden sm:inline-flex" />
           <LanguageSwitcher />
           <ThemeSwitcher className="hidden sm:inline-flex" />
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button with 44x44px minimum touch target */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-glass)] transition-colors"
+            className="md:hidden min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-glass)] active:scale-95 transition-all cursor-pointer"
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -101,8 +101,8 @@ export function GlassNavbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden max-w-7xl mx-auto mt-2 glass-panel p-4 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150">
-          <div className="flex flex-col gap-1">
+        <div className="md:hidden max-w-7xl mx-auto mt-2 glass-panel-elevated p-4 sm:p-5 space-y-3 shadow-2xl animate-in fade-in slide-in-from-top-2 duration-150 rounded-2xl border border-[var(--border-glass)]">
+          <div className="flex flex-col gap-1.5">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
@@ -111,20 +111,20 @@ export function GlassNavbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                  className={`flex items-center gap-3 px-4 py-3 min-h-[48px] rounded-xl text-sm font-medium transition-all active:scale-[0.98] ${
                     active
-                      ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-semibold'
+                      ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-semibold shadow-xs'
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
                   }`}
                 >
-                  <Icon className="w-4 h-4" />
+                  <Icon className="w-4 h-4 shrink-0" />
                   <span>{link.label}</span>
                 </Link>
               );
             })}
           </div>
           <div className="pt-2">
-            <SupportButton variant="pill" className="w-full justify-center" />
+            <SupportButton variant="pill" className="w-full justify-center min-h-[48px]" />
           </div>
           <div className="pt-3 border-t border-[var(--border-glass)] flex items-center justify-between">
             <span className="text-xs text-[var(--text-secondary)] font-medium">

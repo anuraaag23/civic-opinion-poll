@@ -20,9 +20,9 @@ export function GlassButton({
   ...props
 }: GlassButtonProps) {
   const sizeClasses = {
-    sm: 'px-3 py-1.5 text-xs font-medium rounded-lg',
-    md: 'px-5 py-2.5 text-sm font-semibold rounded-xl',
-    lg: 'px-7 py-3.5 text-base font-semibold rounded-2xl',
+    sm: 'px-3 py-1.5 text-xs font-medium rounded-lg min-h-[36px]',
+    md: 'px-4 sm:px-5 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold rounded-xl min-h-[44px]',
+    lg: 'px-5 sm:px-7 py-2.5 sm:py-3.5 text-sm sm:text-base font-bold rounded-2xl min-h-[48px]',
   };
 
   const variantClasses = {

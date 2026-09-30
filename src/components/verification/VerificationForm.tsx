@@ -93,16 +93,16 @@ export function VerificationForm({
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <GlassCard elevated className="space-y-7 p-6 sm:p-8">
+      <GlassCard elevated className="space-y-6 sm:space-y-7 p-4 sm:p-8">
         {/* Neutral Verification Header */}
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-2.5 sm:space-y-3">
           <div className="w-12 h-12 rounded-2xl bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20 flex items-center justify-center mx-auto shadow-xs mb-1">
             <ShieldCheck className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
+          <h2 className="text-xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
             {t.verification.title}
           </h2>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl mx-auto">
             {t.verification.subtitle}
           </p>
         </div>
@@ -225,7 +225,7 @@ export function VerificationForm({
               </p>
 
               {/* Explicit Mandatory Checkbox */}
-              <label className="flex items-start gap-3 p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] cursor-pointer hover:border-[var(--accent)] transition-colors select-none">
+              <label className="flex items-start gap-3 p-3.5 sm:p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] cursor-pointer hover:border-[var(--accent)] active:bg-[var(--accent-soft)]/20 transition-colors select-none min-h-[50px]">
                 <input
                   type="checkbox"
                   id="self-verify-checkbox"
@@ -249,7 +249,7 @@ export function VerificationForm({
               )}
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col-reverse sm:flex-row gap-3">
               <GlassButton
                 type="button"
                 variant="ghost"

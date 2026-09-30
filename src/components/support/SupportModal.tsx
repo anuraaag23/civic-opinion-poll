@@ -365,7 +365,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
     >
       {/* Translucent Backdrop */}
       <div
@@ -374,12 +374,15 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
         aria-hidden="true"
       />
 
-      {/* Modal Dialog Card */}
-      <div className="relative z-10 w-full max-w-lg glass-panel-elevated p-6 sm:p-8 shadow-2xl transition-all my-8 max-h-[92vh] overflow-y-auto border border-amber-500/25">
-        {/* Close Button */}
+      {/* Modal Dialog Card (Bottom-sheet on mobile, centered card on tablet/desktop) */}
+      <div className="relative z-10 w-full max-w-lg glass-panel-elevated p-5 sm:p-8 shadow-2xl transition-all my-0 sm:my-8 max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto border border-amber-500/25 rounded-t-3xl sm:rounded-3xl pb-safe">
+        {/* Mobile Pull / Drag Indicator */}
+        <div className="w-12 h-1.5 rounded-full bg-[var(--text-tertiary)]/30 mx-auto mb-3 sm:hidden" />
+
+        {/* Close Button with 40x40 tap target */}
         <button
           onClick={handleModalClose}
-          className="absolute top-4 right-4 p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-glass)] transition-colors cursor-pointer"
+          className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-glass)] active:scale-95 transition-all cursor-pointer"
           aria-label="Close dialog"
         >
           <X className="w-5 h-5" />
@@ -473,7 +476,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                   }
                   value={customAmount}
                   onChange={(e) => setCustomAmount(e.target.value)}
-                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                  className="w-full pl-8 pr-4 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-base sm:text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                 />
               </div>
             </div>
@@ -496,7 +499,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                 }
                 value={supporterName}
                 onChange={(e) => setSupporterName(e.target.value)}
-                className={`w-full px-4 py-2.5 rounded-xl bg-[var(--bg-surface)] border text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-amber-500/40 ${
+                className={`w-full px-4 py-2.5 rounded-xl bg-[var(--bg-surface)] border text-base sm:text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-amber-500/40 ${
                   nameHasLink ? 'border-[var(--error)] focus:ring-[var(--error)]' : 'border-[var(--border-glass)]'
                 }`}
               />
@@ -512,7 +515,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                   {starRating}.0 / 5.0 ★
                 </span>
               </div>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -524,7 +527,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                     }}
                     onMouseEnter={() => setHoverRating(star)}
                     onMouseLeave={() => setHoverRating(0)}
-                    className="p-1 text-amber-400 hover:scale-115 transition-transform cursor-pointer"
+                    className="p-2 sm:p-1 min-w-[36px] min-h-[36px] flex items-center justify-center text-amber-400 hover:scale-115 active:scale-95 transition-transform cursor-pointer"
                     aria-label={`${star} star`}
                   >
                     <Star
@@ -559,7 +562,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                 }
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className={`w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none ${
+                className={`w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border text-base sm:text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none ${
                   messageHasLink ? 'border-[var(--error)] focus:ring-[var(--error)]' : 'border-[var(--border-glass)]'
                 }`}
               />

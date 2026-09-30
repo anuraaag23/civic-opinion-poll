@@ -54,16 +54,16 @@ export default function HomePage() {
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Link href="/polls/national-opinion-poll-2029">
-                <GlassButton size="lg" className="gap-2 shadow-md font-bold">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
+              <Link href="/polls/national-opinion-poll-2029" className="w-full sm:w-auto">
+                <GlassButton size="lg" className="w-full sm:w-auto gap-2 shadow-md font-bold">
                   <Vote className="w-5 h-5" />
                   <span>{t.hero.primaryCta}</span>
                   <ArrowRight className="w-4 h-4" />
                 </GlassButton>
               </Link>
-              <Link href="/polls/national-opinion-poll-2029/results">
-                <GlassButton variant="secondary" size="lg" className="gap-2">
+              <Link href="/polls/national-opinion-poll-2029/results" className="w-full sm:w-auto">
+                <GlassButton variant="secondary" size="lg" className="w-full sm:w-auto gap-2">
                   <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
                   <span>{language === 'hi' ? 'लाइव मतगणना देखें' : 'View Live Results'}</span>
                 </GlassButton>
@@ -200,15 +200,15 @@ export default function HomePage() {
                   : '2029 National Civic Opinion Poll'}
               </h3>
             </div>
-            <div className="flex items-center gap-2">
-              <Link href="/polls/national-opinion-poll-2029">
-                <GlassButton size="md" className="gap-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+              <Link href="/polls/national-opinion-poll-2029" className="w-full sm:w-auto">
+                <GlassButton size="md" className="w-full sm:w-auto gap-2">
                   <span>{t.polls.participateButton}</span>
                   <ArrowRight className="w-4 h-4" />
                 </GlassButton>
               </Link>
-              <Link href="/polls/national-opinion-poll-2029/results">
-                <GlassButton variant="secondary" size="md" className="gap-1.5">
+              <Link href="/polls/national-opinion-poll-2029/results" className="w-full sm:w-auto">
+                <GlassButton variant="secondary" size="md" className="w-full sm:w-auto gap-1.5">
                   <BarChart3 className="w-4 h-4" />
                   <span>{language === 'hi' ? 'लाइव परिणाम देखें' : 'View Live Results'}</span>
                 </GlassButton>
@@ -222,7 +222,7 @@ export default function HomePage() {
               : 'A non-binding, independent civic public opinion poll measuring public sentiment and preference across major political parties. All responses are cryptographically decoupled from voter identity.'}
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-2">
             <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
               <span className="text-[11px] text-[var(--text-tertiary)] uppercase font-semibold">
                 {language === 'hi' ? 'कुल प्रतिक्रियाएं' : 'Total Responses'}

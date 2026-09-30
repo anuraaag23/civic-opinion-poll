@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { I18nProvider } from '@/lib/i18n/context';
 import { ThemeProvider } from '@/lib/theme/context';
@@ -7,6 +7,17 @@ import { GlassNavbar } from '@/components/layout/GlassNavbar';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { Footer } from '@/components/layout/Footer';
 import { FloatingSupportWidget } from '@/components/support/FloatingSupportWidget';
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F5F6F8' },
+    { media: '(prefers-color-scheme: dark)', color: '#0D0F12' },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://meravote.in'),
@@ -47,7 +58,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col antialiased">
+      <body className="min-h-screen min-h-[100dvh] flex flex-col antialiased overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
         <ThemeProvider>
           <I18nProvider>
             {/* Ambient depth lighting */}
@@ -63,7 +74,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <GlassNavbar />
 
             {/* Main Application Content */}
-            <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
+            <main className="flex-1 w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 relative z-10 overflow-x-hidden">
               {children}
             </main>
 

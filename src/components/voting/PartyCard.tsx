@@ -40,19 +40,19 @@ export function PartyCard({
       tabIndex={disabled ? -1 : 0}
       onClick={() => !disabled && onSelect(optionId)}
       onKeyDown={handleKeyDown}
-      className={`glass-panel p-4 sm:p-5 flex items-center justify-between gap-4 transition-all duration-150 cursor-pointer select-none ${
+      className={`glass-panel p-3 sm:p-5 flex items-center justify-between gap-3 sm:gap-4 transition-all duration-150 cursor-pointer select-none active:scale-[0.98] ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       } ${
         isSelected
-          ? 'border-[var(--accent)] ring-2 ring-[var(--accent)]/30 bg-[var(--bg-glass-elevated)] shadow-md scale-[1.01]'
+          ? 'border-[var(--accent)] ring-2 ring-[var(--accent)]/30 bg-[var(--bg-glass-elevated)] shadow-md'
           : 'hover:border-[var(--border-glass)] hover:bg-[var(--bg-glass-elevated)]'
       }`}
     >
       {/* Party Symbol & Information */}
-      <div className="flex items-center gap-4 sm:gap-5 min-w-0">
+      <div className="flex items-center gap-3 sm:gap-5 min-w-0">
         {/* Verified Authentic High-Quality Party Logo */}
         <div
-          className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl p-2 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 shadow-sm overflow-hidden"
+          className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl p-1.5 sm:p-2 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 shadow-sm overflow-hidden"
           title={symbolAlt}
         >
           {party.logo_url ? (

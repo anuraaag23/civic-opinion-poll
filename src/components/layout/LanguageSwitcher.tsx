@@ -18,9 +18,9 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
       </div>
       <button
         onClick={() => setLanguage('en')}
-        className={`px-2.5 py-1 rounded-lg transition-all ${
+        className={`px-2.5 py-1.5 rounded-lg min-h-[36px] min-w-[36px] flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
           language === 'en'
-            ? 'bg-[var(--accent)] text-white shadow-xs'
+            ? 'bg-[var(--accent)] text-white shadow-xs font-bold'
             : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
         aria-pressed={language === 'en'}
@@ -29,9 +29,9 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
       </button>
       <button
         onClick={() => setLanguage('hi')}
-        className={`px-2.5 py-1 rounded-lg transition-all ${
+        className={`px-2.5 py-1.5 rounded-lg min-h-[36px] min-w-[42px] flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
           language === 'hi'
-            ? 'bg-[var(--accent)] text-white shadow-xs'
+            ? 'bg-[var(--accent)] text-white shadow-xs font-bold'
             : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
         }`}
         aria-pressed={language === 'hi'}

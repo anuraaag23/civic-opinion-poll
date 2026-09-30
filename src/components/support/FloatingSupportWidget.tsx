@@ -34,10 +34,10 @@ export function FloatingSupportWidget() {
 
   return (
     <>
-      <div className="fixed bottom-5 right-5 z-40">
+      <div className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-3 sm:right-5 z-40 max-w-[calc(100vw-1.5rem)]">
         <button
           onClick={() => setModalOpen(true)}
-          className="group relative flex items-center gap-2.5 px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-amber-300/30"
+          className="group relative flex items-center gap-2.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-amber-300/30"
           aria-label={
             language === 'hi'
               ? 'इस वेबसाइट को जीवित रखने के लिए डेवलपर का समर्थन करें'

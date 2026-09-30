@@ -135,13 +135,13 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-4">
       {/* Live Counting Broadcast Badge */}
-      <div className="flex items-center justify-between p-3 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] shadow-sm">
-        <div className="flex items-center gap-2.5">
-          <span className="relative flex h-2.5 w-2.5">
+      <div className="flex flex-wrap sm:flex-nowrap items-center justify-between p-3 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] shadow-sm gap-2">
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          <span className="relative flex h-2.5 w-2.5 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--success)] opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[var(--success)]"></span>
           </span>
-          <span className="text-xs font-black uppercase tracking-wider text-[var(--success)]">
+          <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-[var(--success)]">
             {language === 'hi' ? 'लाइव जनमत गणना' : 'LIVE PUBLIC COUNTING'}
           </span>
         </div>

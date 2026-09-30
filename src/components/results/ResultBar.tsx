@@ -45,11 +45,11 @@ export function ResultBar({ result, maxPercentage }: ResultBarProps) {
         </div>
 
         {/* Stats */}
-        <div className="flex items-baseline gap-2 shrink-0 text-right">
+        <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2 shrink-0 text-right leading-tight">
           <span className="text-sm sm:text-base font-black text-[var(--text-primary)]">
             {result.percentage.toFixed(1)}%
           </span>
-          <span className="text-xs text-[var(--text-tertiary)]">
+          <span className="text-[10px] sm:text-xs text-[var(--text-tertiary)]">
             ({result.count.toLocaleString()})
           </span>
         </div>

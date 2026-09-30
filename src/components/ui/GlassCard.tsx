@@ -21,7 +21,7 @@ export function GlassCard({
 
   return (
     <div
-      className={`${baseClass} ${interactiveClass} p-6 sm:p-8 ${className}`}
+      className={`${baseClass} ${interactiveClass} p-4 sm:p-6 lg:p-8 ${className}`}
       {...props}
     >
       {children}

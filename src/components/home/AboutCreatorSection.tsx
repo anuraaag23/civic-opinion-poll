@@ -133,14 +133,14 @@ export function AboutCreatorSection() {
               </p>
             </div>
 
-            <div className="flex flex-col sm:items-end gap-2.5 shrink-0">
-              <div className="flex items-center gap-1.5">
+            <div className="flex flex-col sm:items-end gap-3 shrink-0 w-full sm:w-auto">
+              <div className="flex items-center gap-2 w-full sm:w-auto">
                 {[50, 100, 250].map((amt) => (
                   <button
                     key={amt}
                     type="button"
                     onClick={() => openSupport(amt)}
-                    className="px-3 py-1.5 rounded-lg border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-bold text-amber-700 dark:text-amber-300 transition-all cursor-pointer active:scale-95"
+                    className="flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-bold text-amber-700 dark:text-amber-300 transition-all cursor-pointer active:scale-95 text-center min-h-[38px] flex items-center justify-center"
                   >
                     ₹{amt}
                   </button>
@@ -150,11 +150,11 @@ export function AboutCreatorSection() {
               <button
                 type="button"
                 onClick={() => openSupport(100)}
-                className="py-2.5 px-5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                className="w-full sm:w-auto min-h-[46px] py-2.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
               >
-                <Coffee className="w-4 h-4" />
+                <Coffee className="w-4 h-4 shrink-0" />
                 <span>{language === 'hi' ? 'डेवलपर को कॉफी दें' : 'Buy Developer a Coffee'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-3.5 h-3.5 shrink-0" />
               </button>
             </div>
           </div>
