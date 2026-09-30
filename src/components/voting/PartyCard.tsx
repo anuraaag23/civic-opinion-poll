@@ -40,8 +40,7 @@ export function PartyCard({
       tabIndex={disabled ? -1 : 0}
       onClick={() => !disabled && onSelect(optionId)}
       onKeyDown={handleKeyDown}
-      data-lg-variant="clear"
-      className={`lg-card lg-surface glass-panel p-4 sm:p-5 flex items-center justify-between gap-4 transition-all duration-150 cursor-pointer select-none ${
+      className={`glass-panel p-4 sm:p-5 flex items-center justify-between gap-4 transition-all duration-150 cursor-pointer select-none ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       } ${
         isSelected

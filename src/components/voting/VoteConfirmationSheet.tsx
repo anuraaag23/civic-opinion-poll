@@ -40,7 +40,7 @@ export function VoteConfirmationSheet({
         </p>
 
         {/* Selected Party Summary Card */}
-        <div data-lg-variant="clear" className="lg-card lg-surface p-4 rounded-2xl border border-[var(--border-glass)] flex items-center gap-4">
+        <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-4">
           <div className="w-14 h-14 rounded-xl p-2 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
             {selectedParty.logo_url ? (
               /* eslint-disable-next-line @next/next/no-img-element */

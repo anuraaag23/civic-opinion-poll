@@ -79,7 +79,7 @@ export function AboutCreatorSection() {
           </div>
 
           {/* Core Personal Pledge */}
-          <div data-lg-variant="clear" className="lg-card lg-surface p-4 rounded-xl border border-[var(--border-glass)] flex items-start gap-3 text-xs sm:text-sm">
+          <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-start gap-3 text-xs sm:text-sm">
             <Shield className="w-5 h-5 text-[var(--success)] shrink-0 mt-0.5" />
             <div className="space-y-1">
               <strong className="text-[var(--text-primary)] block">

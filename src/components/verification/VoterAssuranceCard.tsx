@@ -30,7 +30,7 @@ export function VoterAssuranceCard() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
         {/* Assurance 1: We NEVER ask for your EPIC or ID */}
-        <div data-lg-variant="clear" className="lg-card lg-surface p-3.5 rounded-xl border border-[var(--border-glass)] space-y-1.5">
+        <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--success)]">
             <Lock className="w-4 h-4 shrink-0" />
             <span>{language === 'hi' ? '1. कभी ID नहीं मांगते' : '1. We NEVER Collect Your ID'}</span>
@@ -43,7 +43,7 @@ export function VoterAssuranceCard() {
         </div>
 
         {/* Assurance 2: Vote Once, Never Changes - Be Smart */}
-        <div data-lg-variant="clear" className="lg-card lg-surface p-3.5 rounded-xl border border-[var(--border-glass)] space-y-1.5">
+        <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--accent)]">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>{language === 'hi' ? '2. केवल 1 बार मत, कभी नहीं बदलेगा' : '2. Vote Once, Never Changes'}</span>
@@ -56,7 +56,7 @@ export function VoterAssuranceCard() {
         </div>
 
         {/* Assurance 3: 100% Real - Honest Self-Verification */}
-        <div data-lg-variant="clear" className="lg-card lg-surface p-3.5 rounded-xl border border-[var(--border-glass)] space-y-1.5">
+        <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--warning)]">
             <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>{language === 'hi' ? '3. 100% ईमानदार स्व-सत्यापन' : '3. 100% Honest Self-Verification'}</span>
