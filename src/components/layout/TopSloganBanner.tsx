@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { ShieldCheck, Lock, Sparkles } from 'lucide-react';
 
@@ -12,12 +13,15 @@ export function TopSloganBanner() {
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 sm:gap-4 text-center sm:text-left">
         {/* Main Slogan with Mera Vote Brand */}
         <div className="flex items-center justify-center gap-2">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/meravote-logo.png"
-            alt="Mera Vote Logo"
-            className="w-5 h-5 rounded-full object-contain shrink-0 shadow-xs ring-1 ring-white/30"
-          />
+          <div className="w-5 h-5 rounded-full bg-white p-0.5 shrink-0 flex items-center justify-center shadow-xs">
+            <Image
+              src="/meravote-logo.png"
+              alt="Mera Vote Logo"
+              width={18}
+              height={18}
+              className="w-full h-full object-contain"
+            />
+          </div>
           <span className="text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-white/20 text-white border border-white/30 shrink-0">
             {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
           </span>

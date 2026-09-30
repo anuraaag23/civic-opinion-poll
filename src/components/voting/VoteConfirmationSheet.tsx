@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Party } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassModal } from '@/components/ui/GlassModal';
@@ -71,8 +72,9 @@ export function VoteConfirmationSheet({
 
         {/* Privacy Note with Mera Vote guarantee */}
         <div className="p-3.5 rounded-xl bg-[var(--accent-soft)] text-xs text-[var(--accent)] font-medium flex items-center gap-2.5 border border-[var(--accent)]/15">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/meravote-logo.png" alt="Mera Vote" className="w-5 h-5 rounded-full object-contain shrink-0" />
+          <div className="w-6 h-6 rounded-md bg-white p-0.5 shrink-0 flex items-center justify-center shadow-xs">
+            <Image src="/meravote-logo.png" alt="Mera Vote" width={22} height={22} className="w-full h-full object-contain" />
+          </div>
           <div className="space-y-0.5 min-w-0">
             <span className="font-bold block text-[var(--text-primary)]">
               {language === 'hi' ? 'मेरा वोट गारंटी:' : 'Mera Vote Guarantee:'}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import {
   X,
   ExternalLink,
@@ -143,11 +144,22 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
 
         {step === 'form' ? (
           <div className="space-y-6">
-            {/* Header */}
-            <div className="text-center space-y-2 pt-1">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider mb-1">
-                <Coffee className="w-3.5 h-3.5" />
-                <span>Ko-fi • Buy a Coffee</span>
+            {/* Header with Mera Vote Logo */}
+            <div className="text-center space-y-2.5 pt-1">
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <div className="w-10 h-10 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                  <Image
+                    src="/meravote-logo.png"
+                    alt="Mera Vote Logo"
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
+                  <Coffee className="w-3.5 h-3.5" />
+                  <span>Ko-fi • Buy a Coffee</span>
+                </div>
               </div>
 
               <h3 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] tracking-tight">
@@ -336,6 +348,15 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
         ) : (
           /* Step: Success Screen */
           <div className="space-y-6 text-center py-4 animate-in fade-in duration-300">
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <div className="w-8 h-8 rounded-xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-xs">
+                <Image src="/meravote-logo.png" alt="Mera Vote" width={28} height={28} className="w-full h-full object-contain" />
+              </div>
+              <span className="text-xs font-black tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20">
+                {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
+              </span>
+            </div>
+
             <div className="w-16 h-16 rounded-full bg-[var(--success-soft)] text-[var(--success)] flex items-center justify-center mx-auto shadow-sm">
               <CheckCircle2 className="w-10 h-10" />
             </div>

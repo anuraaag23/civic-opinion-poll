@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Poll, Party } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { PartyCard } from './PartyCard';
@@ -71,6 +72,15 @@ export function VotingView({ poll, anonymousToken, onVoteSuccess }: VotingViewPr
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header & Progress Indicator */}
       <div className="text-center space-y-3">
+        <div className="flex items-center justify-center gap-2 mb-1">
+          <div className="w-8 h-8 rounded-xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-xs">
+            <Image src="/meravote-logo.png" alt="Mera Vote Logo" width={28} height={28} className="w-full h-full object-contain" />
+          </div>
+          <span className="text-xs font-black tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20">
+            {language === 'hi' ? 'मेरा वोट मतपत्र' : 'Mera Vote Ballot'}
+          </span>
+        </div>
+
         <div className="inline-flex flex-wrap items-center justify-center gap-2">
           <GlassBadge variant="success">
             <span>✓ {t.verification.selfVerificationConfirmed}</span>

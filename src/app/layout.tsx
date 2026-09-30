@@ -23,7 +23,11 @@ export const metadata: Metadata = {
     'स्वतंत्र नागरिक जनमत सर्वेक्षण',
   ],
   icons: {
-    icon: '/meravote-logo.png',
+    icon: [
+      { url: '/meravote-logo.png' },
+      { url: '/favicon.ico' },
+    ],
+    shortcut: '/meravote-logo.png',
     apple: '/meravote-logo.png',
   },
   authors: [{ name: 'Civic Technology Research' }],

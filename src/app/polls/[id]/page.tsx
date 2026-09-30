@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
+import Image from 'next/image';
 import { Poll } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { VerificationForm } from '@/components/verification/VerificationForm';
@@ -78,27 +79,47 @@ export default function PollDetailPage() {
       {step === 'RULES' && (
         <div className="max-w-2xl mx-auto space-y-6">
           <GlassCard elevated className="space-y-6">
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <GlassBadge variant={poll.status === 'LIVE' ? 'success' : 'neutral'}>
-                  {poll.status === 'LIVE' && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
-                  )}
-                  {poll.status}
-                </GlassBadge>
-                <GlassBadge variant="neutral">
-                  <Lock className="w-3 h-3 text-[var(--accent)]" />
-                  <span>{t.common.privacyGuaranteed}</span>
-                </GlassBadge>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <GlassBadge variant={poll.status === 'LIVE' ? 'success' : 'neutral'}>
+                    {poll.status === 'LIVE' && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
+                    )}
+                    {poll.status}
+                  </GlassBadge>
+                  <GlassBadge variant="neutral">
+                    <Lock className="w-3 h-3 text-[var(--accent)]" />
+                    <span>{t.common.privacyGuaranteed}</span>
+                  </GlassBadge>
+                </div>
+                <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-[11px] font-black uppercase tracking-wider">
+                  <div className="w-4 h-4 rounded-md bg-white p-0.5 shrink-0 flex items-center justify-center">
+                    <Image src="/meravote-logo.png" alt="Mera Vote" width={16} height={16} className="w-full h-full object-contain" />
+                  </div>
+                  <span>{language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}</span>
+                </div>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight">
-                {pollTitle}
-              </h1>
-
-              <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-                {pollDesc}
-              </p>
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shrink-0 shadow-sm overflow-hidden mt-1">
+                  <Image
+                    src="/meravote-logo.png"
+                    alt="Mera Vote Logo"
+                    width={48}
+                    height={48}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <h1 className="text-2xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight">
+                    {pollTitle}
+                  </h1>
+                  <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
+                    {pollDesc}
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Core Privacy Rules */}
