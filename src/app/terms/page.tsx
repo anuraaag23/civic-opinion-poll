@@ -53,6 +53,32 @@ export default function TermsAndMethodologyPage() {
           </div>
         </GlassCard>
 
+        {/* Mode A Self-Verification Principles & Limitations */}
+        <section id="self-verification">
+          <GlassCard className="space-y-4 border-l-4 border-l-[var(--accent)] bg-[var(--bg-glass-elevated)]">
+            <div className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]">
+              <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)]">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <h2>
+                {language === 'hi'
+                  ? 'स्व-सत्यापन कार्यप्रणाली एवं सीमाएं'
+                  : 'Self-Verification Principles & Limitations (Mode A)'}
+              </h2>
+            </div>
+            <p className="text-sm text-[var(--text-primary)] font-semibold leading-relaxed">
+              {language === 'hi'
+                ? 'स्व-सत्यापन प्रतिभागी की व्यक्तिगत पुष्टि पर निर्भर करता है।'
+                : 'Self-verification relies on the participant\'s confirmation.'}
+            </p>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+              {language === 'hi'
+                ? 'यह मंच तकनीकी रूप से यह साबित या सत्यापित नहीं कर सकता कि प्रतिभागी ने वास्तव में ECI खोज पूरी की है या बाहरी वेबसाइट पर सही विवरण दर्ज किए हैं। EPIC नंबर कभी भी हमारे सर्वर पर जमा या संग्रहीत नहीं होता। यह इस स्व-सत्यापन मॉडल की एक मौलिक सीमा है जिसे पूर्ण पारदर्शिता के साथ स्वीकार किया जाता है।'
+                : 'This platform cannot technically verify or prove whether a participant completed the ECI check or entered accurate details on the external website. EPIC numbers are never submitted or stored on our servers. This is an intentional design boundary of the self-verification model, acknowledged with complete civic transparency.'}
+            </p>
+          </GlassCard>
+        </section>
+
         {/* 2. Results Methodology (Requirement 53 & 54) */}
         <section id="methodology">
           <GlassCard className="space-y-4 border-l-4 border-l-[var(--warning)] bg-[var(--bg-glass-elevated)]">

@@ -53,21 +53,23 @@ CREATE TABLE IF NOT EXISTS poll_options (
     UNIQUE(poll_id, party_id)
 );
 
--- 4. PARTICIPATION TABLE (Duplicate Prevention)
--- STORES ONLY THE KEYED HMAC FINGERPRINT.
--- NO RAW EPIC, NO VOTER NAME, NO ADDRESS.
+-- 4. PARTICIPATION TABLE (Mode A: Self-Verification Confirmed)
+-- STORES ONLY THE ANONYMOUS PARTICIPATION IDENTIFIER / TOKEN HASH.
+-- STRICT MODE A RULE: NO RAW EPIC, NO EPIC HASH, NO VOTER NAME, NO ADDRESS, NO EMAIL, NO PHONE.
 CREATE TABLE IF NOT EXISTS participation (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     poll_id UUID NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
-    participation_fingerprint VARCHAR(64) NOT NULL, -- HMAC-SHA256(server_secret, EPIC + ":" + poll_id)
+    anonymous_participation_id VARCHAR(64) UNIQUE NOT NULL, -- SHA-256(token)
+    self_verification_confirmed BOOLEAN NOT NULL DEFAULT true,
+    status VARCHAR(40) NOT NULL DEFAULT 'SELF_VERIFICATION_CONFIRMED' CHECK (status IN ('SELF_VERIFICATION_CONFIRMED', 'VOTED')),
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     voted_at TIMESTAMPTZ,
-    UNIQUE(poll_id, participation_fingerprint)
+    UNIQUE(poll_id, anonymous_participation_id)
 );
 
 -- Index for instant duplicate checks
 CREATE INDEX IF NOT EXISTS idx_participation_lookup 
-ON participation(poll_id, participation_fingerprint);
+ON participation(poll_id, anonymous_participation_id);
 
 -- 5. ANONYMOUS VOTE TOKENS (Ephemerally issued, decoupled from participation fingerprint)
 CREATE TABLE IF NOT EXISTS anonymous_tokens (

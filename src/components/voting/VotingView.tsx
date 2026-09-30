@@ -71,7 +71,10 @@ export function VotingView({ poll, anonymousToken, onVoteSuccess }: VotingViewPr
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Header & Progress Indicator */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2">
+        <div className="inline-flex flex-wrap items-center justify-center gap-2">
+          <GlassBadge variant="success">
+            <span>✓ {t.verification.selfVerificationConfirmed}</span>
+          </GlassBadge>
           <GlassBadge variant="accent">
             <Lock className="w-3 h-3 text-[var(--accent)]" />
             <span>{t.voting.headerProgress}</span>
@@ -88,6 +91,11 @@ export function VotingView({ poll, anonymousToken, onVoteSuccess }: VotingViewPr
         <p className="text-sm sm:text-base font-semibold text-[var(--accent)] max-w-lg mx-auto">
           {t.voting.question}
         </p>
+
+        {/* Pre-Voting Independent Poll Disclaimer */}
+        <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] text-center leading-relaxed max-w-lg mx-auto">
+          {t.verification.pollPreVoteDisclaimer}
+        </div>
       </div>
 
       {submitError && (

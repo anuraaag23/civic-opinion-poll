@@ -29,16 +29,16 @@ export function VoterAssuranceCard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-        {/* Assurance 1: We NEVER store your EPIC or ID */}
+        {/* Assurance 1: We NEVER ask for your EPIC or ID */}
         <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--success)]">
             <Lock className="w-4 h-4 shrink-0" />
-            <span>{language === 'hi' ? '1. कभी सेव नहीं होता' : '1. We NEVER Save Your ID'}</span>
+            <span>{language === 'hi' ? '1. कभी ID नहीं मांगते' : '1. We NEVER Collect Your ID'}</span>
           </div>
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {language === 'hi'
-              ? 'हम आपका EPIC नंबर या कोई भी पहचान प्रमाण पत्र कहीं भी सेव नहीं करते हैं। यह केवल मेमोरी में जाँचा जाता है और तुरंत नष्ट कर दिया जाता है। आपके वोट और पहचान में कोई संबंध नहीं होता।'
-              : 'We NEVER store your EPIC number or any ID proof in any database. It is validated in memory and discarded in milliseconds. Your identity is 100% decoupled from your vote.'}
+              ? 'हम आपसे इस मंच पर अपना EPIC नंबर या कोई भी पहचान पत्र जमा करने के लिए कभी नहीं कहते। मतदाता पंजीकरण की जांच सीधे आपके द्वारा आधिकारिक ECI वेबसाइट पर की जाती है। आपकी पहचान आपके पास सुरक्षित रहती है।'
+              : 'We NEVER ask you to submit your EPIC number or any ID proof on this platform. Electoral registration checks are performed directly by you on the official ECI portal. Your identity stays private.'}
           </p>
         </div>
 
@@ -46,7 +46,7 @@ export function VoterAssuranceCard() {
         <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--accent)]">
             <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>{language === 'hi' ? '2. केवल 1 बार वोट, कभी नहीं बदलेगा' : '2. Vote Once, Never Changes'}</span>
+            <span>{language === 'hi' ? '2. केवल 1 बार मत, कभी नहीं बदलेगा' : '2. Vote Once, Never Changes'}</span>
           </div>
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {language === 'hi'
@@ -55,16 +55,16 @@ export function VoterAssuranceCard() {
           </p>
         </div>
 
-        {/* Assurance 3: 100% Real - No Fake EPIC */}
+        {/* Assurance 3: 100% Real - Honest Self-Verification */}
         <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5">
           <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--warning)]">
             <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>{language === 'hi' ? '3. 100% वास्तविक नागरिक' : '3. 100% Real Citizens'}</span>
+            <span>{language === 'hi' ? '3. 100% ईमानदार स्व-सत्यापन' : '3. 100% Honest Self-Verification'}</span>
           </div>
           <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             {language === 'hi'
-              ? 'यह मंच असली नागरिकों की सच्ची आवाज है। कृपया किसी भी नकली, उत्पन्न या फर्जी पहचान पत्र का उपयोग न करें। हर असली नागरिक की एक आवाज, एक मत।'
-              : 'This platform reflects real people. Do NOT use fake, fabricated, or duplicate EPIC numbers. We rely on genuine citizens to show authentic public opinion.'}
+              ? 'यह मंच असली नागरिकों की सच्ची आवाज है। आधिकारिक ECI पोर्टल पर सीधे जांच पूरी करें और ईमानदारी से पुष्टि करें। एक असली नागरिक, एक स्वतंत्र निष्पक्ष राय।'
+              : 'This platform reflects real people. Complete the electoral check on the official ECI portal and confirm honestly. One genuine citizen, one voice, one opinion.'}
           </p>
         </div>
       </div>

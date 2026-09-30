@@ -17,23 +17,23 @@ interface LiveResultsViewProps {
 }
 
 const REGIONAL_TICKER_EN = [
-  'Verified participant from Uttar Pradesh recorded anonymously',
-  'Verified participant from Maharashtra recorded anonymously',
-  'Verified participant from Bihar recorded anonymously',
-  'Verified participant from West Bengal recorded anonymously',
-  'Verified participant from Madhya Pradesh recorded anonymously',
-  'Verified participant from Rajasthan recorded anonymously',
-  'Verified participant from Karnataka recorded anonymously',
+  'Self-verified participant from Uttar Pradesh recorded anonymously',
+  'Self-verified participant from Maharashtra recorded anonymously',
+  'Self-verified participant from Bihar recorded anonymously',
+  'Self-verified participant from West Bengal recorded anonymously',
+  'Self-verified participant from Madhya Pradesh recorded anonymously',
+  'Self-verified participant from Rajasthan recorded anonymously',
+  'Self-verified participant from Karnataka recorded anonymously',
 ];
 
 const REGIONAL_TICKER_HI = [
-  'उत्तर प्रदेश से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'महाराष्ट्र से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'बिहार से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'पश्चिम बंगाल से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'मध्य प्रदेश से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'राजस्थान से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'कर्नाटक से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'उत्तर प्रदेश से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'महाराष्ट्र से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'बिहार से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'पश्चिम बंगाल से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'मध्य प्रदेश से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'राजस्थान से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'कर्नाटक से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
 ];
 
 export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
@@ -260,14 +260,14 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
       {/* Assurance Card */}
       <VoterAssuranceCard />
 
-      {/* Mandatory Results Methodology Disclaimer (Requirement 54) */}
+      {/* Mandatory Results Methodology Disclaimer (Requirement 24 & 54) */}
       <div className="glass-panel p-5 bg-[var(--bg-glass-elevated)] border-l-4 border-l-[var(--warning)] space-y-2">
         <div className="flex items-center gap-2 text-xs font-bold text-[var(--warning)] uppercase tracking-wider">
           <ShieldAlert className="w-4 h-4 shrink-0" />
           <span>{language === 'hi' ? 'कार्यप्रणाली सूचना' : 'Methodology & Sample Notice'}</span>
         </div>
         <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed font-medium">
-          {t.results.methodologyDisclaimer}
+          {t.results.resultsDisclaimer}
         </p>
       </div>
 

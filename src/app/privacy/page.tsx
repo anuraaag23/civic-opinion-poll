@@ -28,6 +28,33 @@ export default function PrivacyPage() {
 
       {/* Core Architectural Pillars */}
       <div className="space-y-8">
+        {/* Section: What We Do Not Collect (Mode A) */}
+        <GlassCard elevated className="border-l-4 border-l-[var(--success)] space-y-4 bg-[var(--bg-glass-elevated)]">
+          <div className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]">
+            <div className="p-2 rounded-xl bg-[var(--success-soft)] text-[var(--success)]">
+              <Lock className="w-5 h-5" />
+            </div>
+            <h2>
+              {language === 'hi' ? 'हम क्या एकत्र नहीं करते' : 'What We Do Not Collect'}
+            </h2>
+          </div>
+          <p className="text-sm text-[var(--text-primary)] font-semibold leading-relaxed">
+            {language === 'hi'
+              ? 'हम आपसे इस प्लेटफॉर्म पर आपका EPIC नंबर जमा करने के लिए नहीं कहते। मतदाता पंजीकरण की जांच सीधे आपके द्वारा आधिकारिक ECI वेबसाइट पर की जाती है।'
+              : 'We do not ask you to submit your EPIC number to this platform. Electoral-registration checks are performed directly by you on the official ECI website.'}
+          </p>
+          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+            {language === 'hi'
+              ? 'आपकी सर्वेक्षण प्रतिक्रिया को स्व-सत्यापन पुष्टि से अलग संग्रहीत किया जाता है।'
+              : 'Your poll response is stored separately from the self-verification confirmation.'}
+          </p>
+          <p className="text-xs text-[var(--text-tertiary)] leading-relaxed">
+            {language === 'hi'
+              ? 'हमने व्यक्तिगत जानकारी के संग्रह और प्रदर्शन को कम से कम करने के लिए इस प्रणाली को डिज़ाइन किया है।'
+              : 'We designed the system to minimize the collection and exposure of personal information.'}
+          </p>
+        </GlassCard>
+
         {/* 1. Identity Separation Guarantee */}
         <GlassCard elevated className="space-y-4">
           <div className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]">

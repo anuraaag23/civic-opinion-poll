@@ -3,9 +3,18 @@
 import React, { useState } from 'react';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { GlassInput } from '@/components/ui/GlassInput';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ShieldCheck, CheckCircle2, Info, Lock } from 'lucide-react';
+import { ECI_ELECTORAL_SEARCH_URL } from '@/lib/types';
+import {
+  ExternalLink,
+  ShieldCheck,
+  CheckCircle2,
+  Lock,
+  AlertCircle,
+  Search,
+  CheckSquare,
+  ArrowRight,
+} from 'lucide-react';
 
 interface VerificationFormProps {
   pollId: string;
@@ -18,30 +27,40 @@ export function VerificationForm({
   onVerified,
   onAlreadyVoted,
 }: VerificationFormProps) {
-  const { t } = useI18n();
-  const [epic, setEpic] = useState('');
+  const { t, language } = useI18n();
+
+  const [hasOpenedEci, setHasOpenedEci] = useState(false);
+  const [showConfirmationPanel, setShowConfirmationPanel] = useState(false);
+  const [isCheckedConfirmed, setIsCheckedConfirmed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
   const [credential, setCredential] = useState<string | null>(null);
 
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
+  const handleOpenEci = () => {
+    setHasOpenedEci(true);
+    window.open(ECI_ELECTORAL_SEARCH_URL, '_blank', 'noopener,noreferrer');
+  };
 
-    const cleaned = epic.trim().toUpperCase().replace(/[\s-]/g, '');
-    if (!/^[A-Z]{3}[0-9]{7}$/.test(cleaned)) {
-      setError(t.verification.invalidFormat);
+  const handleConfirmAndProceed = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isCheckedConfirmed) {
+      setError(
+        language === 'hi'
+          ? 'कृपया आगे बढ़ने से पहले चेकबॉक्स का चयन करके पुष्टि करें।'
+          : 'Please select the confirmation checkbox before continuing.'
+      );
       return;
     }
 
     setIsLoading(true);
+    setError(null);
 
     try {
       const response = await fetch('/api/verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ epic: cleaned, pollId }),
+        body: JSON.stringify({ pollId, selfVerificationConfirmed: true }),
       });
 
       const data = await response.json();
@@ -55,7 +74,7 @@ export function VerificationForm({
           setError(t.verification.rateLimited);
           return;
         }
-        setError(t.verification.notFound);
+        setError(data.error || t.verification.serviceUnavailable);
         return;
       }
 
@@ -63,7 +82,7 @@ export function VerificationForm({
         setIsSuccess(true);
         setCredential(data.anonymousCredential);
       } else {
-        setError(t.verification.notFound);
+        setError(t.verification.serviceUnavailable);
       }
     } catch {
       setError(t.verification.serviceUnavailable);
@@ -73,85 +92,240 @@ export function VerificationForm({
   };
 
   return (
-    <div className="max-w-md mx-auto space-y-6">
-      <GlassCard elevated className="space-y-6">
-        {/* Verification Form Header */}
-        <div className="text-center space-y-2">
-          <div className="w-12 h-12 rounded-2xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center mx-auto mb-2">
+    <div className="max-w-2xl mx-auto space-y-6">
+      <GlassCard elevated className="space-y-7 p-6 sm:p-8">
+        {/* Neutral Verification Header */}
+        <div className="text-center space-y-2.5">
+          <div className="w-12 h-12 rounded-2xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center mx-auto mb-2 shadow-sm">
             <ShieldCheck className="w-6 h-6" />
           </div>
-          <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] tracking-tight">
             {t.verification.title}
           </h2>
-          <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+          <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl mx-auto">
             {t.verification.subtitle}
           </p>
         </div>
 
-        {/* Development Helper Notice */}
-        <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] flex items-start gap-2.5">
-          <Info className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
-          <p>{t.verification.testModeNotice}</p>
-        </div>
+        {/* State A: Initial ECI Check Action */}
+        {!isSuccess && !showConfirmationPanel && (
+          <div className="space-y-6 animate-in fade-in duration-300">
+            {/* Primary Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch justify-center pt-2">
+              <a
+                href={ECI_ELECTORAL_SEARCH_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setHasOpenedEci(true)}
+                className="flex-1"
+              >
+                <GlassButton
+                  variant="primary"
+                  size="lg"
+                  className="w-full font-bold shadow-md flex items-center justify-center gap-2 group"
+                >
+                  <span>{t.verification.openEciButton}</span>
+                  <ExternalLink className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </GlassButton>
+              </a>
 
-        {!isSuccess ? (
-          <form onSubmit={handleVerify} className="space-y-5">
-            <GlassInput
-              label={t.verification.epicLabel}
-              placeholder={t.verification.epicPlaceholder}
-              helperText={t.verification.epicHelp}
-              value={epic}
-              onChange={(e) => {
-                setEpic(e.target.value.toUpperCase());
-                if (error) setError(null);
-              }}
-              error={error || undefined}
-              maxLength={12}
-              autoComplete="off"
-              autoFocus
-              required
-            />
+              <GlassButton
+                variant={hasOpenedEci ? 'secondary' : 'ghost'}
+                size="lg"
+                className="flex-1 font-bold border border-[var(--border-glass)]"
+                onClick={() => {
+                  setShowConfirmationPanel(true);
+                  setError(null);
+                }}
+              >
+                {t.verification.completedCheckButton}
+              </GlassButton>
+            </div>
 
-            <GlassButton
-              type="submit"
-              size="lg"
-              className="w-full font-bold shadow-md"
-              isLoading={isLoading}
-            >
-              {isLoading ? t.verification.verifying : t.verification.verifyButton}
-            </GlassButton>
+            {/* Three-Step Process Explanation */}
+            <div className="pt-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-tertiary)] mb-3 text-center sm:text-left">
+                {language === 'hi' ? 'प्रक्रिया विवरण' : 'Process Explanation'}
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {/* Step 01 */}
+                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
+                      01
+                    </span>
+                    <span className="text-xs font-bold text-[var(--text-primary)]">
+                      {t.verification.step1Title}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                    {t.verification.step1Desc}
+                  </p>
+                </div>
+
+                {/* Step 02 */}
+                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
+                      02
+                    </span>
+                    <span className="text-xs font-bold text-[var(--text-primary)]">
+                      {t.verification.step2Title}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                    {t.verification.step2Desc}
+                  </p>
+                </div>
+
+                {/* Step 03 */}
+                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
+                      03
+                    </span>
+                    <span className="text-xs font-bold text-[var(--text-primary)]">
+                      {t.verification.step3Title}
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                    {t.verification.step3Desc}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Prominent Mandatory Legal / Technical Disclaimer */}
+            <div className="p-4 rounded-xl bg-[var(--bg-surface)] border-l-4 border-l-[var(--warning)] border-y border-r border-[var(--border-glass)] space-y-1.5">
+              <div className="flex items-center gap-2 text-xs font-bold text-[var(--warning)]">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{language === 'hi' ? 'महत्वपूर्ण सूचना' : 'Important Disclaimer'}</span>
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                {t.verification.disclaimer}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* State B: Confirmation Panel */}
+        {!isSuccess && showConfirmationPanel && (
+          <form
+            onSubmit={handleConfirmAndProceed}
+            className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300"
+          >
+            <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-4">
+              <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <CheckSquare className="w-5 h-5 text-[var(--accent)]" />
+                <span>{t.verification.confirmModalTitle}</span>
+              </h3>
+
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
+                {t.verification.confirmStatement}
+              </p>
+
+              {/* Explicit Mandatory Checkbox */}
+              <label className="flex items-start gap-3 p-3.5 rounded-xl bg-[var(--bg-glass-elevated)] border border-[var(--border-glass)] cursor-pointer hover:border-[var(--accent)] transition-colors select-none">
+                <input
+                  type="checkbox"
+                  id="self-verify-checkbox"
+                  checked={isCheckedConfirmed}
+                  onChange={(e) => {
+                    setIsCheckedConfirmed(e.target.checked);
+                    if (error) setError(null);
+                  }}
+                  className="w-5 h-5 mt-0.5 rounded border-[var(--border-glass)] text-[var(--accent)] focus:ring-[var(--accent)] cursor-pointer shrink-0"
+                />
+                <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)]">
+                  {t.verification.confirmCheckbox}
+                </span>
+              </label>
+
+              {error && (
+                <div className="p-3 rounded-xl bg-[var(--error-soft)] text-[var(--error)] text-xs font-medium flex items-center gap-2 animate-in fade-in">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3">
+              <GlassButton
+                type="button"
+                variant="ghost"
+                size="lg"
+                onClick={() => {
+                  setShowConfirmationPanel(false);
+                  setError(null);
+                }}
+                className="flex-1"
+              >
+                {language === 'hi' ? 'पीछे जाएं' : 'Back'}
+              </GlassButton>
+
+              <GlassButton
+                type="submit"
+                variant="primary"
+                size="lg"
+                className="flex-1 font-bold shadow-md"
+                isLoading={isLoading}
+                disabled={!isCheckedConfirmed}
+              >
+                {isLoading ? t.common.loading : t.verification.continueAnonymously}
+              </GlassButton>
+            </div>
+
+            {/* Quick helper link if user needs to re-open ECI */}
+            <div className="text-center pt-1">
+              <button
+                type="button"
+                onClick={handleOpenEci}
+                className="text-xs text-[var(--accent)] hover:underline inline-flex items-center gap-1 font-medium"
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span>{t.verification.openEciButton}</span>
+              </button>
+            </div>
           </form>
-        ) : (
-          /* Success Verified View - NO NAME, NO ADDRESS */
+        )}
+
+        {/* State C: Self-Verification Confirmed Screen */}
+        {isSuccess && (
           <div className="space-y-6 text-center animate-in fade-in duration-300">
-            <div className="w-14 h-14 rounded-full bg-[var(--success-soft)] text-[var(--success)] flex items-center justify-center mx-auto">
+            <div className="w-14 h-14 rounded-full bg-[var(--success-soft)] text-[var(--success)] flex items-center justify-center mx-auto shadow-sm">
               <CheckCircle2 className="w-8 h-8" />
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-xl font-bold text-[var(--success)]">
-                ✓ {t.common.verifiedBadge}
+              <h3 className="text-xl sm:text-2xl font-bold text-[var(--success)]">
+                ✓ {t.verification.selfVerificationConfirmed}
               </h3>
               <p className="text-sm font-medium text-[var(--text-primary)]">
-                {t.verification.verifiedSuccess}
+                {t.verification.readyForPollNotice}
               </p>
-              <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-xs mx-auto">
-                {t.verification.anonymousNotice}
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-md mx-auto">
+                {language === 'hi'
+                  ? 'आपकी पुष्टि दर्ज कर ली गई है। आपको एक अस्थायी 256-बिट गुमनाम भागीदारी क्रेडेंशियल जारी किया गया है जो वोट डालने के बाद स्वतः समाप्त हो जाएगा।'
+                  : 'Your self-confirmation has been recorded. You have been issued an ephemeral 256-bit anonymous credential that self-destructs immediately upon response submission.'}
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-medium flex items-center justify-center gap-2">
+            <div className="p-3 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-semibold flex items-center justify-center gap-2 max-w-sm mx-auto">
               <Lock className="w-4 h-4" />
               <span>{t.common.privacyGuaranteed}</span>
             </div>
 
-            <GlassButton
-              size="lg"
-              className="w-full font-bold shadow-md"
-              onClick={() => credential && onVerified(credential)}
-            >
-              {t.verification.continueToVoting}
-            </GlassButton>
+            <div className="pt-2">
+              <GlassButton
+                size="lg"
+                variant="primary"
+                className="w-full sm:w-auto sm:px-12 font-bold shadow-lg gap-2"
+                onClick={() => credential && onVerified(credential)}
+              >
+                <span>{t.verification.continueToVoting}</span>
+                <ArrowRight className="w-4 h-4" />
+              </GlassButton>
+            </div>
           </div>
         )}
       </GlassCard>

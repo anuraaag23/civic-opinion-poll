@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MockVerificationProvider } from './index';
+import { selfVerificationService, ECI_ELECTORAL_SEARCH_URL } from './index';
 import { db, civicStore } from '../db';
 import { hashToken } from '../crypto';
+import { translations } from '../i18n/translations';
 
-describe('Verification & Anonymous Voting Engine', () => {
-  let provider: MockVerificationProvider;
+describe('MODE A: ECI Self-Verification & Anonymous Voting Engine', () => {
   const pollId = 'poll-national-2029';
 
   beforeEach(() => {
@@ -13,47 +13,42 @@ describe('Verification & Anonymous Voting Engine', () => {
     civicStore.tokens.clear();
     civicStore.voteCounts.clear();
     civicStore.seed();
-    provider = new MockVerificationProvider();
   });
 
-  it('successfully verifies a valid EPIC and returns an anonymous token', async () => {
-    const result = await provider.verifyEligibility('ABC1234567', pollId);
-    expect(result.verified).toBe(true);
-    expect(result.anonymous_token).toBeDefined();
-    expect(result.anonymous_token?.length).toBe(64);
+  // TEST 1: User opens poll - self-verification required
+  it('TEST 1: requires self-verification confirmation before issuing voting credentials', async () => {
+    const unconfirmed = await selfVerificationService.processSelfVerification(pollId, false);
+    expect(unconfirmed.verified).toBe(false);
+    expect(unconfirmed.reason).toBe('UNCONFIRMED');
+    expect(unconfirmed.anonymous_token).toBeUndefined();
   });
 
-  it('rejects a second verification attempt for the same EPIC in the same poll', async () => {
-    const first = await provider.verifyEligibility('ABC1234567', pollId);
-    expect(first.verified).toBe(true);
-
-    const second = await provider.verifyEligibility('ABC1234567', pollId);
-    expect(second.verified).toBe(false);
-    expect(second.reason).toBe('ALREADY_VOTED');
+  // TEST 2: Official ECI link
+  it('TEST 2: provides the official immutable ECI electoral search URL', () => {
+    expect(ECI_ELECTORAL_SEARCH_URL).toBe('https://electoralsearch.eci.gov.in/');
+    expect(selfVerificationService.eciSearchUrl).toBe('https://electoralsearch.eci.gov.in/');
   });
 
-  it('allows the same EPIC to participate in a distinct poll', async () => {
-    const poll2Id = 'poll-state-reforms-2027';
-    // Temporarily set poll2 to LIVE for testing
-    const poll2 = civicStore.polls.get(poll2Id);
-    if (poll2) poll2.status = 'LIVE';
-
-    const res1 = await provider.verifyEligibility('XYZ9876543', pollId);
-    const res2 = await provider.verifyEligibility('XYZ9876543', poll2Id);
-
-    expect(res1.verified).toBe(true);
-    expect(res2.verified).toBe(true);
-  });
-
-  it('rejects malformed EPIC formats without issuing tokens', async () => {
-    const result = await provider.verifyEligibility('INVALID123', pollId);
+  // TEST 3: Blocked without explicit confirmation checkbox
+  it('TEST 3: blocks credential issuance when confirmation checkbox is false', async () => {
+    const result = await selfVerificationService.processSelfVerification(pollId, false, '127.0.0.1');
     expect(result.verified).toBe(false);
-    expect(result.reason).toBe('INVALID_FORMAT');
-    expect(result.anonymous_token).toBeUndefined();
+    expect(result.reason).toBe('UNCONFIRMED');
   });
 
-  it('allows voting once with an anonymous token, then rejects duplicate use', async () => {
-    const verifyRes = await provider.verifyEligibility('DEF1234567', pollId);
+  // TEST 4: User checks confirmation - anonymous credential created
+  it('TEST 4: generates anonymous participation credential when self-verification is confirmed', async () => {
+    const result = await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
+    expect(result.verified).toBe(true);
+    expect(result.status).toBe('SELF_VERIFICATION_CONFIRMED');
+    expect(result.anonymous_token).toBeDefined();
+    expect(result.anonymous_token?.length).toBe(64); // 256-bit hex token
+    expect(result.expires_at).toBeDefined();
+  });
+
+  // TEST 5: User votes - one successful vote recorded
+  it('TEST 5: records exactly one successful vote and increments aggregate tally', async () => {
+    const verifyRes = await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
     expect(verifyRes.verified).toBe(true);
     const token = verifyRes.anonymous_token!;
     const tokenHash = hashToken(token);
@@ -62,24 +57,83 @@ describe('Verification & Anonymous Voting Engine', () => {
     const initialBjpCount =
       initialResults?.results.find((r) => r.option_id === 'opt-party-bjp')?.count || 0;
 
-    // First Vote Submission
-    const vote1 = await db.consumeTokenAndIncrementVote(pollId, 'opt-party-bjp', tokenHash);
-    expect(vote1.success).toBe(true);
+    const voteRes = await db.consumeTokenAndIncrementVote(pollId, 'opt-party-bjp', tokenHash);
+    expect(voteRes.success).toBe(true);
 
     const updatedResults = await db.getPollResults(pollId);
     const updatedBjpCount =
       updatedResults?.results.find((r) => r.option_id === 'opt-party-bjp')?.count || 0;
     expect(updatedBjpCount).toBe(initialBjpCount + 1);
+  });
 
-    // Second Vote Submission with the same token MUST FAIL
-    const vote2 = await db.consumeTokenAndIncrementVote(pollId, 'opt-party-bjp', tokenHash);
+  // TEST 6: User tries to vote again with same token - blocked
+  it('TEST 6: blocks duplicate voting attempt using the same credential', async () => {
+    const verifyRes = await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
+    const token = verifyRes.anonymous_token!;
+    const tokenHash = hashToken(token);
+
+    const vote1 = await db.consumeTokenAndIncrementVote(pollId, 'opt-party-inc', tokenHash);
+    expect(vote1.success).toBe(true);
+
+    const vote2 = await db.consumeTokenAndIncrementVote(pollId, 'opt-party-inc', tokenHash);
     expect(vote2.success).toBe(false);
     expect(vote2.error).toBe('CREDENTIAL_ALREADY_USED');
   });
 
-  it('prevents MockVerificationProvider from running if PRODUCTION=true', () => {
-    process.env.PRODUCTION = 'true';
-    expect(() => new MockVerificationProvider()).toThrow('CRITICAL SAFETY EXCEPTION');
-    delete process.env.PRODUCTION;
+  // TEST 7: Inspect database - NO EPIC, NO voter name, NO address, NO email, NO phone
+  it('TEST 7: guarantees NO EPIC, voter name, address, email, or phone in database records', async () => {
+    await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
+
+    // Inspect participation table
+    const records = Array.from(civicStore.participation.values());
+    expect(records.length).toBeGreaterThan(0);
+
+    for (const record of records) {
+      expect((record as unknown as Record<string, unknown>).epic).toBeUndefined();
+      expect((record as unknown as Record<string, unknown>).name).toBeUndefined();
+      expect((record as unknown as Record<string, unknown>).address).toBeUndefined();
+      expect((record as unknown as Record<string, unknown>).email).toBeUndefined();
+      expect((record as unknown as Record<string, unknown>).phone).toBeUndefined();
+      expect(record.self_verification_confirmed).toBe(true);
+      expect(record.status).toBe('SELF_VERIFICATION_CONFIRMED');
+    }
+
+    // Inspect tokens table
+    const tokens = Array.from(civicStore.tokens.values());
+    for (const t of tokens) {
+      expect((t as unknown as Record<string, unknown>).epic).toBeUndefined();
+      expect((t as unknown as Record<string, unknown>).name).toBeUndefined();
+      expect((t as unknown as Record<string, unknown>).vote).toBeUndefined();
+    }
+  });
+
+  // TEST 8: Inspect token decoupled from vote choice
+  it('TEST 8: ensures anonymous token contains zero embedded vote or personal metadata', () => {
+    const verifyRes = selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
+    return verifyRes.then((res) => {
+      const token = res.anonymous_token!;
+      expect(token).toMatch(/^[0-9a-f]{64}$/); // Pure cryptographic hex entropy
+    });
+  });
+
+  // TEST 9: Open poll in Hindi - all verification instructions translated
+  it('TEST 9: verifies complete Hindi translations for Mode A verification instructions', () => {
+    const hi = translations.hi.verification;
+    expect(hi.title).toBe('अपना मतदाता पंजीकरण सत्यापित करें');
+    expect(hi.openEciButton).toContain('ECI खोज');
+    expect(hi.completedCheckButton).toBe('मैंने जांच पूरी कर ली है');
+    expect(hi.step1Title).toBe('ECI खोज खोलें');
+    expect(hi.step2Title).toBe('अपने विवरण जांचें');
+    expect(hi.step3Title).toBe('यहां वापस आएं');
+    expect(hi.disclaimer).toContain('महत्वपूर्ण:');
+    expect(hi.confirmModalTitle).toBe('स्व-सत्यापन की पुष्टि करें');
+    expect(hi.selfVerificationConfirmed).toBe('स्व-सत्यापन की पुष्टि हुई');
+  });
+
+  // TEST 10: Disallow invalid or inactive polls
+  it('TEST 10: rejects self-verification if poll does not exist or is not LIVE', async () => {
+    const result = await selfVerificationService.processSelfVerification('non-existent-poll', true);
+    expect(result.verified).toBe(false);
+    expect(result.reason).toBe('INVALID_POLL');
   });
 });

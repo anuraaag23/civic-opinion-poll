@@ -46,12 +46,16 @@ export interface Poll {
   updated_at: string;
 }
 
+export const ECI_ELECTORAL_SEARCH_URL = 'https://electoralsearch.eci.gov.in/';
+
 export interface ParticipationRecord {
   id: string;
   poll_id: string;
-  participation_fingerprint: string; // HMAC-SHA256(secret, EPIC + ":" + poll_id)
+  anonymous_participation_id: string; // Token hash or anonymous participation id
+  self_verification_confirmed: boolean;
+  status: 'SELF_VERIFICATION_CONFIRMED' | 'VOTED';
   created_at: string;
-  voted_at?: string;
+  voted_at?: string | null;
 }
 
 export interface AnonymousVoteCredential {
@@ -95,7 +99,8 @@ export interface PollResults {
 
 export interface VerificationResult {
   verified: boolean;
-  reason?: 'INVALID_FORMAT' | 'NOT_FOUND' | 'RATE_LIMITED' | 'ALREADY_VOTED' | 'SERVICE_UNAVAILABLE';
+  status?: 'SELF_VERIFICATION_CONFIRMED';
+  reason?: 'ALREADY_VOTED' | 'RATE_LIMITED' | 'SERVICE_UNAVAILABLE' | 'UNCONFIRMED' | 'INVALID_POLL';
   anonymous_token?: string;
   expires_at?: string;
 }
@@ -103,9 +108,9 @@ export interface VerificationResult {
 export interface AuditEvent {
   id: string;
   event_type:
-    | 'verification_attempt'
-    | 'verification_success'
-    | 'verification_failure'
+    | 'self_verification_attempt'
+    | 'self_verification_confirmed'
+    | 'self_verification_failure'
     | 'vote_submission_success'
     | 'vote_submission_failure'
     | 'duplicate_vote_blocked'

@@ -1,4 +1,4 @@
-import { Poll, PollResults, OptionResult, AuditEvent } from '../types';
+import { Poll, PollResults, OptionResult, AuditEvent, ParticipationRecord } from '../types';
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
 import { OFFICIAL_PARTIES } from '../data/parties';
 
@@ -7,8 +7,8 @@ class StorageStore {
   polls: Map<string, Poll> = new Map();
   // pollId -> optionId -> count
   voteCounts: Map<string, Map<string, number>> = new Map();
-  // pollId + ":" + fingerprint -> timestamp
-  participation: Map<string, string> = new Map();
+  // pollId + ":" + anonymous_participation_id -> ParticipationRecord
+  participation: Map<string, ParticipationRecord> = new Map();
   // tokenHash -> { pollId, expiresAt, usedAt }
   tokens: Map<string, { pollId: string; expiresAt: string; usedAt?: string }> = new Map();
   // Audit log
@@ -92,14 +92,22 @@ export const db = {
     };
   },
 
-  async hasParticipated(pollId: string, fingerprint: string): Promise<boolean> {
-    const key = `${pollId}:${fingerprint}`;
+  async hasParticipated(pollId: string, anonymousParticipationId: string): Promise<boolean> {
+    const key = `${pollId}:${anonymousParticipationId}`;
     return civicStore.participation.has(key);
   },
 
-  async recordParticipation(pollId: string, fingerprint: string): Promise<void> {
-    const key = `${pollId}:${fingerprint}`;
-    civicStore.participation.set(key, new Date().toISOString());
+  async recordParticipation(pollId: string, anonymousParticipationId: string): Promise<void> {
+    const key = `${pollId}:${anonymousParticipationId}`;
+    civicStore.participation.set(key, {
+      id: `part-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      poll_id: pollId,
+      anonymous_participation_id: anonymousParticipationId,
+      self_verification_confirmed: true,
+      status: 'SELF_VERIFICATION_CONFIRMED',
+      created_at: new Date().toISOString(),
+      voted_at: null,
+    });
   },
 
   async issueAnonymousCredential(
@@ -148,6 +156,14 @@ export const db = {
 
     // Atomically mark token as used
     tokenEntry.usedAt = new Date().toISOString();
+
+    // Update participation record status
+    const partKey = `${pollId}:${tokenHash}`;
+    const partRecord = civicStore.participation.get(partKey);
+    if (partRecord) {
+      partRecord.status = 'VOTED';
+      partRecord.voted_at = new Date().toISOString();
+    }
 
     // Increment vote count
     let countsMap = civicStore.voteCounts.get(pollId);

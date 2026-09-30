@@ -1,16 +1,13 @@
-import { VerificationResult } from '../types';
-import { normalizeEpic, generateParticipationFingerprint, generateAnonymousToken } from '../crypto';
+import { VerificationResult, ECI_ELECTORAL_SEARCH_URL } from '../types';
+import { generateAnonymousToken } from '../crypto';
 import { db } from '../db';
 
-export interface IVerificationProvider {
-  name: string;
-  verifyEligibility(epic: string, pollId: string, clientIp?: string): Promise<VerificationResult>;
-}
+export { ECI_ELECTORAL_SEARCH_URL };
 
-// Simple in-memory rate limiter for verification attempts (IP or salt hash)
+// In-memory rate limiter for self-verification attempts to prevent spam
 const rateLimitMap = new Map<string, { attempts: number; resetAt: number }>();
 
-function checkRateLimit(key: string, maxAttempts = 10, windowMs = 60000): boolean {
+function checkRateLimit(key: string, maxAttempts = 15, windowMs = 60000): boolean {
   const now = Date.now();
   const entry = rateLimitMap.get(key);
 
@@ -28,82 +25,62 @@ function checkRateLimit(key: string, maxAttempts = 10, windowMs = 60000): boolea
 }
 
 /**
- * Mock Verification Provider for local development & testing.
- * SAFETY RULE: Strictly disabled if PRODUCTION=true or NODE_ENV=production.
+ * MODE A: SELF-VERIFICATION PROVIDER
+ *
+ * CRITICAL LEGAL & ARCHITECTURAL RULES:
+ * 1. Do NOT scrape ECI or reverse-engineer ECI APIs.
+ * 2. Do NOT bypass CAPTCHA or automate ECI portals.
+ * 3. Do NOT collect, store, hash, or transmit user EPIC numbers.
+ * 4. The user verifies their registration independently on https://electoralsearch.eci.gov.in/
+ * 5. This service handles ONLY the participant's explicit self-confirmation and issues
+ *    a decoupled, cryptographically random anonymous participation credential.
  */
-export class MockVerificationProvider implements IVerificationProvider {
-  name = 'MockVerificationProvider';
+export class SelfVerificationService {
+  readonly eciSearchUrl = ECI_ELECTORAL_SEARCH_URL;
 
-  constructor() {
-    if (process.env.PRODUCTION === 'true') {
-      throw new Error(
-        'CRITICAL SAFETY EXCEPTION: MockVerificationProvider cannot be enabled when PRODUCTION=true'
-      );
-    }
-  }
-
-  async verifyEligibility(
-    epic: string,
+  async processSelfVerification(
     pollId: string,
+    selfVerificationConfirmed: boolean,
     clientIp = '127.0.0.1'
   ): Promise<VerificationResult> {
     // 1. Rate Limit Check
     if (!checkRateLimit(clientIp)) {
-      await db.recordAuditEvent('verification_failure', pollId, { reason: 'RATE_LIMITED' });
+      await db.recordAuditEvent('self_verification_failure', pollId, { reason: 'RATE_LIMITED' });
       return { verified: false, reason: 'RATE_LIMITED' };
     }
 
-    // 2. Format & Normalization Validation
-    const { isValid, normalized } = normalizeEpic(epic);
-    if (!isValid || !normalized) {
-      await db.recordAuditEvent('verification_failure', pollId, { reason: 'INVALID_FORMAT' });
-      return { verified: false, reason: 'INVALID_FORMAT' };
+    // 2. Explicit User Confirmation Check
+    if (!selfVerificationConfirmed) {
+      await db.recordAuditEvent('self_verification_failure', pollId, { reason: 'UNCONFIRMED' });
+      return { verified: false, reason: 'UNCONFIRMED' };
     }
 
-    // 3. Compute Keyed Participation Fingerprint
-    const fingerprint = generateParticipationFingerprint(normalized, pollId);
-
-    // 4. Duplicate Participation Prevention Check
-    const alreadyParticipated = await db.hasParticipated(pollId, fingerprint);
-    if (alreadyParticipated) {
-      await db.recordAuditEvent('duplicate_vote_blocked', pollId);
-      return { verified: false, reason: 'ALREADY_VOTED' };
-    }
-
-    // 5. Check Poll Validity
+    // 3. Validate Poll Status
     const poll = await db.getPollById(pollId);
     if (!poll || poll.status !== 'LIVE') {
-      return { verified: false, reason: 'SERVICE_UNAVAILABLE' };
+      return { verified: false, reason: 'INVALID_POLL' };
     }
 
-    // 6. Record Eligibility & Issue Decoupled Anonymous Token
-    await db.recordParticipation(pollId, fingerprint);
-
+    // 4. Generate 256-bit CSPRNG Anonymous Participation Credential
     const { token, tokenHash } = generateAnonymousToken();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15-minute validity
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15-minute token TTL
 
+    // 5. Store Participation Record (Mode A: Token Hash Only, NO EPIC, NO PII)
+    await db.recordParticipation(pollId, tokenHash);
     await db.issueAnonymousCredential(pollId, tokenHash, expiresAt);
-    await db.recordAuditEvent('verification_success', pollId);
+
+    // 6. Record Audit Log (ZERO identifying information)
+    await db.recordAuditEvent('self_verification_confirmed', pollId, {
+      method: 'MODE_A_ECI_SELF_VERIFICATION',
+    });
 
     return {
       verified: true,
+      status: 'SELF_VERIFICATION_CONFIRMED',
       anonymous_token: token,
       expires_at: expiresAt,
     };
   }
 }
 
-/**
- * Verification Provider Factory.
- * Can be swapped with an officially authorized ECI/Government partner provider when available.
- */
-export function getVerificationProvider(): IVerificationProvider {
-  const providerType = process.env.VERIFICATION_PROVIDER || 'MOCK';
-
-  if (providerType === 'MOCK') {
-    return new MockVerificationProvider();
-  }
-
-  // Future pluggable providers (e.g. AuthorizedPartnerProvider)
-  throw new Error(`Unsupported or unconfigured verification provider: ${providerType}`);
-}
+export const selfVerificationService = new SelfVerificationService();

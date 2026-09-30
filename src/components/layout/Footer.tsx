@@ -121,10 +121,13 @@ export function Footer() {
 
         {/* Mandatory Prominent Disclaimer */}
         <div className="pt-6 border-t border-[var(--border-glass)]">
-          <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+          <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+            <p className="text-xs sm:text-sm text-[var(--accent)] font-bold text-center">
+              {t.footer.persistentStatement}
+            </p>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed text-center font-medium">
               <strong className="text-[var(--text-primary)]">
-                {language === 'hi' ? 'महत्वपूर्ण सूचना: ' : 'Legal Notice: '}
+                {language === 'hi' ? 'कानूनी अस्वीकरण: ' : 'Legal Disclaimer: '}
               </strong>
               {t.footer.disclaimer}
             </p>

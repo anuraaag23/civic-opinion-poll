@@ -113,7 +113,7 @@ export default function AdminPage() {
         <GlassCard elevated className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] font-bold">
-              Total Verified
+              {language === 'hi' ? 'कुल स्व-सत्यापन' : 'Self-Verifications'}
             </span>
             <Users className="w-4 h-4 text-[var(--accent)]" />
           </div>
