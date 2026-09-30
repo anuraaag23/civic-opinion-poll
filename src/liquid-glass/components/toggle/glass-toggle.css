@@ -1,0 +1,118 @@
+/*!
+ * Liquid Glass — Toggle Switch
+ * 1:1 Liqui Design Switch Architecture (https://liqui.design)
+ *
+ * Markup:
+ *   <button class="lg-toggle" role="switch" aria-checked="false">
+ *     <span class="lg-toggle-track"><span class="lg-toggle-track-accent"></span></span>
+ *     <span class="lg-toggle-thumb"></span>
+ *   </button>
+ */
+
+.lg-toggle {
+  position: relative;
+  display: inline-block;
+  width: 72px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: none;
+  appearance: none;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  flex: none;
+  user-select: none;
+  touch-action: none;
+}
+
+/* Track: 72x30px capsule with neutral 47% grey and Apple green accent layer */
+.lg-toggle-track {
+  position: absolute;
+  inset: 0;
+  border-radius: 15px;
+  background: var(--lg-switch-off, rgba(148, 148, 159, 0.47));
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.18),
+    inset 0 -0.5px 1px rgba(255, 255, 255, 0.25);
+  transition: background 260ms ease;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.lg-toggle-track-accent {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: var(--lg-toggle-accent, #34c759);
+  opacity: var(--lg-toggle-accent-opacity, 0);
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.lg-toggle[aria-checked="true"] .lg-toggle-track-accent {
+  opacity: 1;
+}
+
+/* Unified Liquid Glass Thumb Container.
+   Base box: 65x41px, r=20.5px, left=-9.7px, top=15px (translateY: -50%).
+   Rest mode: scale 0.65 (visual 42.25x26.65px with 1.675px uniform insets inside 72x30px track).
+   Interactive/Swell mode: scale 0.90..1.0 (swells past track top/bottom), white fill thins to 0.10,
+   revealing the vector Snell displacement lens underneath! */
+.lg-toggle-thumb {
+  position: absolute;
+  left: -9.7px;
+  top: 15px;
+  width: 65px;
+  height: 41px;
+  border-radius: 20.5px;
+  transform-origin: center center;
+  transform: translate3d(var(--lg-toggle-x, 0px), -50%, 0) scale(var(--lg-toggle-scale, 0.65));
+  box-shadow: var(--lg-toggle-shadow, 0 4px 22px rgba(0, 0, 0, 0.10));
+  background-color: rgba(255, 255, 255, var(--lg-toggle-white-opacity, 1));
+  backdrop-filter: var(--lg-toggle-filter, none);
+  -webkit-backdrop-filter: var(--lg-toggle-filter, none);
+  cursor: grab;
+  pointer-events: auto;
+  border: none;
+  overflow: hidden;
+}
+
+.lg-toggle-thumb:active {
+  cursor: grabbing;
+}
+
+.lg-toggle-thumb.lg-surface {
+  background: transparent !important;
+  border: none !important;
+}
+
+.lg-toggle-thumb::before,
+.lg-toggle-thumb::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Legacy inner helper elements hidden */
+.lg-toggle-lens,
+.lg-toggle-fill,
+.lg-toggle-bevel-svg {
+  display: none !important;
+}
+
+/* Disabled state */
+.lg-toggle[data-lg-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.lg-toggle[data-lg-disabled="true"] .lg-toggle-thumb {
+  cursor: not-allowed;
+}
+
+/* Focus indicator */
+.lg-toggle:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 3px;
+  border-radius: 17px;
+}

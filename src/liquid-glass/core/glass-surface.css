@@ -1,0 +1,396 @@
+/*!
+ * Liquid Glass — Base Surface
+ * ----------------------------------------------------------------------------
+ * Every component adds `.lg-surface` alongside its own class
+ * (e.g. class="lg-surface lg-toggle"). This file owns the four layers common
+ * to ALL glass — material, shine, press response, floating idle motion — so
+ * component stylesheets only ever describe their own SHAPE and layout, never
+ * re-derive what glass looks like.
+ *
+ * Layer order (back to front):
+ *   1. backdrop-filter on the element itself   → blur + real-time lensing
+ *   2. ::before                                → tint wash + specular rim
+ *   3. ::after                                 → pointer-tracked highlight bloom
+ *   4. element's own content                   → label/icon/children
+ * ----------------------------------------------------------------------------
+ */
+
+.lg-surface {
+  position: relative;
+  isolation: isolate; /* keeps ::before/::after glow contained to this element's stacking context */
+  border-radius: var(--lg-radius-md);
+  background: var(--lg-tint);
+  -webkit-backdrop-filter: blur(var(--lg-blur-1)) saturate(var(--lg-saturate-1));
+  backdrop-filter: blur(var(--lg-blur-1)) saturate(var(--lg-saturate-1)) var(--lg-lens-filter, blur(0px));
+  box-shadow: var(--lg-shadow-1);
+  border: 0.5px solid var(--lg-border);
+  transform: scale(var(--lg-press-transform-scale, 1));
+  will-change: transform;
+  /* Press/hold scale is spring-driven (glass-engine.js Spring writes the
+     custom property every frame); everything else can use a short CSS
+     transition since it only fires on discrete state changes, not continuously. */
+  transition: box-shadow 260ms ease, border-color 260ms ease;
+}
+
+/* Specular rim + tint wash. A separate layer (not baked into box-shadow on
+   the element itself) so it can be animated/intensified independently of the
+   elevation shadow, which lives on the element. */
+.lg-surface::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: var(--lg-shine);
+  pointer-events: none;
+}
+
+/* Pointer-tracked highlight bloom — a soft radial light that follows
+   --lg-hl-x/--lg-hl-y (written by LiquidGlass.trackSpecular). Opacity is
+   near-zero at rest and rises on hover/press so idle glass doesn't look like
+   it has a permanent glare baked in.
+
+   The color blends toward --lg-ambient-tint (default: white) rather than
+   being pure white unconditionally — Apple's own material description is
+   explicit that it "reflects color and light of surrounding content", not
+   a fixed white shine. True per-pixel sampling of whatever is actually
+   behind an element isn't something CSS can do without capturing the page
+   into a canvas (fragile, heavy, and re-introduces exactly the kind of
+   double-rendering this project has avoided elsewhere) — so this is a
+   deliberate, lighter-weight version of the same idea: a region declares
+   its own ambient color once (--lg-ambient-tint on a container), and every
+   glass surface inside that region picks it up automatically. See the demo
+   sections for --lg-ambient-tint set to match each background. */
+.lg-surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 320ms ease, background 420ms ease;
+  background: radial-gradient(
+    120px 120px at var(--lg-hl-x, 50%) var(--lg-hl-y, 20%),
+    color-mix(in srgb, var(--lg-ambient-tint, white) 55%, transparent),
+    transparent 70%
+  );
+}
+
+.lg-surface:hover::after {
+  opacity: 0.5;
+}
+
+[data-lg-state="pressed"].lg-surface::after,
+[data-lg-state="held"].lg-surface::after {
+  opacity: 0.85;
+}
+
+/* Elevation escalation on hold — a temporarily "lifted" element gets the
+   next elevation tier's shadow + blur + saturation together (never shadow
+   alone; see the elevation comment in glass-tokens.css). */
+[data-lg-state="held"].lg-surface {
+  box-shadow: var(--lg-shadow-3);
+  -webkit-backdrop-filter: blur(var(--lg-blur-3)) saturate(var(--lg-saturate-3));
+  backdrop-filter: blur(var(--lg-blur-3)) saturate(var(--lg-saturate-3)) var(--lg-lens-filter, blur(0px));
+  /* A lifted element is the one state that visibly parallaxes against
+     device tilt (set by LiquidGlass.enableTiltParallax) — resting glass
+     stays still so the effect reads as "this specific thing is floating
+     above everything else" rather than the whole screen swimming. */
+  transform: scale(var(--lg-press-transform-scale, 1))
+    translate(calc(var(--lg-tilt-x, 0) * 3px), calc(var(--lg-tilt-y, 0) * 3px));
+}
+
+[data-lg-state="pressed"].lg-surface {
+  box-shadow: var(--lg-shadow-1);
+}
+
+/* ---- Floating idle motion --------------------------------------------------
+   Opt-in via data-lg-float="true". Pure CSS (no JS needed for the idle
+   state) — a slow, gentle bob suited to elements like a floating action
+   button or a Control Center bubble, never applied by default since most
+   glass (toggles, sliders, bars) should stay perfectly still until touched. */
+@keyframes lg-float {
+  0%, 100% { transform: translateY(0) scale(var(--lg-press-transform-scale, 1)); }
+  50% { transform: translateY(calc(var(--lg-float-distance) * -1)) scale(var(--lg-press-transform-scale, 1)); }
+}
+
+[data-lg-float="true"] {
+  animation: lg-float var(--lg-float-duration) ease-in-out infinite;
+}
+
+/* ---- Focus visibility -------------------------------------------------- */
+.lg-surface:focus-visible {
+  outline: 2px solid #0a84ff;
+  outline-offset: 2px;
+}
+
+/* ---- Glass effect container (proximity-based auto merge/split) -----------
+   Set up via LiquidGlass.createGlassContainer(el). Members render as normal
+   flat shapes (see glass-control-buttons.css for why they aren't full
+   .lg-surface glass) until data-lg-merging="true" is set by the proximity
+   check in glass-engine.js §8, at which point the container's goo filter
+   fuses whichever members' blur halos overlap. */
+.lg-effect-container {
+  position: relative;
+  filter: none;
+}
+
+.lg-effect-container[data-lg-merging="true"] {
+  filter: var(--lg-container-goo-filter, none);
+}
+
+/* ---- Regular vs. Clear variants -------------------------------------------
+   Confirmed directly from Apple's own WWDC25 "Meet Liquid Glass" session:
+   Regular is fully adaptive (see the ambient light/dark block below) and
+   legible by default — the implicit behavior everywhere else in this
+   file. Clear is explicitly "permanently more transparent" and
+   EXPLICITLY DOES NOT get the adaptive light/dark treatment ("the clear
+   variant does not have any adaptive behaviors") — Apple's own guidance
+   is that it's for bright, media-rich content and "should be placed on
+   top of a dimming layer to improve legibility", which is what
+   .lg-dim-layer below is for. Use Clear deliberately, not as a lighter
+   Regular. */
+.lg-surface[data-lg-variant="clear"] {
+  /* --lg-glass-amount (0–1) is Apple's current, continuous "Liquid Glass"
+     slider — 0 = ultra-clear, 1 = fully tinted. Deliberately no :root
+     default here — every usage below falls back to 0 via var(...,0)
+     itself, so an unset property behaves as ultra-clear. See "The
+     Liquid Glass slider" further down for the full sourcing/history.
+
+     The amount:0 end used to mix in a real 40% of --lg-tint — still a
+     visible white haze sitting on top of whatever's behind it, not
+     actually "clear" by any literal reading of the word. Dropped to a
+     true 0% here: at rest, Clear now has NO tint overlay at all, just
+     backdrop-filter's blur/saturate and the SVG lens doing the edge
+     bending — the only two things actually meant to be doing work at
+     this end of the slider. Checked this wasn't just a stylistic call
+     worth making unilaterally: a real Apple Developer Forums thread
+     ("Liquid Glass clear variant isn't clear", Aug '25) has multiple
+     developers reporting that even Apple's own public Glass.clear API
+     can't fully escape a baseline blur+tint either — "no way to recreate
+     a truly clear (passthrough) bubble that just warps the light
+     underneath around the edges... Apple is silent on this topic." That
+     gap is a real, acknowledged limitation of the PUBLIC API surface,
+     not evidence that true Clear glass is supposed to look hazy — this
+     project isn't bound by that same API ceiling, so it can chase the
+     literal material honestly instead of its constrained public
+     exposure. Compositing a few candidate tint/blur levels over a busy
+     test background (not just reasoned about) confirmed 0% tint reads
+     as unambiguously clear while a light blur alone is still enough to
+     read as glass, not an invisible hole — blur cut from a 0.5x to a
+     0.33x multiplier of the base token to match.
+
+     Still too much, per direct, repeated feedback with real screenshots
+     across several rounds after that first cut shipped — "Clear glass
+     must be clear not have too much blur," not a one-off. Cut again,
+     0.33x to 0.18x: this composite-test check was real but only ever
+     checked "does 0% tint alone look clear enough," never separately
+     re-checked whether 0.33x of blur ALONE (independent of the tint that
+     was actually removed) was already more than the material needs —
+     conflating the two meant the blur number rode along with the tint
+     fix instead of being tuned on its own. The amount:1 (fully tinted)
+     end is untouched — still ramps up to the same real 68% mix / full
+     blur-1 this project already measured and settled on. */
+  background: color-mix(in srgb, var(--lg-tint) calc(var(--lg-glass-amount, 0) * 68%), transparent);
+  -webkit-backdrop-filter: blur(calc(var(--lg-blur-1) * (0.18 + var(--lg-glass-amount, 0) * 0.82))) saturate(var(--lg-saturate-1));
+  backdrop-filter: blur(calc(var(--lg-blur-1) * (0.18 + var(--lg-glass-amount, 0) * 0.82))) saturate(var(--lg-saturate-1)) var(--lg-lens-filter, blur(0px));
+}
+
+/* Reduce Transparency needs its own explicit override here, not just the
+   token-level bump [data-lg-reduce-transparency] already applies to
+   --lg-tint (glass-tokens.css §8) — that bump changes how opaque the
+   COLOR is, but Clear's own formula above now mixes in 0% of it at
+   rest, and 0% of any color, however opaque, is still fully transparent.
+   Reduce Transparency asking for less transparency should always win
+   over how transparent Clear specifically wants to be at a given point
+   on the slider, so this ignores --lg-glass-amount entirely and matches
+   Regular's own full tint + full blur outright. */
+[data-lg-reduce-transparency] .lg-surface[data-lg-variant="clear"] {
+  background: var(--lg-tint);
+  -webkit-backdrop-filter: blur(var(--lg-blur-1)) saturate(var(--lg-saturate-1));
+  backdrop-filter: blur(var(--lg-blur-1)) saturate(var(--lg-saturate-1)) var(--lg-lens-filter, blur(0px));
+}
+
+.lg-surface[data-lg-variant="clear"]::before {
+  opacity: calc(0.6 + var(--lg-glass-amount, 0) * 0.25); /* the rim stays, softened at amount:0, closer to full strength as the slider moves toward "tinted" */
+}
+
+/* Companion utility for Apple's own recommendation — put this behind a
+   Clear-variant surface (as an absolutely-positioned sibling filling the
+   same area, behind it in paint order) when the content underneath is
+   busy or bright enough that Clear alone won't stay legible. Not
+   automatic, on purpose — only the author placing it knows whether their
+   background actually needs it, the same judgment call Apple leaves to a
+   native app's designer rather than making it for them. */
+.lg-dim-layer {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ---- The Liquid Glass slider (Clear variant only) --------------------------
+   Real, sourced history worth keeping straight, found digging into this
+   properly: Apple's own "Meet Liquid Glass" session frames Clear/Regular
+   as the only two DEVELOPER-facing variants (SwiftUI's `Glass` enum has
+   no third case) — but responded to real legibility complaints about
+   Clear with a systemwide APPEARANCE setting, twice. First a binary
+   "Clear vs. Tinted" toggle, in the 26.1 point releases. Then, in 27, a
+   full continuous slider replacing that toggle outright — "anywhere from
+   ultra-clear to fully tinted" is how it's described, confirmed via
+   current reporting, not just the original 26.1-era framing. Neither is
+   a new per-element developer variant, and neither restores Clear's
+   deliberately-excluded light/dark adaptivity anywhere on the dial —
+   "clear, toned down," not "clear becomes regular," even at the fully-
+   tinted end. There's no matching `prefers-*` media feature for this on
+   the web (unlike Reduce Transparency/Increase Contrast, which real OS
+   settings expose), so this project models it as a plain custom property
+   an app sets from whatever its own equivalent setting is — the same
+   spirit as glass-engine.js's a11y watchers, just without an automatic
+   matchMedia source behind it. --lg-glass-amount (0–1, default 0 via
+   each usage's own var() fallback above, not a :root declaration — see
+   that comment) is the real, current mechanism. [data-lg-tinted-glass]
+   below is sugar over it for anyone who just wants the old binary
+   mental model — sets the property straight to 1 — not a second,
+   separate mechanism. Only ever touches [data-lg-variant="clear"] —
+   Regular was never the legibility problem either version shipped to
+   fix. */
+[data-lg-tinted-glass] {
+  --lg-glass-amount: 1;
+}
+
+/* "Muting the highlight bloom" as the amount rises (not removing it —
+   Increase Contrast already covers full removal, glass-tokens.css §8) —
+   only the interactive states have a nonzero bloom to mute; rest state
+   is already opacity:0 in the base rule above and doesn't need touching
+   here. No attribute-selector gating needed: at the default amount:0
+   these calc()s resolve to the exact same 0.5/0.85 the generic
+   .lg-surface rules already use, so Clear behaves identically to before
+   this existed until something actually raises the amount. */
+.lg-surface[data-lg-variant="clear"]:hover::after {
+  opacity: calc(0.5 - var(--lg-glass-amount, 0) * 0.25); /* 0.5 at amount:0 down to 0.25 at amount:1 */
+}
+
+[data-lg-state="held"].lg-surface[data-lg-variant="clear"]::after {
+  opacity: calc(0.85 - var(--lg-glass-amount, 0) * 0.4); /* 0.85 down to 0.45 */
+}
+
+/* ---- Ambient light/dark adaptation (Regular variant only) -----------------
+   Set by LiquidGlass.setAmbientTint(el, color) computing real WCAG
+   relative luminance — see glass-engine.js §10. Deliberately excluded
+   from [data-lg-variant="clear"] via :not() below, matching Apple's own
+   "clear... does not have any adaptive behaviors" — applying this to
+   Clear glass would be adding behavior Apple's spec explicitly says that
+   variant doesn't have. Placed after the theme/color-scheme blocks in
+   glass-tokens.css so a LOCAL ambient reading wins over the PAGE's
+   overall theme, which is the point: this is about what's actually
+   nearby, not what mode the whole page is in. */
+[data-lg-ambient-light="true"] .lg-surface:not([data-lg-variant="clear"]) {
+  --lg-tint: var(--lg-tint-light);
+  --lg-border: var(--lg-border-light);
+  --lg-shine: var(--lg-shine-light);
+  --lg-fg: #1c1c1e;
+  --lg-fg-secondary: rgba(28, 28, 30, 0.6);
+}
+
+[data-lg-ambient-light="false"] .lg-surface:not([data-lg-variant="clear"]) {
+  --lg-tint: var(--lg-tint-dark);
+  --lg-border: var(--lg-border-dark);
+  --lg-shine: var(--lg-shine-dark);
+  --lg-fg: #f5f5f7;
+  --lg-fg-secondary: rgba(245, 245, 247, 0.6);
+}
+
+/* ---- Increased Contrast ----------------------------------------------------
+   Mirrors Settings → Accessibility → Display & Text Size → Increase
+   Contrast: elements go predominantly solid black/white and pick up a real
+   border, rather than relying on translucency for definition — set
+   automatically by the same watcher in glass-engine.js that handles reduced
+   motion/transparency. */
+[data-lg-increase-contrast] .lg-surface {
+  background: var(--lg-fg-secondary);
+  border: 1.5px solid var(--lg-fg);
+  box-shadow: none;
+}
+
+[data-lg-increase-contrast] .lg-surface::after {
+  display: none; /* no ambient highlight bloom competing with a hard border */
+}
+
+/* ---- Scroll edge effect ----------------------------------------------------
+   Apple's own WWDC25 sessions describe this as automatic: "a scroll edge
+   effect blurs content under toolbars for legibility" — distinct from the
+   toolbar/tab bar's OWN glass material, this is a progressive blur applied
+   to whatever scrolls underneath it, strongest right at the bar and fading
+   to nothing a short distance away. CSS can't vary a single blur()'s
+   radius across one element, so this stacks a few layers at increasing
+   blur, each masked to a different band — the classic "progressive blur"
+   construction. Markup:
+     <div class="lg-scroll-edge lg-scroll-edge--bottom"></div>
+   placed as a sibling positioned at the same edge as the bar it protects.
+   Needs its three layer children present in markup:
+     <div class="lg-scroll-edge lg-scroll-edge--bottom"><i></i><i></i><i></i></div>
+   (see index.html for both a header/top and tab-bar/bottom example). Purely
+   decorative — pointer-events: none throughout — and it never appears in
+   the "frosted" (non-Chromium) render path (see below), where a plain
+   partial-opacity scrim substitutes since layered backdrop-filter blur
+   compounds the same way flat blur does elsewhere in this system. */
+.lg-scroll-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 64px;
+  pointer-events: none;
+  z-index: 30;
+  overflow: hidden;
+}
+
+.lg-scroll-edge--top { top: 0; }
+.lg-scroll-edge--bottom { bottom: 0; }
+
+.lg-scroll-edge i {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.lg-scroll-edge--top i:nth-child(1) { -webkit-backdrop-filter: blur(1px); backdrop-filter: blur(1px); mask-image: linear-gradient(to bottom, black 0%, black 25%, transparent 55%); }
+.lg-scroll-edge--top i:nth-child(2) { -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); mask-image: linear-gradient(to bottom, black 0%, black 15%, transparent 40%); }
+.lg-scroll-edge--top i:nth-child(3) { -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); mask-image: linear-gradient(to bottom, black 0%, black 8%, transparent 25%); }
+
+.lg-scroll-edge--bottom i:nth-child(1) { -webkit-backdrop-filter: blur(1px); backdrop-filter: blur(1px); mask-image: linear-gradient(to top, black 0%, black 25%, transparent 55%); }
+.lg-scroll-edge--bottom i:nth-child(2) { -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); mask-image: linear-gradient(to top, black 0%, black 15%, transparent 40%); }
+.lg-scroll-edge--bottom i:nth-child(3) { -webkit-backdrop-filter: blur(7px); backdrop-filter: blur(7px); mask-image: linear-gradient(to top, black 0%, black 8%, transparent 25%); }
+
+[data-lg-render="frosted"] .lg-scroll-edge i {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+[data-lg-render="frosted"] .lg-scroll-edge--top i:nth-child(1) { background: linear-gradient(to bottom, var(--lg-tint) 0%, transparent 60%); }
+[data-lg-render="frosted"] .lg-scroll-edge--bottom i:nth-child(1) { background: linear-gradient(to top, var(--lg-tint) 0%, transparent 60%); }
+[data-lg-render="frosted"] .lg-scroll-edge i:nth-child(2),
+[data-lg-render="frosted"] .lg-scroll-edge i:nth-child(3) { display: none; }
+
+/* ----------------------------------------------------------------------------
+ * Touch bulge — the floating lens LiquidGlass.attachTouchBulge() creates and
+ * positions (see glass-engine.js §5b). Fully transparent/invisible at rest
+ * (opacity 0, scale 0 via --lg-bulge-scale); a real touch fades it in and
+ * springs it to follow the pointer, then fades it back out on release.
+ * ---------------------------------------------------------------------------- */
+.lg-touch-bulge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none; /* passive overlay — clicks must reach the real content beneath it */
+  opacity: 0;
+  transform: translate(calc(var(--lg-bulge-x, 0px) - 50%), calc(var(--lg-bulge-y, 0px) - 50%)) scale(var(--lg-bulge-scale, 0));
+  transition: opacity 180ms ease;
+  background: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 24px 6px rgba(255, 255, 255, 0.35);
+}
+
+.lg-touch-bulge[data-lg-visible="true"] {
+  opacity: 1;
+}

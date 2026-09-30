@@ -40,11 +40,12 @@ export function PartyCard({
       tabIndex={disabled ? -1 : 0}
       onClick={() => !disabled && onSelect(optionId)}
       onKeyDown={handleKeyDown}
-      className={`glass-panel p-4 sm:p-5 flex items-center justify-between gap-4 transition-all duration-150 cursor-pointer select-none ${
+      data-lg-variant="clear"
+      className={`lg-card lg-surface glass-panel p-4 sm:p-5 flex items-center justify-between gap-4 transition-all duration-150 cursor-pointer select-none ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       } ${
         isSelected
-          ? 'border-[var(--accent)] ring-2 ring-[var(--accent)]/30 bg-[var(--bg-glass-elevated)] shadow-md'
+          ? 'border-[var(--accent)] ring-2 ring-[var(--accent)]/30 bg-[var(--bg-glass-elevated)] shadow-md scale-[1.01]'
           : 'hover:border-[var(--border-glass)] hover:bg-[var(--bg-glass-elevated)]'
       }`}
     >

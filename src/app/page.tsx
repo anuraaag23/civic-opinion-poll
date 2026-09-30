@@ -8,6 +8,7 @@ import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { KeyGuaranteesSection } from '@/components/home/KeyGuaranteesSection';
 import { AboutCreatorSection } from '@/components/home/AboutCreatorSection';
 import { VoterAssuranceCard } from '@/components/verification/VoterAssuranceCard';
+import { LiquidGlassShowcase } from '@/components/home/LiquidGlassShowcase';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
@@ -95,6 +96,9 @@ export default function HomePage() {
       <section>
         <VoterAssuranceCard />
       </section>
+
+      {/* 3D Liquid Glass Engine & Clearness Showcase */}
+      <LiquidGlassShowcase />
 
       {/* Super Simple 3-Step Walkthrough For Any User */}
       <section className="space-y-4">
@@ -220,13 +224,13 @@ export default function HomePage() {
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+            <div data-lg-variant="clear" className="lg-card lg-surface p-3 rounded-xl border border-[var(--border-glass)]">
               <span className="text-[11px] text-[var(--text-tertiary)] uppercase font-semibold">
                 {language === 'hi' ? 'कुल प्रतिक्रियाएं' : 'Total Responses'}
               </span>
               <p className="text-lg font-bold text-[var(--text-primary)] mt-0.5">128,420</p>
             </div>
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+            <div data-lg-variant="clear" className="lg-card lg-surface p-3 rounded-xl border border-[var(--border-glass)]">
               <span className="text-[11px] text-[var(--text-tertiary)] uppercase font-semibold">
                 {language === 'hi' ? 'पात्रता मानक' : 'Eligibility'}
               </span>
@@ -234,7 +238,7 @@ export default function HomePage() {
                 {language === 'hi' ? 'सत्यापित मतदाता' : 'Verified Citizens'}
               </p>
             </div>
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+            <div data-lg-variant="clear" className="lg-card lg-surface p-3 rounded-xl border border-[var(--border-glass)]">
               <span className="text-[11px] text-[var(--text-tertiary)] uppercase font-semibold">
                 {language === 'hi' ? 'गोपनीयता स्तर' : 'Privacy Tier'}
               </span>
@@ -242,7 +246,7 @@ export default function HomePage() {
                 {language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage'}
               </p>
             </div>
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+            <div data-lg-variant="clear" className="lg-card lg-surface p-3 rounded-xl border border-[var(--border-glass)]">
               <span className="text-[11px] text-[var(--text-tertiary)] uppercase font-semibold">
                 {language === 'hi' ? 'समापन' : 'Poll Closes'}
               </span>

@@ -15,7 +15,10 @@ export function ResultBar({ result, maxPercentage }: ResultBarProps) {
   const partyName = language === 'hi' ? result.party_name_hi : result.party_name_en;
 
   return (
-    <div className="space-y-2 p-3 sm:p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] shadow-xs transition-all hover:border-[var(--accent)]/40">
+    <div
+      data-lg-variant="clear"
+      className="lg-card lg-surface space-y-2 p-3 sm:p-4 rounded-xl border border-[var(--border-glass)] shadow-xs transition-all hover:border-[var(--accent)]/40"
+    >
       <div className="flex items-center justify-between gap-4">
         {/* Party Identity */}
         <div className="flex items-center gap-3 min-w-0">

@@ -1,0 +1,323 @@
+/*!
+ * Liquid Glass — Card & Sheet
+ * Two related surfaces:
+ *
+ * Card (static, in-flow):
+ *   <div class="lg-card lg-surface"> … </div>
+ *
+ * Sheet (modal, spring-driven slide-up):
+ *   <div class="lg-sheet-scrim">
+ *     <div class="lg-sheet lg-surface" role="dialog" aria-modal="true" data-lg-no-press="true">
+ *       <div class="lg-sheet-grabber"></div>
+ *       … content …
+ *     </div>
+ *   </div>
+ */
+
+.lg-card {
+  padding: 20px;
+  border-radius: var(--lg-radius-lg);
+  background: rgba(24, 24, 30, 0.26);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.25),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.40);
+}
+
+.lg-card[data-lg-variant="clear"] {
+  background: rgba(24, 24, 30, 0.16);
+  -webkit-backdrop-filter: blur(18px) saturate(190%);
+  backdrop-filter: blur(18px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.20),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.50);
+}
+
+
+/* Concentricity in practice: anything nested inside a card should curve
+   with a SMALLER radius than the card, tracing the same arc rather than
+   picking an unrelated number — see glass-tokens.css §1. 20px card padding
+   ⇒ child radius = lg-radius-lg (28) − 20 ≈ 8, so lg-radius-min covers it. */
+.lg-card .lg-button,
+.lg-card .lg-toggle-track {
+  border-radius: var(--lg-radius-min);
+}
+.lg-card .lg-button {
+  border-radius: var(--lg-radius-pill); /* pills stay pills regardless of nesting depth */
+}
+
+.lg-sheet-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, var(--lg-scrim-opacity, 0));
+  pointer-events: none;
+  transition: background 320ms ease;
+  -webkit-backdrop-filter: blur(calc(var(--lg-scrim-opacity, 0) * 12px));
+  backdrop-filter: blur(calc(var(--lg-scrim-opacity, 0) * 12px));
+}
+
+.lg-sheet-scrim[data-lg-open="true"] {
+  --lg-scrim-opacity: 0.20;
+  pointer-events: auto;
+}
+
+.lg-sheet {
+  position: relative;
+  width: min(520px, calc(100% - 20px));
+  max-height: 85vh;
+  padding: 14px 26px calc(26px + env(safe-area-inset-bottom, 0px));
+  border-radius: 32px 32px 0 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: rgba(24, 24, 30, 0.22);
+  -webkit-backdrop-filter: blur(20px) saturate(190%);
+  backdrop-filter: blur(20px) saturate(190%);
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-bottom: none;
+  box-shadow:
+    0 -12px 48px rgba(0, 0, 0, 0.40),
+    0 -2px 12px rgba(0, 0, 0, 0.20),
+    inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+    inset 0 -1px 1px 0 rgba(255, 255, 255, 0.12);
+  transform: translateY(var(--lg-sheet-y, 100%));
+  color: #ffffff;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+}
+
+.lg-sheet[data-lg-variant="clear"] {
+  background: rgba(24, 24, 30, 0.20);
+  -webkit-backdrop-filter: blur(18px) saturate(190%);
+  backdrop-filter: blur(18px) saturate(190%);
+}
+
+.lg-sheet-grabber {
+  width: 40px;
+  height: 5px;
+  margin: 6px auto 16px;
+  border-radius: 2.5px;
+  background: rgba(255, 255, 255, 0.40);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.60);
+  cursor: grab;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.lg-sheet-grabber:hover {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+.lg-sheet-grabber:active {
+  cursor: grabbing;
+  transform: scaleX(1.1);
+  background: rgba(255, 255, 255, 0.80);
+}
+
+/* Header Row with Title & Top-Right Circular Close Button */
+.lg-sheet-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.lg-sheet-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lg-sheet-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.50);
+}
+
+.lg-sheet-subtitle {
+  font-size: 13px;
+  font-weight: 450;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Apple Circular Glass Close Button */
+.lg-sheet-close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  background: rgba(255, 255, 255, 0.15);
+  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  backdrop-filter: blur(8px) saturate(160%);
+  box-shadow:
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.70),
+    0 2px 8px rgba(0, 0, 0, 0.20);
+  color: rgba(255, 255, 255, 0.90);
+  cursor: pointer;
+  outline: none;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background 160ms cubic-bezier(0.16, 1, 0.3, 1), transform 140ms cubic-bezier(0.34, 1.56, 0.64, 1), border-color 160ms ease;
+  flex-shrink: 0;
+}
+
+.lg-sheet-close-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.lg-sheet-close-btn:hover {
+  background: rgba(255, 255, 255, 0.26);
+  border-color: rgba(255, 255, 255, 0.55);
+  transform: scale(1.08);
+}
+
+.lg-sheet-close-btn:active {
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(0.92);
+}
+
+/* Sheet Description & Highlights */
+.lg-sheet-body {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.82);
+  margin-bottom: 16px;
+}
+
+.lg-sheet-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 16px 0;
+  padding: 12px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.30);
+}
+
+.lg-sheet-metric-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+}
+
+.lg-sheet-metric-val {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.50);
+}
+
+.lg-sheet-metric-lbl {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.60);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Sheet Footer Action Buttons */
+.lg-sheet-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.lg-sheet-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 22px;
+  border-radius: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: all 160ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lg-sheet-btn--secondary {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.95);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.60), 0 2px 8px rgba(0, 0, 0, 0.20);
+}
+
+.lg-sheet-btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.48);
+}
+
+.lg-sheet-btn--secondary:active {
+  background: rgba(255, 255, 255, 0.30);
+  transform: scale(0.95);
+}
+
+.lg-sheet-btn--primary {
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background: rgba(10, 132, 255, 0.40);
+  color: #ffffff;
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+  box-shadow:
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.85),
+    0 4px 16px rgba(0, 122, 255, 0.35);
+}
+
+.lg-sheet-btn--primary:hover {
+  background: rgba(10, 132, 255, 0.55);
+  box-shadow:
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95),
+    0 6px 20px rgba(0, 122, 255, 0.50);
+}
+
+.lg-sheet-btn--primary:active {
+  transform: scale(0.95);
+  background: rgba(10, 132, 255, 0.65);
+}
+
+@media (min-width: 640px) {
+  .lg-sheet-scrim {
+    align-items: flex-end;
+    padding-bottom: 20px;
+  }
+  .lg-sheet {
+    border-radius: 36px;
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    max-height: 80vh;
+    box-shadow:
+      0 24px 72px rgba(0, 0, 0, 0.40),
+      0 6px 20px rgba(0, 0, 0, 0.20),
+      inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.85),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.18),
+      inset 0 -1px 1px 0 rgba(255, 255, 255, 0.12);
+    transform: translateY(var(--lg-sheet-y, 100%));
+    opacity: 1;
+  }
+}

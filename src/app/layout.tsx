@@ -6,8 +6,11 @@ import { TopSloganBanner } from '@/components/layout/TopSloganBanner';
 import { GlassNavbar } from '@/components/layout/GlassNavbar';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { Footer } from '@/components/layout/Footer';
+import { LiquidGlassInitializer } from '@/components/layout/LiquidGlassInitializer';
+import { LiquidGlassDock } from '@/components/layout/LiquidGlassDock';
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://meravote.in'),
   title: 'Mera Vote | Independent Civic Opinion Poll Platform',
   description:
     'Mera Vote (मेरा वोट) — Independent civic opinion poll platform for India. Participate with privacy-preserving self-verification and cryptographically anonymous responses. Not affiliated with the Election Commission of India.',
@@ -44,7 +47,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen flex flex-col antialiased">
         <ThemeProvider>
           <I18nProvider>
-            {/* Ambient depth lighting */}
+            {/* Automatic Liquid Glass Engine initializer: SVG displacement maps & specular tracking */}
+            <LiquidGlassInitializer />
+
+            {/* Chromatic Ambient Depth Canvas for real optical refraction */}
             <div className="civic-ambient-depth" aria-hidden="true" />
 
             {/* Inspiring Bilingual Slogan & Guarantee Banner */}
@@ -60,6 +66,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 relative z-10">
               {children}
             </main>
+
+            {/* 1:1 Floating Liquid Glass TabBar Dock */}
+            <LiquidGlassDock />
 
             {/* Footer */}
             <Footer />

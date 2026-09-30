@@ -1,0 +1,138 @@
+/*!
+ * Liquid Glass — Slider (Apple iOS 27 Reference)
+ * - 14px track height (Apple Control Center & Settings standard)
+ * - 68x45px convex dome lens thumb (3:2 ratio), 41x27px resting box (0.60x scale)
+ * - Real Snell's Law convex dome refraction with magnified rail fattening
+ * - Wet-edge saturated rim Fresnel reflection catching live track color
+ */
+
+.lg-slider {
+  position: relative;
+  width: 100%;
+  min-width: 140px;
+  height: 45px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  user-select: none;
+}
+
+.lg-slider:focus {
+  outline: none;
+}
+
+.lg-slider-track,
+.lg-slider-fill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 14px;
+  border-radius: 7px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.lg-slider-track {
+  width: 100%;
+  background: rgba(137, 137, 143, 0.35);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .lg-slider-track {
+  background: rgba(120, 120, 128, 0.32);
+}
+
+.lg-slider-fill {
+  width: var(--lg-slider-fill-width, 0px);
+  background: var(--lg-slider-accent, #007aff);
+  border-radius: 7px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Permanent glass / clear variant defaults */
+.lg-slider-thumb[data-lg-variant="clear"] .lg-slider-lens,
+.lg-slider[data-lg-variant="clear"] .lg-slider-lens,
+.lg-slider[data-lg-glass="permanent"] .lg-slider-lens,
+.lg-slider.lg-permanent-glass .lg-slider-lens {
+  --lg-slider-white-opacity: 0.02;
+  --lg-slider-scale: 1.0;
+}
+
+/* Positioning wrapper for thumb: matches 41x27px resting box */
+.lg-slider-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 41px;
+  height: 27px;
+  transform: translate(var(--lg-slider-x, 0px), -50%);
+  border-radius: 13.5px;
+  border: none;
+  background: transparent;
+  outline: none;
+  cursor: grab;
+  pointer-events: auto;
+}
+
+.lg-slider-thumb:active {
+  cursor: grabbing;
+}
+
+/* The actual convex dome lens centered inside the thumb wrapper.
+   Base size is 68x45px (LENS_W x LENS_H), scaled by --lg-slider-scale (0.60 resting -> 1.0 grabbed). */
+.lg-slider-lens {
+  position: absolute;
+  left: -13.5px; /* (41 - 68) / 2 */
+  top: -9px;     /* (27 - 45) / 2 */
+  width: 68px;
+  height: 45px;
+  border-radius: 22.5px;
+  transform: scale(calc(var(--lg-slider-scale, 0.60) * var(--lg-slider-stretch-x, 1)),
+                   calc(var(--lg-slider-scale, 0.60) * var(--lg-slider-stretch-y, 1)));
+  transform-origin: center center;
+  background: rgba(255, 255, 255, var(--lg-slider-white-opacity, 1));
+  box-shadow:
+    0 calc(3px + 11px * (1 - var(--lg-slider-white-opacity, 1)))
+      calc(8px + 24px * (1 - var(--lg-slider-white-opacity, 1)))
+      rgba(0, 0, 0, calc(0.16 - 0.02 * (1 - var(--lg-slider-white-opacity, 1)))),
+    0 2px 6px rgba(0, 0, 0, 0.08),
+    inset 0 1px 1px rgba(255, 255, 255, 0.95),
+    inset 0 -0.5px 0.5px rgba(255, 255, 255, 0.40);
+  pointer-events: none;
+  overflow: hidden;
+  border: 0.5px solid rgba(255, 255, 255, 0.65);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  contain: paint;
+  transition: box-shadow 140ms ease;
+}
+
+/* WebGL2 GPU optical glass layer if active */
+.lg-slider-thumb-gpu-glass {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: calc(1 - var(--lg-slider-white-opacity, 1));
+  pointer-events: none;
+  transition: opacity 90ms ease;
+  overflow: hidden;
+}
+
+.lg-slider[aria-disabled="true"] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.lg-slider:focus-visible:not(:active) .lg-slider-lens {
+  outline: 2px solid #007aff;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lg-slider-lens {
+    transition: none;
+  }
+}

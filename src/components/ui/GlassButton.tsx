@@ -25,22 +25,26 @@ export function GlassButton({
     lg: 'px-7 py-3 text-base font-bold rounded-full',
   };
 
+  const lgStyle = variant === 'primary' ? 'primary' : variant === 'ghost' ? 'plain' : 'secondary';
+
   const variantClasses = {
     primary:
-      'bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-md border border-white/20',
+      'bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white shadow-md border border-white/30',
     secondary:
-      'bg-[var(--bg-glass)] hover:bg-[var(--bg-glass-elevated)] text-[var(--text-primary)] border border-[var(--border-glass)] backdrop-blur-md shadow-sm',
+      'bg-[var(--bg-glass)] hover:bg-[var(--bg-glass-elevated)] text-[var(--text-primary)] border border-[var(--border-glass)] shadow-sm',
     outline:
       'bg-transparent hover:bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]',
     ghost:
-      'bg-transparent hover:bg-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-transparent',
+      'bg-transparent hover:bg-white/10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-transparent',
     danger:
       'bg-[var(--error)] hover:opacity-90 text-white border border-transparent shadow-sm',
   };
 
   return (
     <button
-      className={`glass-button-interactive inline-flex items-center justify-center transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      className={`lg-button lg-surface glass-button-interactive inline-flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      data-lg-style={lgStyle}
+      data-lg-variant="clear"
       disabled={disabled || isLoading}
       {...props}
     >

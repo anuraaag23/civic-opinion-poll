@@ -44,9 +44,11 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       if (isDark) {
         root.classList.add('dark');
         root.setAttribute('data-theme', 'dark');
+        root.setAttribute('data-lg-theme', 'dark');
       } else {
         root.classList.remove('dark');
         root.setAttribute('data-theme', 'light');
+        root.setAttribute('data-lg-theme', 'light');
       }
     };
 

@@ -93,7 +93,7 @@ export function VotingView({ poll, anonymousToken, onVoteSuccess }: VotingViewPr
         </p>
 
         {/* Pre-Voting Independent Poll Disclaimer */}
-        <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] text-center leading-relaxed max-w-lg mx-auto">
+        <div data-lg-variant="clear" className="lg-card lg-surface p-3 rounded-xl border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] text-center leading-relaxed max-w-lg mx-auto">
           {t.verification.pollPreVoteDisclaimer}
         </div>
       </div>

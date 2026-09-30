@@ -6,6 +6,7 @@ interface GlassCardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   elevated?: boolean;
   interactive?: boolean;
+  variant?: 'clear' | 'regular';
   className?: string;
 }
 
@@ -13,6 +14,7 @@ export function GlassCard({
   children,
   elevated = false,
   interactive = false,
+  variant = 'clear',
   className = '',
   ...props
 }: GlassCardProps) {
@@ -21,7 +23,8 @@ export function GlassCard({
 
   return (
     <div
-      className={`${baseClass} lg-surface ${interactiveClass} p-6 sm:p-8 ${className}`}
+      className={`lg-card lg-surface ${baseClass} ${interactiveClass} p-6 sm:p-8 ${className}`}
+      data-lg-variant={variant}
       {...props}
     >
       {children}

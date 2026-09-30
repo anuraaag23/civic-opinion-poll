@@ -38,7 +38,7 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] leading-relaxed text-left space-y-2">
+        <div data-lg-variant="clear" className="lg-card lg-surface p-4 rounded-xl border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] leading-relaxed text-left space-y-2">
           <div className="flex items-center gap-1.5 font-bold text-[var(--text-primary)]">
             <ShieldCheck className="w-4 h-4 text-[var(--accent)]" />
             <span>{language === 'hi' ? 'गोपनीयता पुष्टिकरण' : 'Cryptographic Anonymity Confirmed'}</span>

@@ -135,7 +135,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-4">
       {/* Live Counting Broadcast Badge */}
-      <div className="flex items-center justify-between p-3 rounded-2xl bg-[var(--bg-glass-elevated)] border border-[var(--border-glass)] shadow-sm">
+      <div data-lg-variant="clear" className="lg-card lg-surface flex items-center justify-between p-3 rounded-2xl border border-[var(--border-glass)] shadow-sm">
         <div className="flex items-center gap-2.5">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/meravote-logo.png" alt="Mera Vote" className="w-5 h-5 rounded-full object-contain shadow-xs" />
@@ -217,7 +217,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
         </div>
 
         {/* Live Anonymous Activity Ticker */}
-        <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
+        <div data-lg-variant="clear" className="lg-card lg-surface p-3 rounded-xl border border-[var(--border-glass)] flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
           <Radio className="w-4 h-4 text-[var(--success)] shrink-0 animate-pulse" />
           <span className="font-semibold text-[var(--text-primary)] shrink-0">
             {language === 'hi' ? 'लाइव प्रवाह:' : 'Live Stream:'}
@@ -263,7 +263,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
       <VoterAssuranceCard />
 
       {/* Mandatory Results Methodology Disclaimer (Requirement 24 & 54) */}
-      <div className="glass-panel p-5 bg-[var(--bg-glass-elevated)] border-l-4 border-l-[var(--warning)] space-y-2">
+      <div data-lg-variant="clear" className="lg-card lg-surface glass-panel p-5 border-l-4 border-l-[var(--warning)] space-y-2">
         <div className="flex items-center gap-2 text-xs font-bold text-[var(--warning)] uppercase tracking-wider">
           <ShieldAlert className="w-4 h-4 shrink-0" />
           <span>{language === 'hi' ? 'कार्यप्रणाली सूचना' : 'Methodology & Sample Notice'}</span>

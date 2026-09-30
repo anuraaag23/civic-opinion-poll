@@ -156,7 +156,7 @@ export function VerificationForm({
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Step 01 */}
-                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+                <div data-lg-variant="clear" className="lg-card lg-surface p-3.5 rounded-xl border border-[var(--border-glass)] space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
                       01
@@ -171,7 +171,7 @@ export function VerificationForm({
                 </div>
 
                 {/* Step 02 */}
-                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+                <div data-lg-variant="clear" className="lg-card lg-surface p-3.5 rounded-xl border border-[var(--border-glass)] space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
                       02
@@ -186,7 +186,7 @@ export function VerificationForm({
                 </div>
 
                 {/* Step 03 */}
-                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+                <div data-lg-variant="clear" className="lg-card lg-surface p-3.5 rounded-xl border border-[var(--border-glass)] space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
                       03
@@ -203,7 +203,7 @@ export function VerificationForm({
             </div>
 
             {/* Prominent Mandatory Legal / Technical Disclaimer */}
-            <div className="p-4 rounded-xl bg-[var(--bg-surface)] border-l-4 border-l-[var(--warning)] border-y border-r border-[var(--border-glass)] space-y-1.5">
+            <div data-lg-variant="clear" className="lg-card lg-surface p-4 rounded-xl border-l-4 border-l-[var(--warning)] border-y border-r border-[var(--border-glass)] space-y-1.5">
               <div className="flex items-center gap-2 text-xs font-bold text-[var(--warning)]">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{language === 'hi' ? 'महत्वपूर्ण सूचना' : 'Important Disclaimer'}</span>
@@ -221,7 +221,7 @@ export function VerificationForm({
             onSubmit={handleConfirmAndProceed}
             className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300"
           >
-            <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-4">
+            <div data-lg-variant="clear" className="lg-card lg-surface p-5 rounded-2xl border border-[var(--border-glass)] space-y-4">
               <h3 className="text-lg font-bold text-[var(--text-primary)] flex items-center gap-2">
                 <CheckSquare className="w-5 h-5 text-[var(--accent)]" />
                 <span>{t.verification.confirmModalTitle}</span>
@@ -232,7 +232,7 @@ export function VerificationForm({
               </p>
 
               {/* Explicit Mandatory Checkbox */}
-              <label className="flex items-start gap-3 p-3.5 rounded-xl bg-[var(--bg-glass-elevated)] border border-[var(--border-glass)] cursor-pointer hover:border-[var(--accent)] transition-colors select-none">
+              <label data-lg-variant="clear" className="lg-card lg-surface flex items-start gap-3 p-3.5 rounded-xl border border-[var(--border-glass)] cursor-pointer hover:border-[var(--accent)] transition-colors select-none">
                 <input
                   type="checkbox"
                   id="self-verify-checkbox"
