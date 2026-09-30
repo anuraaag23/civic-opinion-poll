@@ -73,7 +73,8 @@ export async function POST(request: NextRequest) {
     });
 
     return response;
-  } catch {
+  } catch (err) {
+    console.error('Verification route error:', err);
     return NextResponse.json(
       { verified: false, reason: 'SERVICE_UNAVAILABLE', error: 'Internal verification failure' },
       { status: 500 }
