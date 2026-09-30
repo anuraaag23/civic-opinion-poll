@@ -50,15 +50,25 @@ export function PartyCard({
     >
       {/* Party Symbol & Information */}
       <div className="flex items-center gap-4 sm:gap-5 min-w-0">
-        {/* Verified Party Symbol Container */}
+        {/* Verified Authentic High-Quality Party Logo */}
         <div
-          className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl p-2.5 bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center justify-center shrink-0 shadow-xs"
+          className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl p-2 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 shadow-sm overflow-hidden"
           title={symbolAlt}
         >
-          <div
-            className="w-full h-full flex items-center justify-center"
-            dangerouslySetInnerHTML={{ __html: party.symbol_svg }}
-          />
+          {party.logo_url ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={party.logo_url}
+              alt={symbolAlt}
+              className="w-full h-full object-contain"
+              loading="lazy"
+            />
+          ) : (
+            <div
+              className="w-full h-full flex items-center justify-center"
+              dangerouslySetInnerHTML={{ __html: party.symbol_svg }}
+            />
+          )}
         </div>
 
         {/* Text Metadata */}

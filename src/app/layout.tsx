@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { I18nProvider } from '@/lib/i18n/context';
 import { ThemeProvider } from '@/lib/theme/context';
+import { TopSloganBanner } from '@/components/layout/TopSloganBanner';
 import { GlassNavbar } from '@/components/layout/GlassNavbar';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { Footer } from '@/components/layout/Footer';
@@ -38,6 +39,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <I18nProvider>
             {/* Ambient depth lighting */}
             <div className="civic-ambient-depth" aria-hidden="true" />
+
+            {/* Inspiring Bilingual Slogan & Guarantee Banner */}
+            <TopSloganBanner />
 
             {/* Permanent Top Legal Disclaimer */}
             <DisclaimerBanner compact />

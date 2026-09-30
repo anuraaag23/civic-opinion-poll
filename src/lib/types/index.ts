@@ -7,8 +7,10 @@ export interface Party {
   id: string;
   name_en: string;
   name_hi: string;
-  short_name: string;
+  short_name?: string;
   symbol_svg: string; // Clean, legally permitted SVG or asset path
+  logo_url?: string;  // High-res authentic SVG logo path in public/parties/
+  color?: string;     // Primary brand color
   symbol_alt_en: string;
   symbol_alt_hi: string;
   description_en: string;
@@ -75,6 +77,8 @@ export interface OptionResult {
   party_name_hi: string;
   party_short_name: string;
   symbol_svg: string;
+  logo_url?: string;
+  color?: string;
   count: number;
   percentage: number;
 }

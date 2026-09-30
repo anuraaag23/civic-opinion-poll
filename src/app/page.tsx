@@ -6,11 +6,13 @@ import { useI18n } from '@/lib/i18n/context';
 import { LiquidGlassHeroVisual } from '@/components/home/LiquidGlassHeroVisual';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { KeyGuaranteesSection } from '@/components/home/KeyGuaranteesSection';
+import { AboutCreatorSection } from '@/components/home/AboutCreatorSection';
+import { VoterAssuranceCard } from '@/components/verification/VoterAssuranceCard';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { GlassBadge } from '@/components/ui/GlassBadge';
-import { ArrowRight, BarChart3, ShieldCheck, Users, Clock } from 'lucide-react';
+import { ArrowRight, BarChart3, ShieldCheck, Users, Clock, Vote } from 'lucide-react';
 
 export default function HomePage() {
   const { t, language } = useI18n();
@@ -18,62 +20,62 @@ export default function HomePage() {
   return (
     <div className="space-y-16 sm:space-y-24">
       {/* Hero Section */}
-      <section className="pt-6 sm:pt-12 pb-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      <section className="pt-4 sm:pt-8 pb-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Left Column: Hero Typography & CTAs */}
           <div className="lg:col-span-7 space-y-6 text-left">
-            <div className="inline-flex items-center gap-2">
+            <div className="inline-flex items-center gap-2 flex-wrap">
               <GlassBadge variant="accent">
                 <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-ping" />
                 {t.common.liveBadge}
               </GlassBadge>
-              <GlassBadge variant="neutral">
+              <GlassBadge variant="success">
                 <ShieldCheck className="w-3.5 h-3.5 text-[var(--success)]" />
-                {language === 'hi' ? 'गोपनीयता-सत्यापित' : 'Privacy-Preserving'}
+                <span>{language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage Guaranteed'}</span>
               </GlassBadge>
             </div>
 
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-[var(--text-primary)] leading-[1.12]">
-              {t.hero.title}
+              {language === 'hi'
+                ? 'स्वतंत्र नागरिक जनमत सर्वेक्षण'
+                : 'Independent India Civic Opinion Polls'}
             </h1>
 
             <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl font-normal">
-              {t.hero.subtitle}
+              {language === 'hi'
+                ? 'गोपनीयता-केंद्रित सत्यापन और 100% गुमनाम प्रतिक्रियाओं के साथ स्वतंत्र जनमत सर्वेक्षण में भाग लें। आपकी राय अपरिवर्तनीय और सुरक्षित है।'
+                : 'Participate in independent public opinion polls with verified eligibility and 100% anonymous responses. Your voice is permanent, immutable, and tamper-proof.'}
             </p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-3 pt-1">
               <Link href="/polls/national-opinion-poll-2029">
-                <GlassButton size="lg" className="gap-2 shadow-md">
+                <GlassButton size="lg" className="gap-2 shadow-md font-bold">
+                  <Vote className="w-5 h-5" />
                   <span>{t.hero.primaryCta}</span>
                   <ArrowRight className="w-4 h-4" />
                 </GlassButton>
               </Link>
-              <Link href="/how-it-works">
-                <GlassButton variant="secondary" size="lg">
-                  {t.hero.secondaryCta}
-                </GlassButton>
-              </Link>
               <Link href="/polls/national-opinion-poll-2029/results">
-                <GlassButton variant="ghost" size="lg" className="gap-2">
+                <GlassButton variant="secondary" size="lg" className="gap-2">
                   <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
-                  <span>{t.results.title}</span>
+                  <span>{language === 'hi' ? 'लाइव मतगणना देखें' : 'View Live Results'}</span>
                 </GlassButton>
               </Link>
             </div>
 
             {/* Trust Metrics Pill */}
-            <div className="pt-4 flex flex-wrap items-center gap-6 text-xs text-[var(--text-secondary)] font-medium">
+            <div className="pt-2 flex flex-wrap items-center gap-6 text-xs text-[var(--text-secondary)] font-medium">
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-[var(--accent)]" />
                 <span>
-                  <strong>128,420+</strong> {language === 'hi' ? 'सत्यापित प्रतिक्रियाएं' : 'Verified Participants'}
+                  <strong>128,420+</strong> {language === 'hi' ? 'सत्यापित नागरिक मत' : 'Verified Citizen Responses'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[var(--success)]" />
                 <span>
-                  <strong>{language === 'hi' ? 'सक्रिय' : 'Live'}</strong> {language === 'hi' ? 'राष्ट्रीय जनमत' : 'National Poll'}
+                  <strong>{language === 'hi' ? 'सक्रिय' : 'Live'}</strong> {language === 'hi' ? 'राष्ट्रीय जनमत' : 'National Poll 2029'}
                 </span>
               </div>
             </div>
@@ -86,7 +88,68 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Prominent Mandatory Non-Affiliation Disclaimer Banner */}
+      {/* Prominent Voter Assurance Card (Crucial User Requirement) */}
+      <section>
+        <VoterAssuranceCard />
+      </section>
+
+      {/* Super Simple 3-Step Walkthrough For Any User */}
+      <section className="space-y-4">
+        <div className="text-center max-w-xl mx-auto space-y-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
+            {language === 'hi' ? 'आसान प्रक्रिया' : 'Simple 3-Step Process'}
+          </span>
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
+            {language === 'hi' ? 'केवल 30 सेकंड में अपना मत दर्ज करें' : 'Cast Your Opinion in 30 Seconds'}
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <GlassCard className="space-y-2 p-5">
+            <div className="flex items-center gap-3">
+              <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center">1</span>
+              <h3 className="font-bold text-sm text-[var(--text-primary)]">
+                {language === 'hi' ? '1. वोटर आईडी (EPIC) दर्ज करें' : '1. Enter Voter ID (EPIC)'}
+              </h3>
+            </div>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
+              {language === 'hi'
+                ? 'पात्रता की पुष्टि केवल मेमोरी में होती है। आपका आईडी कहीं भी सेव नहीं होता।'
+                : 'Checked strictly in RAM to confirm eligibility. Discarded immediately.'}
+            </p>
+          </GlassCard>
+
+          <GlassCard className="space-y-2 p-5">
+            <div className="flex items-center gap-3">
+              <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center">2</span>
+              <h3 className="font-bold text-sm text-[var(--text-primary)]">
+                {language === 'hi' ? '2. पार्टी या नोटा चुनें' : '2. Select Your Party or NOTA'}
+              </h3>
+            </div>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
+              {language === 'hi'
+                ? 'असली चुनाव चिन्हों के साथ निष्पक्ष सूची। 1 व्यक्ति 1 मत।'
+                : 'Clear official symbols. One response per verified citizen.'}
+            </p>
+          </GlassCard>
+
+          <GlassCard className="space-y-2 p-5">
+            <div className="flex items-center gap-3">
+              <span className="w-8 h-8 rounded-full bg-[var(--success)] text-white text-xs font-black flex items-center justify-center">3</span>
+              <h3 className="font-bold text-sm text-[var(--text-primary)]">
+                {language === 'hi' ? '3. पुष्टि करें और परिणाम देखें' : '3. Confirm & View Live Results'}
+              </h3>
+            </div>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
+              {language === 'hi'
+                ? 'मतदान के बाद आपका वोट कभी नहीं बदलेगा। तुरंत लाइव मतगणना देखें।'
+                : 'Response is permanently locked. Watch real-time vote counting.'}
+            </p>
+          </GlassCard>
+        </div>
+      </section>
+
+      {/* Mandatory Non-Affiliation Disclaimer Banner */}
       <section>
         <DisclaimerBanner />
       </section>
@@ -141,7 +204,7 @@ export default function HomePage() {
               <Link href="/polls/national-opinion-poll-2029/results">
                 <GlassButton variant="secondary" size="md" className="gap-1.5">
                   <BarChart3 className="w-4 h-4" />
-                  <span>{t.polls.viewResultsButton}</span>
+                  <span>{language === 'hi' ? 'लाइव परिणाम देखें' : 'View Live Results'}</span>
                 </GlassButton>
               </Link>
             </div>
@@ -173,7 +236,7 @@ export default function HomePage() {
                 {language === 'hi' ? 'गोपनीयता स्तर' : 'Privacy Tier'}
               </span>
               <p className="text-lg font-bold text-[var(--success)] mt-0.5">
-                {language === 'hi' ? 'शून्य ट्रैकिंग' : 'Zero Tracking'}
+                {language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage'}
               </p>
             </div>
             <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
@@ -187,6 +250,9 @@ export default function HomePage() {
           </div>
         </GlassCard>
       </section>
+
+      {/* About Creator Section (User Requirement: 20yo from UP, frustrated with politics, anonymous) */}
+      <AboutCreatorSection />
 
       {/* How It Works Section */}
       <HowItWorksSection />

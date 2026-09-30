@@ -51,12 +51,14 @@ export const INITIAL_POLLS: Poll[] = [
 export const INITIAL_VOTE_COUNTS: Record<string, Record<string, number>> = {
   'poll-national-2029': {
     'opt-party-bjp': 48620,
-    'opt-party-inc': 38240,
-    'opt-party-aap': 14890,
-    'opt-party-cpim': 6410,
-    'opt-party-bsp': 5120,
-    'opt-party-npp': 2340,
-    'opt-party-others': 9100,
-    'opt-party-nota': 3700,
+    'opt-party-inc': 34240,
+    'opt-party-sp': 18450,
+    'opt-party-aap': 11890,
+    'opt-party-bsp': 4120,
+    'opt-party-cpim': 3410,
+    'opt-party-tmc': 4280,
+    'opt-party-others': 2410,
+    'opt-party-nota': 1000,
   },
 };
+

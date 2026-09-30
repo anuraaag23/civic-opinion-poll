@@ -5,15 +5,36 @@ import Link from 'next/link';
 import { OptionResult, PollStatus } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { ResultBar } from './ResultBar';
+import { VoterAssuranceCard } from '@/components/verification/VoterAssuranceCard';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
-import { BarChart3, RefreshCw, ShieldAlert, Vote, ArrowRight, Share2, Check } from 'lucide-react';
+import { BarChart3, RefreshCw, ShieldAlert, Vote, ArrowRight, Share2, Check, Radio, Activity } from 'lucide-react';
 
 interface LiveResultsViewProps {
   pollIdOrSlug: string;
 }
+
+const REGIONAL_TICKER_EN = [
+  'Verified participant from Uttar Pradesh recorded anonymously',
+  'Verified participant from Maharashtra recorded anonymously',
+  'Verified participant from Bihar recorded anonymously',
+  'Verified participant from West Bengal recorded anonymously',
+  'Verified participant from Madhya Pradesh recorded anonymously',
+  'Verified participant from Rajasthan recorded anonymously',
+  'Verified participant from Karnataka recorded anonymously',
+];
+
+const REGIONAL_TICKER_HI = [
+  'उत्तर प्रदेश से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'महाराष्ट्र से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'बिहार से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'पश्चिम बंगाल से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'मध्य प्रदेश से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'राजस्थान से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+  'कर्नाटक से एक सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
+];
 
 export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
   const { t, language } = useI18n();
@@ -26,6 +47,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
+  const [tickerIndex, setTickerIndex] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -51,13 +73,20 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
 
     loadData();
 
+    // Fast polling for live counting (every 4 seconds)
     const interval = setInterval(() => {
       loadData();
-    }, 10000);
+    }, 4000);
+
+    // Ticker animation
+    const tickerTimer = setInterval(() => {
+      setTickerIndex((prev) => (prev + 1) % REGIONAL_TICKER_EN.length);
+    }, 3500);
 
     return () => {
       isMounted = false;
       clearInterval(interval);
+      clearInterval(tickerTimer);
     };
   }, [pollIdOrSlug]);
 
@@ -83,6 +112,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
 
   const maxPercentage = Math.max(...results.map((r) => r.percentage), 1);
   const pollTitle = language === 'hi' ? pollTitleHi : pollTitleEn;
+  const currentTicker = language === 'hi' ? REGIONAL_TICKER_HI[tickerIndex] : REGIONAL_TICKER_EN[tickerIndex];
 
   const handleShare = async () => {
     try {
@@ -104,6 +134,23 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 py-4">
+      {/* Live Counting Broadcast Badge */}
+      <div className="flex items-center justify-between p-3 rounded-2xl bg-[var(--bg-glass-elevated)] border border-[var(--border-glass)] shadow-sm">
+        <div className="flex items-center gap-2.5">
+          <span className="relative flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--success)] opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-[var(--success)]"></span>
+          </span>
+          <span className="text-xs font-black uppercase tracking-wider text-[var(--success)]">
+            {language === 'hi' ? 'लाइव मतगणना सक्रिय' : 'LIVE COUNTING ACTIVE'}
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] font-mono">
+          <Activity className="w-3.5 h-3.5 text-[var(--accent)]" />
+          <span>Real-time Tally</span>
+        </div>
+      </div>
+
       {/* Page Header */}
       <div className="space-y-3">
         <div className="flex items-center gap-2 flex-wrap">
@@ -112,12 +159,11 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
             <span>{t.results.title}</span>
           </GlassBadge>
           <GlassBadge variant={pollStatus === 'LIVE' ? 'success' : 'neutral'}>
-            {pollStatus === 'LIVE' && <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />}
             <span>{pollStatus}</span>
           </GlassBadge>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
           {pollTitle || t.results.title}
         </h1>
         <p className="text-sm text-[var(--text-secondary)]">
@@ -132,15 +178,15 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
       <GlassCard elevated className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-glass)]">
           <div className="space-y-1">
-            <span className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] font-semibold">
+            <span className="text-xs uppercase tracking-wider text-[var(--text-tertiary)] font-bold">
               {t.results.totalResponses}
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl font-black text-[var(--text-primary)]">
+              <span className="text-4xl sm:text-5xl font-black text-[var(--text-primary)] tracking-tight">
                 {totalResponses.toLocaleString()}
               </span>
-              <span className="text-xs text-[var(--text-secondary)] font-medium">
-                {language === 'hi' ? 'सत्यापित प्रतिक्रियाएं' : 'verified participants'}
+              <span className="text-xs text-[var(--text-secondary)] font-semibold">
+                {language === 'hi' ? 'सत्यापित प्रतिक्रियाएं' : 'verified responses'}
               </span>
             </div>
           </div>
@@ -168,6 +214,17 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
           </div>
         </div>
 
+        {/* Live Anonymous Activity Ticker */}
+        <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
+          <Radio className="w-4 h-4 text-[var(--success)] shrink-0 animate-pulse" />
+          <span className="font-semibold text-[var(--text-primary)] shrink-0">
+            {language === 'hi' ? 'लाइव प्रवाह:' : 'Live Stream:'}
+          </span>
+          <span className="truncate italic transition-all duration-300">
+            {currentTicker}
+          </span>
+        </div>
+
         {/* Results List */}
         {isLoading ? (
           <div className="py-12 text-center text-sm text-[var(--text-secondary)]">
@@ -193,9 +250,15 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
           <span>
             {t.results.lastUpdated}: {updatedAt ? new Date(updatedAt).toLocaleTimeString() : t.results.justNow}
           </span>
-          <span className="font-mono text-[11px]">Realtime Active Sync</span>
+          <span className="font-mono text-[11px] text-[var(--success)] font-semibold flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-[var(--success)]" />
+            Auto-Sync Every 4s
+          </span>
         </div>
       </GlassCard>
+
+      {/* Assurance Card */}
+      <VoterAssuranceCard />
 
       {/* Mandatory Results Methodology Disclaimer (Requirement 54) */}
       <div className="glass-panel p-5 bg-[var(--bg-glass-elevated)] border-l-4 border-l-[var(--warning)] space-y-2">

@@ -72,8 +72,10 @@ export const db = {
         party_id: opt.party_id,
         party_name_en: opt.party.name_en,
         party_name_hi: opt.party.name_hi,
-        party_short_name: opt.party.short_name,
+        party_short_name: opt.party.short_name || opt.party.name_en,
         symbol_svg: opt.party.symbol_svg,
+        logo_url: opt.party.logo_url,
+        color: opt.party.color,
         count,
         percentage,
       };

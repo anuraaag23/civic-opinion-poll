@@ -42,10 +42,21 @@ export function VoteConfirmationSheet({
 
         {/* Selected Party Summary Card */}
         <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-4">
-          <div
-            className="w-14 h-14 rounded-xl p-2.5 bg-[var(--bg-primary)] border border-[var(--border-glass)] flex items-center justify-center shrink-0"
-            dangerouslySetInnerHTML={{ __html: selectedParty.symbol_svg }}
-          />
+          <div className="w-14 h-14 rounded-xl p-2 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+            {selectedParty.logo_url ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={selectedParty.logo_url}
+                alt={selectedParty.short_name}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center"
+                dangerouslySetInnerHTML={{ __html: selectedParty.symbol_svg }}
+              />
+            )}
+          </div>
           <div className="space-y-0.5 min-w-0">
             <span className="text-xs text-[var(--text-tertiary)] uppercase font-semibold">
               {t.voting.confirmSelectedParty}

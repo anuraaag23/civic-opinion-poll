@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useI18n } from '@/lib/i18n/context';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
-import { Menu, X, BarChart3, Vote, HelpCircle, ShieldCheck } from 'lucide-react';
+import { Menu, X, BarChart3, Vote, HelpCircle, ShieldCheck, HeartHandshake } from 'lucide-react';
 
 export function GlassNavbar() {
   const { t, language } = useI18n();
@@ -17,6 +17,7 @@ export function GlassNavbar() {
     { href: '/polls', label: t.nav.polls, icon: Vote },
     { href: '/polls/national-opinion-poll-2029/results', label: t.nav.results, icon: BarChart3 },
     { href: '/how-it-works', label: t.nav.howItWorks, icon: HelpCircle },
+    { href: '/about', label: language === 'hi' ? 'निर्माता' : 'About Creator', icon: HeartHandshake },
     { href: '/privacy', label: t.nav.privacy, icon: ShieldCheck },
   ];
 

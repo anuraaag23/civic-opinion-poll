@@ -19,10 +19,21 @@ export function ResultBar({ result, maxPercentage }: ResultBarProps) {
       <div className="flex items-center justify-between gap-4">
         {/* Party Identity */}
         <div className="flex items-center gap-3 min-w-0">
-          <div
-            className="w-8 h-8 rounded-lg p-1.5 bg-[var(--bg-primary)] border border-[var(--border-glass)] flex items-center justify-center shrink-0"
-            dangerouslySetInnerHTML={{ __html: result.symbol_svg }}
-          />
+          <div className="w-9 h-9 rounded-lg p-1.5 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+            {result.logo_url ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={result.logo_url}
+                alt={result.party_short_name}
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <div
+                className="w-full h-full flex items-center justify-center"
+                dangerouslySetInnerHTML={{ __html: result.symbol_svg }}
+              />
+            )}
+          </div>
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)]">
               {result.party_short_name}

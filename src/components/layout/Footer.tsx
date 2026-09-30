@@ -77,6 +77,11 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/about" className="hover:text-[var(--accent)] transition-colors">
+                  {language === 'hi' ? 'निर्माता के बारे में' : 'About the Creator'}
+                </Link>
+              </li>
+              <li>
                 <Link href="/admin" className="hover:text-[var(--accent)] transition-colors">
                   {t.nav.admin}
                 </Link>
