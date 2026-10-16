@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useTheme } from '@/lib/theme/context';
-import { Sun, Moon, Laptop } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 
 export function ThemeSwitcher({ className = '' }: { className?: string }) {
   const { theme, setTheme } = useTheme();
