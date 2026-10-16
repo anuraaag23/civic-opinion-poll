@@ -3,12 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { Coffee } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
-import { SupportModal } from './SupportModal';
-import { getStoredSupportStats, SupportStats } from '@/lib/buymeachai/config';
+import { BUYMEACHAI_CONFIG, getStoredSupportStats, SupportStats } from '@/lib/buymeachai/config';
 
 export function FloatingSupportWidget() {
   const { language } = useI18n();
-  const [modalOpen, setModalOpen] = useState(false);
   const [stats, setStats] = useState<SupportStats>(() => getStoredSupportStats());
 
   useEffect(() => {
@@ -32,48 +30,43 @@ export function FloatingSupportWidget() {
     return () => window.removeEventListener('meravote_support_updated', handleUpdate);
   }, []);
 
+  const titleText =
+    language === 'hi'
+      ? 'इस वेबसाइट को जीवित रखने के लिए डेवलपर का समर्थन करें'
+      : 'support to developer for make alive this website';
+
   return (
-    <>
-      <div className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-3 sm:right-5 z-40 max-w-[calc(100vw-1.5rem)]">
-        <button
-          onClick={() => setModalOpen(true)}
-          className="group relative flex items-center gap-2.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-amber-300/30"
-          aria-label={
-            language === 'hi'
-              ? 'इस वेबसाइट को जीवित रखने के लिए डेवलपर का समर्थन करें'
-              : 'Support developer for make alive this website'
-          }
-          title={
-            language === 'hi'
-              ? 'इस वेबसाइट को जीवित रखने के लिए डेवलपर का समर्थन करें'
-              : 'Support developer for make alive this website'
-          }
-        >
-          {/* Animated Coffee Icon */}
-          <div className="relative flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white shadow-inner shrink-0">
-            <Coffee className="w-4 h-4 transition-transform group-hover:rotate-12" />
-          </div>
+    <div className="fixed bottom-4 right-4 sm:bottom-5 sm:right-6 z-40 max-w-[calc(100vw-2rem)]">
+      <a
+        href={BUYMEACHAI_CONFIG.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group relative flex items-center gap-2.5 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white shadow-xl hover:shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-amber-300/30"
+        aria-label={titleText}
+        title={titleText}
+      >
+        {/* Animated Chai Icon */}
+        <div className="relative flex items-center justify-center w-7 h-7 rounded-full bg-white/20 text-white shadow-inner shrink-0">
+          <Coffee className="w-4 h-4 transition-transform group-hover:rotate-12" />
+        </div>
 
-          {/* Text and stats */}
-          <div className="flex flex-col text-left pr-1">
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black tracking-tight text-white">
-                {language === 'hi' ? 'डेवलपर का समर्थन करें' : 'Support Developer'}
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
-            </div>
-            <span className="text-[10px] text-white/80 font-medium leading-none mt-0.5">
-              {stats.totalCups > 0
-                ? `${stats.totalCups} ☕ · ₹${stats.totalAmountInr.toLocaleString()}`
-                : language === 'hi'
-                ? 'वेबसाइट चालू रखें'
-                : 'Keep this alive'}
+        {/* Text and stats */}
+        <div className="flex flex-col text-left pr-1">
+          <div className="flex items-center gap-1.5">
+            <span className="text-xs font-black tracking-tight text-white">
+              {language === 'hi' ? 'डेवलपर का समर्थन करें' : 'Support Developer'}
             </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
           </div>
-        </button>
-      </div>
-
-      <SupportModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
-    </>
+          <span className="text-[10px] text-white/80 font-medium leading-none mt-0.5">
+            {stats.totalCups > 0
+              ? `${stats.totalCups} ☕ · ₹${stats.totalAmountInr.toLocaleString()}`
+              : language === 'hi'
+              ? 'वेबसाइट चालू रखें'
+              : 'Keep this alive'}
+          </span>
+        </div>
+      </a>
+    </div>
   );
 }

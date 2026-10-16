@@ -34,9 +34,9 @@ export function DisclaimerBanner({ compact = false, className = '' }: Disclaimer
           <ShieldAlert className="w-5 h-5" />
         </div>
         <div className="space-y-1">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-secondary)]">
+          <h2 className="text-xs font-bold text-[var(--text-secondary)]">
             Legal Disclaimer & Non-Affiliation Notice
-          </h4>
+          </h2>
           <p className="text-sm leading-relaxed text-[var(--text-primary)] font-medium">
             {t.common.officialDisclaimer}
           </p>

@@ -1,21 +1,14 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { SupportModal } from '@/components/support/SupportModal';
+import { BUYMEACHAI_CONFIG, CHAI_TIERS } from '@/lib/buymeachai/config';
 import { MapPin, Shield, User, Coffee, ArrowRight } from 'lucide-react';
 
 export function AboutCreatorSection() {
   const { language } = useI18n();
-  const [supportModalOpen, setSupportModalOpen] = useState(false);
-  const [supportAmount, setSupportAmount] = useState(100);
-
-  const openSupport = (amt: number) => {
-    setSupportAmount(amt);
-    setSupportModalOpen(true);
-  };
 
   return (
     <section id="about" className="py-12 sm:py-16 relative">
@@ -134,38 +127,37 @@ export function AboutCreatorSection() {
             </div>
 
             <div className="flex flex-col sm:items-end gap-3 shrink-0 w-full sm:w-auto">
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                {[50, 100, 250].map((amt) => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => openSupport(amt)}
-                    className="flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-bold text-amber-700 dark:text-amber-300 transition-all cursor-pointer active:scale-95 text-center min-h-[38px] flex items-center justify-center"
+              <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+                {CHAI_TIERS.map((tier) => (
+                  <a
+                    key={tier.amount}
+                    href={BUYMEACHAI_CONFIG.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-bold text-amber-700 dark:text-amber-300 transition-all cursor-pointer active:scale-95 text-center min-h-[38px] flex items-center justify-center gap-1"
+                    title={`Buy ${tier.chais} Chai (${tier.label})`}
                   >
-                    ₹{amt}
-                  </button>
+                    <span>{tier.label}</span>
+                    <span className="text-[10px] opacity-75">({tier.chais} ☕)</span>
+                  </a>
                 ))}
               </div>
 
-              <button
-                type="button"
-                onClick={() => openSupport(100)}
+              <a
+                href={BUYMEACHAI_CONFIG.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full sm:w-auto min-h-[46px] py-2.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                title={language === 'hi' ? 'इस वेबसाइट को जीवित रखने के लिए डेवलपर का समर्थन करें' : 'support to developer for make alive this website'}
               >
                 <Coffee className="w-4 h-4 shrink-0" />
-                <span>{language === 'hi' ? 'डेवलपर को कॉफी दें' : 'Buy Developer a Coffee'}</span>
+                <span>{language === 'hi' ? 'डेवलपर को चाय भेंट करें' : 'Buy Developer a Chai'}</span>
                 <ArrowRight className="w-3.5 h-3.5 shrink-0" />
-              </button>
+              </a>
             </div>
           </div>
         </GlassCard>
       </div>
-
-      <SupportModal
-        isOpen={supportModalOpen}
-        onClose={() => setSupportModalOpen(false)}
-        defaultAmount={supportAmount}
-      />
     </section>
   );
 }

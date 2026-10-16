@@ -57,7 +57,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <body className="min-h-screen min-h-[100dvh] flex flex-col antialiased overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
         <ThemeProvider>
           <I18nProvider>

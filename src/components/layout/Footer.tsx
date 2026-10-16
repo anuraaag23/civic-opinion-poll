@@ -15,42 +15,44 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-28 sm:pb-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
           {/* Brand & Purpose */}
-          <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md overflow-hidden backdrop-blur-md shrink-0">
-                <Image
-                  src="/meravote-logo.png"
-                  alt="Mera Vote Logo"
-                  width={36}
-                  height={36}
-                  className="w-full h-full object-contain"
-                />
+          <div className="md:col-span-2 space-y-3 flex flex-col justify-between">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md overflow-hidden backdrop-blur-md shrink-0">
+                    <Image
+                      src="/meravote-logo.png"
+                      alt="Mera Vote Logo"
+                      width={36}
+                      height={36}
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                  <span className="text-lg font-black tracking-tight text-[var(--text-primary)]">
+                    {language === 'hi' ? 'मेरा वोट (Mera Vote)' : 'Mera Vote'}
+                  </span>
+                </div>
+                <SupportButton variant="compact" />
               </div>
-              <span className="text-lg font-black tracking-tight text-[var(--text-primary)]">
-                {language === 'hi' ? 'मेरा वोट (Mera Vote)' : 'Mera Vote'}
-              </span>
-            </div>
-            <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-md">
-              {t.common.tagline}. {t.hero.subtitle}
-            </p>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-[var(--text-tertiary)] pt-1">
-              <span className="inline-flex items-center gap-1.5">
-                <Lock className="w-3.5 h-3.5 text-[var(--success)]" />
-                {language === 'hi' ? 'पहचान पृथक्करण' : 'Identity Separation'}
-              </span>
-              <span>•</span>
-              <span className="inline-flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent)]" />
-                {language === 'hi' ? 'एक सत्यापित प्रतिक्रिया' : 'One Response Per Poll'}
-              </span>
-              <span>•</span>
-              <span className="inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[var(--success)]" />
-                {language === 'hi' ? 'सामूहिक सार्वजनिक परिणाम' : 'Aggregate Live Results'}
-              </span>
-            </div>
-            <div className="pt-1">
-              <SupportButton variant="pill" />
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-md">
+                {t.common.tagline}. {t.hero.subtitle}
+              </p>
+              <div className="flex flex-wrap items-center gap-2.5 text-xs text-[var(--text-tertiary)]">
+                <span className="inline-flex items-center gap-1.5">
+                  <Lock className="w-3.5 h-3.5 text-[var(--success)]" />
+                  {language === 'hi' ? 'पहचान पृथक्करण' : 'Identity Separation'}
+                </span>
+                <span>•</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent)]" />
+                  {language === 'hi' ? 'एक सत्यापित प्रतिक्रिया' : 'One Response Per Poll'}
+                </span>
+                <span>•</span>
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[var(--success)]" />
+                  {language === 'hi' ? 'सामूहिक सार्वजनिक परिणाम' : 'Aggregate Live Results'}
+                </span>
+              </div>
             </div>
           </div>
 

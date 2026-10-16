@@ -97,7 +97,7 @@ export function StateSelector({
               onClick={() => setIsOpen(false)}
               aria-hidden="true"
             />
-            <div className="absolute top-full left-0 right-0 mt-2 z-50 glass-panel-elevated p-4 rounded-2xl shadow-2xl border border-[var(--border-glass)] space-y-3 animate-in fade-in slide-in-from-top-2 duration-150 max-h-[420px] flex flex-col">
+            <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-[var(--bg-surface)] dark:bg-[#15181D] p-3.5 sm:p-4 rounded-2xl shadow-2xl border border-[var(--border-glass)] ring-1 ring-black/10 dark:ring-white/10 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150 max-h-[380px] flex flex-col w-full max-w-full overflow-hidden">
               {/* Search Field */}
               <div className="relative shrink-0">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]" />
@@ -105,47 +105,23 @@ export function StateSelector({
                   type="text"
                   placeholder={
                     language === 'hi'
-                      ? 'राज्य का नाम खोजें (उदा. उत्तर प्रदेश, महाराष्ट्र, बिहार)'
+                      ? 'राज्य का नाम खोजें (उदा. उत्तर प्रदेश, बिहार)...'
                       : 'Search state by name or code (e.g. UP, Bihar, Delhi)...'
                   }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                   autoFocus
                 />
               </div>
 
-              {/* Quick Select Chips */}
-              {!searchQuery && (
-                <div className="shrink-0 space-y-1.5">
-                  <span className="text-[10px] font-bold uppercase text-[var(--text-tertiary)] tracking-wider">
-                    {language === 'hi' ? 'प्रमुख राज्य' : 'Popular States'}
-                  </span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {quickStates.map((st) => (
-                      <button
-                        key={st.id}
-                        type="button"
-                        onClick={() => {
-                          onSelectState(st.id);
-                          setIsOpen(false);
-                          setSearchQuery('');
-                        }}
-                        className={`text-xs px-2.5 py-1 rounded-lg transition-all cursor-pointer font-medium ${
-                          st.id === selectedStateId
-                            ? 'bg-[var(--accent)] text-white font-bold'
-                            : 'bg-[var(--bg-surface)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] text-[var(--text-secondary)] border border-[var(--border-glass)]'
-                        }`}
-                      >
-                        {language === 'hi' ? st.name_hi : st.name_en}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* State List Scroll Container */}
-              <div className="overflow-y-auto space-y-1 pr-1 flex-1 max-h-60" role="listbox">
+              {/* State List Scroll Container with Opaque Surface */}
+              <div
+                className="overflow-y-auto overscroll-contain space-y-1.5 pr-1 flex-1 max-h-[280px] custom-scrollbar"
+                role="listbox"
+                tabIndex={0}
+                aria-label="Indian States and Union Territories list"
+              >
                 {filteredStates.map((st) => {
                   const isSelected = st.id === selectedStateId;
                   return (
@@ -159,29 +135,35 @@ export function StateSelector({
                         setIsOpen(false);
                         setSearchQuery('');
                       }}
-                      className={`w-full p-2.5 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer ${
+                      className={`w-full p-2.5 sm:p-3 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-bold'
-                          : 'hover:bg-[var(--bg-surface)] text-[var(--text-primary)]'
+                          ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-bold border border-[var(--accent)]/30'
+                          : 'bg-[var(--bg-surface)] hover:bg-[var(--bg-primary)] text-[var(--text-primary)] border border-transparent'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
-                        <span className="w-8 h-8 rounded-lg bg-[var(--border-glass)] text-[var(--text-secondary)] text-xs font-bold flex items-center justify-center">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="w-8 h-8 rounded-lg bg-[var(--border-glass)] text-[var(--text-secondary)] text-xs font-black flex items-center justify-center shrink-0">
                           {st.code}
                         </span>
-                        <div>
-                          <span className="text-sm font-semibold block">
-                            {language === 'hi' ? st.name_hi : st.name_en}
-                          </span>
-                          <span className="text-[11px] text-[var(--text-tertiary)]">
-                            {language === 'hi' ? st.name_en : st.name_hi}
-                            {st.assemblySeats ? ` • ${st.assemblySeats} seats` : ''}
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <span className="text-sm font-bold text-[var(--text-primary)]">
+                              {language === 'hi' ? st.name_hi : st.name_en}
+                            </span>
+                            <span className="text-xs text-[var(--text-secondary)] font-medium">
+                              • {language === 'hi' ? st.name_en : st.name_hi}
+                            </span>
+                          </div>
+                          <span className="text-xs text-[var(--text-tertiary)] font-normal block mt-0.5">
+                            {st.assemblySeats
+                              ? `${st.assemblySeats} ${language === 'hi' ? 'विधानसभा सीटें' : 'Assembly Seats'}`
+                              : st.type}
                           </span>
                         </div>
                       </div>
 
                       {isSelected && (
-                        <div className="w-5 h-5 rounded-full bg-[var(--accent)] text-white flex items-center justify-center">
+                        <div className="w-5 h-5 rounded-full bg-[var(--accent)] text-white flex items-center justify-center shrink-0 ml-2">
                           <Check className="w-3 h-3 stroke-[3]" />
                         </div>
                       )}
@@ -190,7 +172,7 @@ export function StateSelector({
                 })}
 
                 {filteredStates.length === 0 && (
-                  <div className="p-4 text-center text-xs text-[var(--text-secondary)]">
+                  <div className="p-6 text-center text-xs text-[var(--text-secondary)]">
                     {language === 'hi' ? 'कोई राज्य नहीं मिला' : 'No state found matching your query.'}
                   </div>
                 )}

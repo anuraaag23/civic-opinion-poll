@@ -83,7 +83,7 @@ export default function CMPage() {
     <div className="space-y-8 sm:space-y-10 py-4 max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
           <Building2 className="w-3.5 h-3.5" />
           <span>{language === 'hi' ? 'राज्य विधानसभा • मुख्यमंत्री जनमत' : 'State Assembly • Chief Minister Scope'}</span>
         </div>
@@ -224,10 +224,10 @@ export default function CMPage() {
                           <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block mb-0.5">
                             {party.short_name}
                           </span>
-                          <h4 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] truncate">
+                          <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] leading-snug">
                             {language === 'hi' ? party.name_hi : party.name_en}
-                          </h4>
-                          <span className="text-[10px] text-[var(--text-tertiary)] truncate block">
+                          </h3>
+                          <span className="text-xs text-[var(--text-tertiary)] block mt-0.5">
                             {language === 'hi' ? party.symbol_alt_hi.split('-')[0] : party.symbol_alt_en.split('-')[0]}
                           </span>
                         </div>

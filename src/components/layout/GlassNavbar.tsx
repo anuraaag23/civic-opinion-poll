@@ -55,7 +55,7 @@ export function GlassNavbar() {
                 {language === 'hi' ? 'Mera Vote' : 'भारत'}
               </span>
             </span>
-            <span className="text-[9px] sm:text-[10px] tracking-wide text-[var(--text-secondary)] font-medium truncate">
+            <span className="text-xs tracking-normal text-[var(--text-secondary)] font-medium truncate">
               {language === 'hi' ? 'स्वतंत्र नागरिक जनमत' : 'Independent Civic Polls'}
             </span>
           </div>

@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useI18n } from '@/lib/i18n/context';
-import { BUYMEACHAI_CONFIG, addSupporter } from '@/lib/buymeachai/config';
+import { BUYMEACHAI_CONFIG, CHAI_TIERS, addSupporter } from '@/lib/buymeachai/config';
 import {
   containsLink,
   sanitizeText,
@@ -34,7 +34,7 @@ interface SupportModalProps {
   defaultAmount?: number;
 }
 
-export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportModalProps) {
+export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportModalProps) {
   const { language } = useI18n();
 
   // Modal flow states:
@@ -101,7 +101,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
   }, [isOpen, handleModalClose]);
 
   const currentAmount = customAmount ? Math.max(1, Number(customAmount) || 0) : selectedAmount;
-  const estimatedCups = Math.max(1, Math.round(currentAmount / 50));
+  const estimatedCups = Math.max(1, Math.round(currentAmount / 20));
 
   // Anti-spam link detection
   const nameHasLink = containsLink(supporterName);
@@ -222,11 +222,18 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
     setPaymentInitiatedAt(now);
     setPollCountdown(45);
 
-    // Open Buy Me a Chai payment in a new tab
-    window.open(BUYMEACHAI_CONFIG.url, '_blank', 'noopener,noreferrer');
+    addSupporter(
+      supporterName || 'Anonymous Citizen',
+      currentAmount,
+      estimatedCups,
+      starRating,
+      message,
+      `chai-${now}`,
+      true
+    );
 
-    // Automatically transition to the auto-verification state
-    setStep('auto_verifying');
+    // Redirect directly to the Buy Me a Chai payment page
+    window.location.href = BUYMEACHAI_CONFIG.url;
   };
 
   // User manually triggers a check
@@ -432,12 +439,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
               <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider block">
                 {language === 'hi' ? '1. योगदान राशि चुनें' : '1. Select Contribution Amount'}
               </label>
-              <div className="grid grid-cols-3 gap-2.5">
-                {[
-                  { amount: 50, label: '₹50', sub: '1 Cup Chai' },
-                  { amount: 100, label: '₹100', sub: '2 Cups Chai' },
-                  { amount: 250, label: '₹250', sub: 'Chai & Samosa' },
-                ].map((tier) => (
+              <div className="grid grid-cols-4 gap-2">
+                {CHAI_TIERS.map((tier) => (
                   <button
                     key={tier.amount}
                     type="button"
@@ -445,14 +448,14 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                       setSelectedAmount(tier.amount);
                       setCustomAmount('');
                     }}
-                    className={`p-3 rounded-2xl border text-center transition-all cursor-pointer ${
+                    className={`p-2.5 rounded-2xl border text-center transition-all cursor-pointer ${
                       selectedAmount === tier.amount && !customAmount
                         ? 'border-amber-500 bg-amber-500/15 shadow-sm text-amber-600 dark:text-amber-400 font-bold'
                         : 'border-[var(--border-glass)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:border-amber-500/50 hover:text-[var(--text-primary)]'
                     }`}
                   >
                     <div className="text-sm font-bold">{tier.label}</div>
-                    <div className="text-[10px] opacity-75">{tier.sub}</div>
+                    <div className="text-[10px] opacity-75">{tier.chais} ☕</div>
                   </button>
                 ))}
               </div>
@@ -565,27 +568,29 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
               />
             </div>
 
-            {/* CTA Button */}
+            {/* CTA Button: Direct Redirect Link */}
             <div className="pt-2">
-              <button
-                type="button"
+              <a
+                href={BUYMEACHAI_CONFIG.url}
+                target="_blank"
+                rel="noopener noreferrer"
                 onClick={handleProceedToPayment}
                 className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-sm shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 <Coffee className="w-4 h-4 shrink-0" />
                 <span>
                   {language === 'hi'
-                    ? `Buy Me a Chai पर ₹${currentAmount} का भुगतान करें`
-                    : `Pay ₹${currentAmount} on Buy Me a Chai`}
+                    ? `Buy Me a Chai पर ₹${currentAmount} का भुगतान करें (पेमेंट पेज)`
+                    : `Pay ₹${currentAmount} on Buy Me a Chai (Payment Page)`}
                 </span>
                 <ExternalLink className="w-4 h-4 shrink-0 opacity-80" />
-              </button>
+              </a>
             </div>
 
             <div className="text-center text-[11px] text-[var(--text-tertiary)] leading-relaxed font-normal">
               {language === 'hi'
-                ? 'भुगतान Buy Me a Chai पर सुरक्षित रूप से संसाधित होता है। भुगतान के तुरंत बाद, यह विंडो स्वचालित रूप से सत्यापन का पता लगाएगी।'
-                : 'Payment is processed securely on Buy Me a Chai. After payment, your contribution is automatically verified in real-time.'}
+                ? 'क्लिक करते ही आप सुरक्षित UPI भुगतान के लिए सीधे Buy Me a Chai (buymeachai.in/ryper) पर रीडायरेक्ट हो जाएंगे।'
+                : 'Clicking will redirect you directly to Buy Me a Chai (buymeachai.in/ryper) to complete payment securely via UPI.'}
             </div>
           </div>
         )}

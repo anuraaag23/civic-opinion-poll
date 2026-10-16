@@ -17,14 +17,23 @@ export interface SupportStats {
   lastUpdated: number;
 }
 
+export const CHAI_PRICE_INR = 20;
+
+export const CHAI_TIERS = [
+  { chais: 1, amount: 20, label: '₹20', sub_en: '1 Chai', sub_hi: '1 कप चाय' },
+  { chais: 3, amount: 60, label: '₹60', sub_en: '3 Chais', sub_hi: '3 कप चाय' },
+  { chais: 5, amount: 100, label: '₹100', sub_en: '5 Chais', sub_hi: '5 कप चाय' },
+  { chais: 10, amount: 200, label: '₹200', sub_en: '10 Chais', sub_hi: '10 कप चाय' },
+] as const;
+
 export const BUYMEACHAI_CONFIG = {
   url: 'https://buymeachai.in/ryper',
   handle: '@ryper',
   creatorName: 'ryper',
   platformName: 'Mera Vote',
-  description: 'Support developer for make alive this website',
+  description: 'support to developer for make alive this website',
   currency: 'INR',
-  cupPriceInr: 50,
+  cupPriceInr: 20,
 };
 
 // Backward-compatible alias
@@ -98,7 +107,7 @@ export const addSupporter = (
   const newSupporter: SupporterRecord = {
     id: `sup-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
     name: sanitizedName,
-    amount: Math.max(1, Math.min(100000, Number(amount) || 50)),
+    amount: Math.max(1, Math.min(100000, Number(amount) || 20)),
     cups: Math.max(1, Math.min(2000, Number(cups) || 1)),
     rating: Math.min(5, Math.max(1, Math.round(Number(rating)) || 5)),
     message: sanitizedMessage,
