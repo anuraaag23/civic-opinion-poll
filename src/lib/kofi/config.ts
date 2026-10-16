@@ -17,15 +17,18 @@ export interface SupportStats {
   lastUpdated: number;
 }
 
-export const KOFI_CONFIG = {
-  url: 'https://ko-fi.com/ryper',
+export const BUYMEACHAI_CONFIG = {
+  url: 'https://buymeachai.in/ryper',
   handle: '@ryper',
   creatorName: 'ryper',
   platformName: 'Mera Vote',
-  description: 'Support the developer to make alive this website',
+  description: 'Support developer for make alive this website',
   currency: 'INR',
   cupPriceInr: 50,
 };
+
+// Backward-compatible alias
+export const KOFI_CONFIG = BUYMEACHAI_CONFIG;
 
 // Security & Anti-Spam: Link Detection & Removal
 export const LINK_REGEX =

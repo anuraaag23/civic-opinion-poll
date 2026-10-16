@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { getPartiesForState, getStateById } from '@/lib/data/parties';
 
 export async function GET(
   request: NextRequest,
@@ -11,6 +12,33 @@ export async function GET(
 
     if (!poll) {
       return NextResponse.json({ success: false, error: 'Poll not found' }, { status: 404 });
+    }
+
+    const searchParams = request.nextUrl.searchParams;
+    const stateParam = searchParams.get('state');
+
+    // If state filter is requested (for CM poll)
+    if (stateParam) {
+      const stateParties = getPartiesForState(stateParam);
+      const partyIdSet = new Set(stateParties.map((p) => p.id));
+      const filteredOptions = poll.options.filter((opt) => partyIdSet.has(opt.party_id));
+
+      const stateInfo = getStateById(stateParam);
+
+      return NextResponse.json({
+        success: true,
+        poll: {
+          ...poll,
+          title_en: stateInfo
+            ? `Chief Minister (CM) Poll — ${stateInfo.name_en}`
+            : poll.title_en,
+          title_hi: stateInfo
+            ? `मुख्यमंत्री (CM) जनमत सर्वेक्षण — ${stateInfo.name_hi}`
+            : poll.title_hi,
+          options: filteredOptions.length > 0 ? filteredOptions : poll.options,
+        },
+        state: stateInfo || null,
+      });
     }
 
     return NextResponse.json({ success: true, poll });

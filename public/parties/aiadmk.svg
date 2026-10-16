@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- AIADMK Two Leaves Official Symbol -->
+  <rect width="512" height="512" rx="48" fill="#ffffff"/>
+  <circle cx="256" cy="256" r="230" fill="#f8fafc" stroke="#16a34a" stroke-width="8"/>
+  <g transform="translate(256, 280)">
+    <!-- Stem connecting leaves -->
+    <path d="M0 160 C0 80 -10 20 0 -10" fill="none" stroke="#15803d" stroke-width="20" stroke-linecap="round"/>
+    <!-- Left Leaf -->
+    <g transform="rotate(-30, 0, 0)">
+      <path d="M0 0 C-80 -60 -130 -160 0 -240 C130 -160 80 -60 0 0 Z" fill="#22c55e" stroke="#15803d" stroke-width="8"/>
+      <!-- Veins -->
+      <path d="M0 0 L0 -230" stroke="#15803d" stroke-width="6"/>
+      <path d="M0 -60 L-35 -100 M0 -110 L-45 -150 M0 -160 L-30 -190" stroke="#15803d" stroke-width="4"/>
+      <path d="M0 -60 L35 -100 M0 -110 L45 -150 M0 -160 L30 -190" stroke="#15803d" stroke-width="4"/>
+    </g>
+    <!-- Right Leaf -->
+    <g transform="rotate(30, 0, 0)">
+      <path d="M0 0 C-80 -60 -130 -160 0 -240 C130 -160 80 -60 0 0 Z" fill="#22c55e" stroke="#15803d" stroke-width="8"/>
+      <!-- Veins -->
+      <path d="M0 0 L0 -230" stroke="#15803d" stroke-width="6"/>
+      <path d="M0 -60 L-35 -100 M0 -110 L-45 -150 M0 -160 L-30 -190" stroke="#15803d" stroke-width="4"/>
+      <path d="M0 -60 L35 -100 M0 -110 L45 -150 M0 -160 L30 -190" stroke="#15803d" stroke-width="4"/>
+    </g>
+  </g>
+</svg>

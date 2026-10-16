@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- YSRCP Ceiling Fan Official Symbol -->
+  <!-- Tricolor horizontal stripes: Blue, White, Green -->
+  <rect width="512" height="170" fill="#1e40af"/>
+  <rect y="170" width="512" height="172" fill="#ffffff"/>
+  <rect y="342" width="512" height="170" fill="#15803d"/>
+  <!-- Central Ceiling Fan -->
+  <g transform="translate(256, 256)">
+    <!-- Fan Rod / Downrod from top -->
+    <rect x="-8" y="-200" width="16" height="110" fill="#0f172a"/>
+    <!-- Canopy -->
+    <path d="M-25 -90 L25 -90 L16 -60 L-16 -60 Z" fill="#0f172a"/>
+    <!-- Motor Housing -->
+    <circle cx="0" cy="0" r="42" fill="#0f172a" stroke="#334155" stroke-width="6"/>
+    <circle cx="0" cy="0" r="22" fill="#e2e8f0"/>
+    <circle cx="0" cy="0" r="10" fill="#0f172a"/>
+    <!-- 3 Fan Blades -->
+    <!-- Blade 1 (pointing upwards-left) -->
+    <g transform="rotate(30)">
+      <path d="M-18 -40 L-28 -180 C-28 -195 28 -195 28 -180 L18 -40 Z" fill="#0f172a" stroke="#334155" stroke-width="4"/>
+    </g>
+    <!-- Blade 2 (pointing right) -->
+    <g transform="rotate(150)">
+      <path d="M-18 -40 L-28 -180 C-28 -195 28 -195 28 -180 L18 -40 Z" fill="#0f172a" stroke="#334155" stroke-width="4"/>
+    </g>
+    <!-- Blade 3 (pointing down-left) -->
+    <g transform="rotate(270)">
+      <path d="M-18 -40 L-28 -180 C-28 -195 28 -195 28 -180 L18 -40 Z" fill="#0f172a" stroke="#334155" stroke-width="4"/>
+    </g>
+  </g>
+</svg>

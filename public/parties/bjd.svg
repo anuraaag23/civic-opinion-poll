@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- BJD Conch Shell / Shankha Official Symbol -->
+  <rect width="512" height="512" rx="48" fill="#15803d"/>
+  <!-- Pure White Conch Shell -->
+  <g fill="#ffffff" stroke="#166534" stroke-width="4" stroke-linejoin="round">
+    <!-- Conch Body -->
+    <path d="M120 380 C80 340 70 280 110 230 C150 180 230 130 320 110 C390 95 440 120 440 160 C440 220 380 300 280 350 C210 385 150 395 120 380 Z"/>
+    <!-- Conch Spiral Lines & Flutes -->
+    <path d="M320 110 C270 170 220 250 200 370" fill="none" stroke="#166534" stroke-width="8"/>
+    <path d="M360 125 C320 190 280 270 250 360" fill="none" stroke="#166534" stroke-width="8"/>
+    <path d="M400 150 C370 210 340 280 300 340" fill="none" stroke="#166534" stroke-width="8"/>
+    <!-- Shell Tip / Apex Spiral -->
+    <path d="M110 230 C100 200 120 180 150 180 C180 180 200 200 190 230 C180 260 140 260 120 230 Z" fill="#ffffff" stroke="#166534" stroke-width="6"/>
+  </g>
+</svg>

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- TDP Bicycle on Yellow Official Symbol -->
+  <rect width="512" height="512" rx="48" fill="#eab308"/>
+  <g stroke="#000000" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <!-- Wheels -->
+    <circle cx="130" cy="320" r="75" stroke-width="16"/>
+    <circle cx="382" cy="320" r="75" stroke-width="16"/>
+    <!-- Wheel Hubs -->
+    <circle cx="130" cy="320" r="14" fill="#000000"/>
+    <circle cx="382" cy="320" r="14" fill="#000000"/>
+    <!-- Spokes -->
+    <path d="M130 245 L130 395 M55 320 L205 320 M77 267 L183 373 M183 267 L77 373" stroke-width="6"/>
+    <path d="M382 245 L382 395 M307 320 L457 320 M329 267 L435 373 M435 267 L329 373" stroke-width="6"/>
+    <!-- Frame Tubes -->
+    <path d="M130 320 L240 320 L350 200 L210 200 Z" stroke-width="18"/>
+    <!-- Seat Tube & Seat -->
+    <path d="M240 320 L200 170" stroke-width="18"/>
+    <path d="M165 170 L235 170" stroke-width="20" stroke-linecap="round"/>
+    <!-- Front Fork & Handlebars -->
+    <path d="M382 320 L335 150" stroke-width="18"/>
+    <path d="M305 140 L365 140" stroke-width="20" stroke-linecap="round"/>
+    <!-- Chain & Pedal -->
+    <circle cx="240" cy="320" r="22" stroke-width="12"/>
+    <line x1="240" y1="300" x2="240" y2="340" stroke-width="10"/>
+  </g>
+</svg>

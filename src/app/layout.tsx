@@ -78,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               {children}
             </main>
 
-            {/* Floating Ko-fi Support Widget */}
+            {/* Floating Buy Me a Chai Support Widget */}
             <FloatingSupportWidget />
 
             {/* Footer */}

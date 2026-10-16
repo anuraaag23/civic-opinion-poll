@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- NCP (Sharadchandra Pawar) Man blowing Tutari Official ECI Symbol -->
+  <rect width="512" height="512" rx="48" fill="#ffffff"/>
+  <circle cx="256" cy="256" r="230" fill="#f8fafc" stroke="#0284c7" stroke-width="8"/>
+  <g fill="#0284c7" stroke="#0284c7" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Man's Head & Turban (Pheta) -->
+    <circle cx="160" cy="200" r="28" fill="#0284c7"/>
+    <!-- Traditional Maharashtrian Turban feather / pleat -->
+    <path d="M140 175 Q160 140 190 160 Q170 190 140 175 Z" fill="#0284c7"/>
+    <!-- Man's Face & Torso in profile -->
+    <path d="M150 228 C130 250 110 300 110 380 L180 380 C180 330 175 270 185 245 Z" fill="#0284c7"/>
+    <!-- Arms holding Tutari -->
+    <path d="M150 250 L200 240 L230 200" stroke-width="18" fill="none"/>
+    <path d="M160 270 L210 270 L250 210" stroke-width="16" fill="none"/>
+    <!-- The Tutari (Curved traditional trumpet horn) -->
+    <!-- Mouthpiece touching mouth -->
+    <circle cx="185" cy="205" r="8" fill="#0284c7"/>
+    <!-- S-curved long brass horn tube -->
+    <path d="M185 205 C260 210 290 140 270 90 C250 40 340 40 370 70 C400 100 410 160 380 200 L410 210" stroke-width="16" fill="none"/>
+    <!-- Flared Bell opening of Tutari pointing up-right -->
+    <path d="M375 190 C420 220 440 250 450 280 L410 295 C390 260 370 230 350 205 Z" fill="#0284c7"/>
+  </g>
+</svg>

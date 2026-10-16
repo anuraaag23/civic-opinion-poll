@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Coffee } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
 import { SupportModal } from './SupportModal';
-import { getStoredSupportStats, SupportStats } from '@/lib/kofi/config';
+import { getStoredSupportStats, SupportStats } from '@/lib/buymeachai/config';
 
 export function FloatingSupportWidget() {
   const { language } = useI18n();

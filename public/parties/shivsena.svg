@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Shiv Sena Bow and Arrow Official Symbol -->
+  <rect width="512" height="512" rx="48" fill="#ea580c"/>
+  <g fill="none" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" transform="translate(0, 0)">
+    <!-- Bow Arc -->
+    <path d="M120 100 C280 140 280 372 120 412" stroke-width="26"/>
+    <!-- Bow string -->
+    <line x1="120" y1="100" x2="120" y2="412" stroke-width="10"/>
+    <!-- Arrow shaft -->
+    <line x1="90" y1="256" x2="410" y2="256" stroke-width="20"/>
+    <!-- Arrow Head -->
+    <polygon points="410,256 340,210 360,256 340,302" fill="#ffffff" stroke="none"/>
+    <!-- Arrow Fletching / Back -->
+    <polygon points="90,256 60,226 75,256 60,286" fill="#ffffff" stroke="none"/>
+  </g>
+</svg>

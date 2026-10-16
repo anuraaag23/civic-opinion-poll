@@ -7,7 +7,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ArrowRight, BarChart3, Calendar, Users } from 'lucide-react';
+import { ArrowRight, BarChart3, Calendar, Users, Globe, Building2 } from 'lucide-react';
 
 interface PollCardProps {
   poll: Poll;
@@ -20,6 +20,16 @@ export function PollCard({ poll }: PollCardProps) {
   const description = language === 'hi' ? poll.description_hi : poll.description_en;
   const isLive = poll.status === 'LIVE';
 
+  const isPM = poll.id === 'poll-national-2029' || poll.slug.includes('pm') || poll.slug.includes('national');
+  const isCM = poll.id === 'poll-state-cm-2029' || poll.slug.includes('cm') || poll.slug.includes('state');
+
+  const targetLink = isPM ? '/pm' : isCM ? '/cm' : `/polls/${poll.slug}`;
+  const resultsLink = isPM
+    ? '/polls/national-opinion-poll-2029/results'
+    : isCM
+    ? '/polls/national-opinion-poll-2029/results?state=uttar-pradesh'
+    : `/polls/${poll.slug}/results`;
+
   const statusVariant = isLive ? 'success' : poll.status === 'CLOSED' ? 'neutral' : 'warning';
   const statusLabel =
     poll.status === 'LIVE'
@@ -31,11 +41,28 @@ export function PollCard({ poll }: PollCardProps) {
   return (
     <GlassCard interactive className="flex flex-col justify-between space-y-6">
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-2">
-          <GlassBadge variant={statusVariant}>
-            {isLive && <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />}
-            {statusLabel}
-          </GlassBadge>
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <GlassBadge variant={statusVariant}>
+              {isLive && <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />}
+              {statusLabel}
+            </GlassBadge>
+
+            {isPM && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30">
+                <Globe className="w-3 h-3" />
+                <span>{language === 'hi' ? 'PM • संपूर्ण भारत' : 'PM • India Only'}</span>
+              </span>
+            )}
+
+            {isCM && (
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                <Building2 className="w-3 h-3" />
+                <span>{language === 'hi' ? 'CM • राज्य विधानसभा' : 'CM • State Assembly'}</span>
+              </span>
+            )}
+          </div>
+
           <span className="text-xs text-[var(--text-tertiary)] font-mono">
             {poll.slug}
           </span>
@@ -67,7 +94,7 @@ export function PollCard({ poll }: PollCardProps) {
 
         <div className="flex items-center gap-2 pt-2">
           {isLive ? (
-            <Link href={`/polls/${poll.slug}`} className="flex-1">
+            <Link href={targetLink} className="flex-1">
               <GlassButton size="md" className="w-full gap-1.5">
                 <span>{t.polls.participateButton}</span>
                 <ArrowRight className="w-4 h-4" />
@@ -78,7 +105,7 @@ export function PollCard({ poll }: PollCardProps) {
               {statusLabel}
             </GlassButton>
           )}
-          <Link href={`/polls/${poll.slug}/results`}>
+          <Link href={resultsLink}>
             <GlassButton variant="secondary" size="md" className="gap-1.5" title={t.polls.viewResultsButton}>
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">{t.polls.viewResultsButton}</span>

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- NCP Alarm Clock Official Symbol -->
+  <rect width="512" height="512" rx="48" fill="#ffffff"/>
+  <!-- Tricolor ring around clock -->
+  <circle cx="256" cy="270" r="170" fill="none" stroke="#0ea5e9" stroke-width="16"/>
+  <!-- Alarm bells on top -->
+  <path d="M140 135 C110 165 95 200 120 225 C145 200 155 160 140 135 Z" fill="#0284c7"/>
+  <path d="M372 135 C402 165 417 200 392 225 C367 200 357 160 372 135 Z" fill="#0284c7"/>
+  <!-- Bell Hammer -->
+  <rect x="246" y="80" width="20" height="25" rx="4" fill="#0284c7"/>
+  <!-- Clock Feet -->
+  <polygon points="150,400 110,455 135,465 175,410" fill="#0284c7"/>
+  <polygon points="362,400 402,455 377,465 337,410" fill="#0284c7"/>
+  <!-- Clock Face -->
+  <circle cx="256" cy="270" r="148" fill="#ffffff"/>
+  <!-- Clock Hour Marks -->
+  <circle cx="256" cy="145" r="7" fill="#0f172a"/>
+  <circle cx="256" cy="395" r="7" fill="#0f172a"/>
+  <circle cx="131" cy="270" r="7" fill="#0f172a"/>
+  <circle cx="381" cy="270" r="7" fill="#0f172a"/>
+  <!-- Clock Hands set to 10:10 (official ECI NCP design) -->
+  <!-- Hour hand pointing to 10 -->
+  <line x1="256" y1="270" x2="190" y2="195" stroke="#0f172a" stroke-width="14" stroke-linecap="round"/>
+  <!-- Minute hand pointing to 2 -->
+  <line x1="256" y1="270" x2="335" y2="180" stroke="#0f172a" stroke-width="10" stroke-linecap="round"/>
+  <!-- Center nut -->
+  <circle cx="256" cy="270" r="12" fill="#0284c7"/>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- AIMIM Flying Kite (Patang) Official Symbol -->
+  <rect width="512" height="512" rx="48" fill="#14532d"/>
+  <g transform="translate(256, 230)">
+    <!-- Kite Body (Diamond) -->
+    <!-- Top half green, bottom half white/red -->
+    <polygon points="0,-160 140,0 0,160 -140,0" fill="#ffffff" stroke="#052e16" stroke-width="8"/>
+    <!-- Top Triangle filled with green -->
+    <polygon points="0,-160 140,0 -140,0" fill="#16a34a"/>
+    <!-- Bottom Triangle filled with red -->
+    <polygon points="0,0 140,0 0,160 -140,0" fill="#dc2626"/>
+    <!-- Central Bamboo Spine -->
+    <line x1="0" y1="-160" x2="0" y2="160" stroke="#052e16" stroke-width="8"/>
+    <!-- Bow / Curved Bamboo Crossbar -->
+    <path d="M-140 0 Q0 -80 140 0" fill="none" stroke="#052e16" stroke-width="8"/>
+    <!-- Kite Tail (Triangle) -->
+    <polygon points="0,160 -40,210 40,210" fill="#facc15" stroke="#ca8a04" stroke-width="6"/>
+  </g>
+</svg>

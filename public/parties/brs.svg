@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- BRS Official Pink with Ambassador Car Symbol -->
+  <rect width="512" height="512" rx="48" fill="#ec4899"/>
+  <g fill="#ffffff" stroke="#be185d" stroke-width="6" stroke-linejoin="round">
+    <!-- Car Body -->
+    <!-- Roof and windows -->
+    <path d="M150 240 L190 170 L330 170 L380 240 Z" fill="#fdf2f8"/>
+    <!-- Window divider -->
+    <line x1="260" y1="170" x2="260" y2="240" stroke="#be185d" stroke-width="8"/>
+    <!-- Main Car Chassis / Hood & Trunk -->
+    <path d="M70 280 C70 250 100 240 140 240 L385 240 C425 240 455 255 455 285 L455 330 C455 340 440 345 425 345 L385 345 C385 315 325 315 325 345 L195 345 C195 315 135 315 135 345 L95 345 C80 345 70 335 70 325 Z" fill="#ffffff"/>
+    <!-- Front and Rear Bumpers -->
+    <rect x="55" y="310" width="25" height="20" rx="4" fill="#cbd5e1" stroke="#94a3b8"/>
+    <rect x="445" y="310" width="25" height="20" rx="4" fill="#cbd5e1" stroke="#94a3b8"/>
+    <!-- Wheels -->
+    <circle cx="165" cy="345" r="45" fill="#0f172a" stroke="#be185d" stroke-width="8"/>
+    <circle cx="165" cy="345" r="22" fill="#e2e8f0" stroke="#be185d" stroke-width="4"/>
+    <circle cx="355" cy="345" r="45" fill="#0f172a" stroke="#be185d" stroke-width="8"/>
+    <circle cx="355" cy="345" r="22" fill="#e2e8f0" stroke="#be185d" stroke-width="4"/>
+    <!-- Headlight -->
+    <circle cx="95" cy="265" r="14" fill="#facc15" stroke="#ca8a04" stroke-width="3"/>
+  </g>
+</svg>

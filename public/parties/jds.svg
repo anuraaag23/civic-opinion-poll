@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- JD(S) Lady Farmer with Paddy Sheaf Official Symbol -->
+  <rect width="512" height="512" rx="48" fill="#15803d"/>
+  <circle cx="256" cy="256" r="230" fill="#f0fdf4" stroke="#166534" stroke-width="8"/>
+  <g fill="#166534" stroke="#166534" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Paddy Sheaf on Head (golden rice stalks bundle) -->
+    <path d="M170 140 C190 90 256 60 340 70 C360 110 320 150 220 160 Z" fill="#eab308" stroke="#ca8a04" stroke-width="6"/>
+    <path d="M190 120 C220 70 300 50 370 70" fill="none" stroke="#ca8a04" stroke-width="6"/>
+    <path d="M180 135 C230 90 280 80 340 100" fill="none" stroke="#ca8a04" stroke-width="6"/>
+    <!-- Lady Farmer Figure -->
+    <!-- Head with bindi & saree pallu -->
+    <circle cx="240" cy="180" r="24" fill="#166534"/>
+    <!-- Raised Arms balancing sheaf -->
+    <path d="M225 210 L200 170 L210 150" stroke-width="16" fill="none"/>
+    <path d="M255 210 L280 170 L270 150" stroke-width="16" fill="none"/>
+    <!-- Saree Torso -->
+    <path d="M215 210 L265 210 L280 320 L200 320 Z" fill="#166534"/>
+    <!-- Flowing Saree Skirt -->
+    <path d="M200 320 L280 320 L310 430 L170 430 Z" fill="#15803d" stroke-width="6"/>
+    <!-- Feet -->
+    <path d="M210 430 L200 450 M270 430 L280 450" stroke-width="14" fill="none"/>
+  </g>
+</svg>

@@ -8,7 +8,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { SupportButton } from '@/components/support/SupportButton';
-import { Menu, X, BarChart3, Vote, HelpCircle, ShieldCheck, HeartHandshake } from 'lucide-react';
+import { Menu, X, BarChart3, HelpCircle, HeartHandshake, Globe, Building2 } from 'lucide-react';
 
 export function GlassNavbar() {
   const { t, language } = useI18n();
@@ -16,16 +16,16 @@ export function GlassNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { href: '/polls', label: t.nav.polls, icon: Vote },
+    { href: '/pm', label: language === 'hi' ? 'PM जनमत' : 'PM Poll', icon: Globe },
+    { href: '/cm', label: language === 'hi' ? 'CM जनमत' : 'CM Poll', icon: Building2 },
     { href: '/polls/national-opinion-poll-2029/results', label: t.nav.results, icon: BarChart3 },
     { href: '/how-it-works', label: t.nav.howItWorks, icon: HelpCircle },
     { href: '/about', label: language === 'hi' ? 'निर्माता' : 'About Creator', icon: HeartHandshake },
-    { href: '/privacy', label: t.nav.privacy, icon: ShieldCheck },
   ];
 
   const isActive = (href: string) => {
-    if (href === '/polls' && pathname === '/polls') return true;
-    if (href !== '/polls' && pathname.startsWith(href)) return true;
+    if (href === pathname) return true;
+    if (href !== '/' && pathname.startsWith(href)) return true;
     return false;
   };
 
@@ -81,7 +81,7 @@ export function GlassNavbar() {
           })}
         </div>
 
-        {/* Controls: Language, Theme, Ko-fi Support & Mobile Toggle */}
+        {/* Controls: Language, Theme, Buy Me a Chai Support & Mobile Toggle */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
           <SupportButton variant="compact" className="hidden sm:inline-flex" />
           <LanguageSwitcher />

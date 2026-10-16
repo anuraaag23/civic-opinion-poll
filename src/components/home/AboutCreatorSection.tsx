@@ -114,12 +114,12 @@ export function AboutCreatorSection() {
             </div>
           </div>
 
-          {/* Dedicated Ko-fi Support Banner for Developer */}
+          {/* Dedicated Buy Me a Chai Support Banner for Developer */}
           <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-5 shadow-xs">
             <div className="space-y-2 max-w-lg">
               <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-700 dark:text-amber-300 text-xs font-bold uppercase tracking-wider">
                 <Coffee className="w-3.5 h-3.5" />
-                <span>Ko-fi • Community Supported</span>
+                <span>Buy Me a Chai • Community Supported</span>
               </div>
               <h3 className="text-lg sm:text-xl font-black text-[var(--text-primary)] tracking-tight">
                 {language === 'hi'
@@ -128,7 +128,7 @@ export function AboutCreatorSection() {
               </h3>
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
                 {language === 'hi'
-                  ? 'सर्वर लागत और निष्पक्षता बनाए रखने के लिए 20 वर्षीय युवा को सीधे Ko-fi पर एक कप कॉफी भेंट करें। शून्य कॉरपोरेट या पार्टी फंडिंग।'
+                  ? 'सर्वर लागत और निष्पक्षता बनाए रखने के लिए 20 वर्षीय युवा को सीधे Buy Me a Chai पर एक कप चाय भेंट करें। शून्य कॉरपोरेट या पार्टी फंडिंग।'
                   : 'Every single rupee helps pay for cloud servers, zero-lag databases, and anti-abuse safeguards. Keep Mera Vote 100% free, alive, and uncompromised.'}
               </p>
             </div>

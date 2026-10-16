@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <rect width="512" height="512" rx="48" fill="#15803d"/>
+  <!-- White ECI Arrow for JD(U) pointing right -->
+  <g fill="#ffffff">
+    <path d="M64 236 h260 v-56 l124 76 -124 76 v-56 H64 z"/>
+    <!-- Feathers / Nock at the back of arrow -->
+    <path d="M64 216 L96 256 L64 296 L40 296 L72 256 L40 216 z"/>
+  </g>
+</svg>

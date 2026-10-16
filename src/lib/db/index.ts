@@ -44,11 +44,21 @@ export const db = {
   },
 
   async getPollBySlug(slug: string): Promise<Poll | null> {
+    if (slug === 'pm' || slug === 'national-opinion-poll-2029' || slug === 'pm-election-poll-2029') {
+      const pmPoll = civicStore.polls.get('poll-national-2029');
+      if (pmPoll) return { ...pmPoll };
+    }
+    if (slug === 'cm' || slug === 'state-cm-poll-2029' || slug === 'cm-state-assembly-poll') {
+      const cmPoll = civicStore.polls.get('poll-state-cm-2029');
+      if (cmPoll) return { ...cmPoll };
+    }
     const poll = Array.from(civicStore.polls.values()).find((p) => p.slug === slug);
     return poll ? { ...poll } : null;
   },
 
   async getPollById(id: string): Promise<Poll | null> {
+    if (id === 'pm') return this.getPollById('poll-national-2029');
+    if (id === 'cm') return this.getPollById('poll-state-cm-2029');
     const poll = civicStore.polls.get(id);
     return poll ? { ...poll } : null;
   },

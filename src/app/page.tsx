@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n/context';
 import { LiquidGlassHeroVisual } from '@/components/home/LiquidGlassHeroVisual';
@@ -9,13 +9,18 @@ import { KeyGuaranteesSection } from '@/components/home/KeyGuaranteesSection';
 import { AboutCreatorSection } from '@/components/home/AboutCreatorSection';
 import { VoterAssuranceCard } from '@/components/verification/VoterAssuranceCard';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
+import { StateSelector } from '@/components/common/StateSelector';
+import { NATIONAL_PARTIES, getPartiesForState, getStateById } from '@/lib/data/parties';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { GlassBadge } from '@/components/ui/GlassBadge';
-import { ArrowRight, BarChart3, ShieldCheck, Users, Clock, Vote } from 'lucide-react';
+import { ArrowRight, BarChart3, ShieldCheck, Users, Clock, Vote, Globe, Building2, MapPin } from 'lucide-react';
 
 export default function HomePage() {
   const { t, language } = useI18n();
+  const [homeStateId, setHomeStateId] = useState('uttar-pradesh');
+  const currentState = getStateById(homeStateId) || getStateById('uttar-pradesh')!;
+  const stateParties = getPartiesForState(homeStateId);
 
   return (
     <div className="space-y-16 sm:space-y-24">
@@ -35,6 +40,9 @@ export default function HomePage() {
                   <ShieldCheck className="w-3.5 h-3.5 text-[var(--success)]" />
                   <span>{language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage Guaranteed'}</span>
                 </GlassBadge>
+                <GlassBadge variant="neutral">
+                  <span>🇮🇳 {language === 'hi' ? '2 अलग वर्ग: PM एवं CM' : '2 Dedicated Sections: PM & CM'}</span>
+                </GlassBadge>
               </div>
             </div>
 
@@ -49,23 +57,30 @@ export default function HomePage() {
 
             <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl font-normal">
               {language === 'hi'
-                ? 'गोपनीयता-केंद्रित सत्यापन और 100% गुमनाम प्रतिक्रियाओं के साथ स्वतंत्र जनमत सर्वेक्षण में भाग लें। आपकी राय अपरिवर्तनीय और सुरक्षित है।'
-                : 'Participate in independent public opinion polls with verified eligibility and 100% anonymous responses. Your voice is permanent, immutable, and tamper-proof.'}
+                ? 'प्रधानमंत्री (संपूर्ण भारत) और मुख्यमंत्री (राज्यवार) के लिए अलग-अलग जनमत सर्वेक्षण। आधिकारिक चुनाव चिन्हों के साथ 100% निष्पक्ष, सुरक्षित और गुमनाम।'
+                : 'Two dedicated polling sections: One for Prime Minister (All India) and one for Chief Minister (State-by-State). Cast your voice anonymously with authentic party logos.'}
             </p>
 
-            {/* CTAs */}
+            {/* Direct Dual CTAs: PM Poll & CM Poll */}
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
-              <Link href="/polls/national-opinion-poll-2029" className="w-full sm:w-auto">
+              <Link href="/pm" className="w-full sm:w-auto">
                 <GlassButton size="lg" className="w-full sm:w-auto gap-2 shadow-md font-bold">
-                  <Vote className="w-5 h-5" />
-                  <span>{t.hero.primaryCta}</span>
+                  <Globe className="w-4 h-4 text-white" />
+                  <span>{language === 'hi' ? 'PM जनमत (संपूर्ण भारत)' : 'PM Poll (All India)'}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </GlassButton>
+              </Link>
+              <Link href="/cm" className="w-full sm:w-auto">
+                <GlassButton variant="secondary" size="lg" className="w-full sm:w-auto gap-2 font-bold border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                  <Building2 className="w-4 h-4" />
+                  <span>{language === 'hi' ? 'CM जनमत (राज्यवार)' : 'CM Poll (State-wise)'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </GlassButton>
               </Link>
               <Link href="/polls/national-opinion-poll-2029/results" className="w-full sm:w-auto">
-                <GlassButton variant="secondary" size="lg" className="w-full sm:w-auto gap-2">
+                <GlassButton variant="ghost" size="lg" className="w-full sm:w-auto gap-1.5">
                   <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
-                  <span>{language === 'hi' ? 'लाइव मतगणना देखें' : 'View Live Results'}</span>
+                  <span>{language === 'hi' ? 'लाइव परिणाम' : 'Live Results'}</span>
                 </GlassButton>
               </Link>
             </div>
@@ -75,13 +90,13 @@ export default function HomePage() {
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-[var(--accent)]" />
                 <span>
-                  <strong>128,420+</strong> {language === 'hi' ? 'सत्यापित नागरिक मत' : 'Verified Citizen Responses'}
+                  <strong>223,230+</strong> {language === 'hi' ? 'सत्यापित नागरिक मत' : 'Verified Citizen Responses'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[var(--success)]" />
                 <span>
-                  <strong>{language === 'hi' ? 'सक्रिय' : 'Live'}</strong> {language === 'hi' ? 'राष्ट्रीय जनमत' : 'National Poll 2029'}
+                  <strong>{language === 'hi' ? 'सक्रिय' : 'Live'}</strong> {language === 'hi' ? 'PM एवं CM 2029' : 'PM & CM Polls Active'}
                 </span>
               </div>
             </div>
@@ -94,12 +109,189 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Prominent Voter Assurance Card (Crucial User Requirement) */}
+      {/* Prominent Voter Assurance Card */}
       <section>
         <VoterAssuranceCard />
       </section>
 
-      {/* Super Simple 3-Step Walkthrough For Any User */}
+      {/* ── TWO DEDICATED SECTIONS: PM & CM SHOWCASE ───────────────────────── */}
+      <section className="space-y-6">
+        <div className="text-center max-w-2xl mx-auto space-y-1.5">
+          <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
+            {language === 'hi' ? 'दो अलग-अलग सर्वेक्षण वर्ग' : 'Two Distinct Polling Sections'}
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
+            {language === 'hi'
+              ? 'राष्ट्रीय नेतृत्व (PM) एवं राज्य नेतृत्व (CM)'
+              : 'Choose Your Sphere: Prime Minister or Chief Minister'}
+          </h2>
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+            {language === 'hi'
+              ? 'PM पेज पर संपूर्ण भारत की राष्ट्रीय पार्टियां देखें, और CM पेज पर अपने राज्य का चयन करके अपने राज्य के दल देखें।'
+              : 'The PM section represents All-India national choice, while the CM section lets you pick your state for assembly candidates.'}
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* SECTION 1: PRIME MINISTER (PM) POLL */}
+          <GlassCard elevated className="space-y-5 border-t-4 border-t-[var(--accent)] flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-black uppercase tracking-wider">
+                  <Globe className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? '1. प्रधानमंत्री (PM) वर्ग' : '1. Prime Minister (PM) Section'}</span>
+                </div>
+                <GlassBadge variant="neutral">
+                  <span>🇮🇳 {language === 'hi' ? 'संपूर्ण भारत' : 'India Only'}</span>
+                </GlassBadge>
+              </div>
+
+              <div>
+                <h3 className="text-xl sm:text-2xl font-black text-[var(--text-primary)]">
+                  {language === 'hi'
+                    ? 'प्रधानमंत्री जनमत सर्वेक्षण (लोकसभा)'
+                    : 'Prime Minister (PM) Civic Poll — Lok Sabha'}
+                </h3>
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1 leading-relaxed">
+                  {language === 'hi'
+                    ? 'संपूर्ण भारत के लिए एक राष्ट्रीय सर्वेक्षण। इसमें सभी राष्ट्रीय मान्यता प्राप्त दल अपने आधिकारिक चुनाव चिन्हों के साथ उपस्थित हैं।'
+                    : 'Covers all 28 states and 8 union territories at the national level. Features national parties with their official ECI election symbols.'}
+                </p>
+              </div>
+
+              {/* National Parties Logos Preview */}
+              <div className="space-y-2 pt-1">
+                <span className="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider block">
+                  {language === 'hi' ? 'शामिल राष्ट्रीय दल (असली चुनाव चिन्ह):' : 'Contesting National Parties with Official Logos:'}
+                </span>
+                <div className="grid grid-cols-3 gap-2">
+                  {NATIONAL_PARTIES.slice(0, 6).map((p) => (
+                    <div
+                      key={p.id}
+                      className="p-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-2"
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-white p-0.5 flex items-center justify-center shrink-0 border border-[var(--border-glass)] shadow-2xs overflow-hidden">
+                        {p.logo_url && (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img src={p.logo_url} alt={p.name_en} className="w-full h-full object-contain" />
+                        )}
+                      </div>
+                      <span className="text-xs font-bold text-[var(--text-primary)] truncate">{p.short_name}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* PM Card Actions */}
+            <div className="pt-3 border-t border-[var(--border-glass)] flex flex-col sm:flex-row items-center gap-2.5">
+              <Link href="/pm" className="w-full sm:flex-1">
+                <GlassButton size="md" className="w-full gap-2 font-bold justify-center">
+                  <Vote className="w-4 h-4" />
+                  <span>{language === 'hi' ? 'PM के लिए वोट करें' : 'Vote in PM Poll'}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </GlassButton>
+              </Link>
+              <Link href="/polls/national-opinion-poll-2029/results" className="w-full sm:w-auto">
+                <GlassButton variant="secondary" size="md" className="w-full justify-center gap-1.5">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>{language === 'hi' ? 'राष्ट्रीय परिणाम' : 'National Results'}</span>
+                </GlassButton>
+              </Link>
+            </div>
+          </GlassCard>
+
+          {/* SECTION 2: CHIEF MINISTER (CM) POLL */}
+          <GlassCard elevated className="space-y-5 border-t-4 border-t-emerald-500 flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider">
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? '2. मुख्यमंत्री (CM) वर्ग' : '2. Chief Minister (CM) Section'}</span>
+                </div>
+                <GlassBadge variant="neutral">
+                  <MapPin className="w-3 h-3 text-[var(--accent)]" />
+                  <span>{language === 'hi' ? 'राज्यवार चयन' : 'State-by-State'}</span>
+                </GlassBadge>
+              </div>
+
+              <div>
+                <h3 className="text-xl sm:text-2xl font-black text-[var(--text-primary)]">
+                  {language === 'hi'
+                    ? 'मुख्यमंत्री जनमत सर्वेक्षण (विधानसभा)'
+                    : 'Chief Minister (CM) Civic Poll — State Assembly'}
+                </h3>
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1 leading-relaxed">
+                  {language === 'hi'
+                    ? 'अपने राज्य का चयन करें और उस राज्य के अनुसार चुनाव लड़ने वाले दलों को उनके असली चुनाव चिन्ह के साथ देखकर वोट करें।'
+                    : 'Pick any Indian state to see the exact political parties and official symbols active in that state assembly election.'}
+                </p>
+              </div>
+
+              {/* Interactive State Selector Inline Preview */}
+              <div className="space-y-2 pt-1">
+                <span className="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider block">
+                  {language === 'hi' ? 'राज्य का चयन करें:' : 'Select State / Union Territory:'}
+                </span>
+                <StateSelector
+                  compact
+                  selectedStateId={homeStateId}
+                  onSelectState={(id) => setHomeStateId(id)}
+                />
+
+                {/* State Parties Preview with Logos */}
+                <div className="pt-2">
+                  <span className="text-[10px] text-[var(--text-tertiary)] font-bold uppercase tracking-wider block mb-1">
+                    {language === 'hi'
+                      ? `${currentState.name_hi} में सक्रिय दल (${stateParties.length} विकल्प):`
+                      : `Parties active in ${currentState.name_en} (${stateParties.length} choices):`}
+                  </span>
+                  <div className="grid grid-cols-3 gap-2">
+                    {stateParties.slice(0, 6).map((p) => (
+                      <div
+                        key={p.id}
+                        className="p-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-2"
+                      >
+                        <div className="w-7 h-7 rounded-lg bg-white p-0.5 flex items-center justify-center shrink-0 border border-[var(--border-glass)] shadow-2xs overflow-hidden">
+                          {p.logo_url && (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={p.logo_url} alt={p.name_en} className="w-full h-full object-contain" />
+                          )}
+                        </div>
+                        <span className="text-xs font-bold text-[var(--text-primary)] truncate">{p.short_name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* CM Card Actions */}
+            <div className="pt-3 border-t border-[var(--border-glass)] flex flex-col sm:flex-row items-center gap-2.5">
+              <Link href="/cm" className="w-full sm:flex-1">
+                <GlassButton size="md" className="w-full gap-2 font-bold justify-center bg-emerald-600 hover:bg-emerald-500 text-white">
+                  <Vote className="w-4 h-4" />
+                  <span>{language === 'hi' ? `${currentState.name_hi} CM के लिए वोट करें` : `Vote in ${currentState.code} CM Poll`}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </GlassButton>
+              </Link>
+              <Link href={`/polls/national-opinion-poll-2029/results?state=${currentState.id}`} className="w-full sm:w-auto">
+                <GlassButton variant="secondary" size="md" className="w-full justify-center gap-1.5">
+                  <BarChart3 className="w-4 h-4" />
+                  <span>{language === 'hi' ? 'राज्य परिणाम' : 'State Results'}</span>
+                </GlassButton>
+              </Link>
+            </div>
+          </GlassCard>
+        </div>
+      </section>
+
+      {/* Mandatory Non-Affiliation Disclaimer Banner */}
+      <section>
+        <DisclaimerBanner />
+      </section>
+
+      {/* Super Simple 3-Step Walkthrough */}
       <section className="space-y-4">
         <div className="text-center max-w-xl mx-auto space-y-1">
           <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
@@ -121,7 +313,7 @@ export default function HomePage() {
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
               {language === 'hi'
                 ? 'आधिकारिक ECI पोर्टल पर सीधे अपनी स्थिति जांचें और स्व-सत्यापन पूरा करें। 100% शून्य आईडी भंडारण।'
-                : 'Check registration directly on official ECI portal and confirm. Zero ID stored.'}
+                : 'Check registration directly on official ECI portal and confirm. Zero personal ID stored.'}
             </p>
           </GlassCard>
 
@@ -129,13 +321,13 @@ export default function HomePage() {
             <div className="flex items-center gap-3">
               <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center">2</span>
               <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                {language === 'hi' ? '2. पार्टी या नोटा चुनें' : '2. Select Your Party or NOTA'}
+                {language === 'hi' ? '2. PM या CM पार्टी चुनें' : '2. Select Your PM or CM Choice'}
               </h3>
             </div>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
               {language === 'hi'
-                ? 'असली चुनाव चिन्हों के साथ निष्पक्ष सूची। 1 व्यक्ति 1 मत।'
-                : 'Clear official symbols. One response per verified citizen.'}
+                ? 'राष्ट्रीय या राज्य स्तर पर अपने पसंदीदा दल या नोटा का चयन करें। असली चुनाव चिन्हों के साथ।'
+                : 'Pick your preferred national or state party option with authentic verified symbols.'}
             </p>
           </GlassCard>
 
@@ -148,113 +340,11 @@ export default function HomePage() {
             </div>
             <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
               {language === 'hi'
-                ? 'मतदान के बाद आपका वोट कभी नहीं बदलेगा। तुरंत लाइव मतगणना देखें।'
-                : 'Response is permanently locked. Watch real-time vote counting.'}
+                ? 'मतदान के बाद आपका वोट कभी नहीं बदलेगा। तुरंत राष्ट्रीय और राज्य-वार लाइव मतगणना देखें।'
+                : 'Response is permanently sealed. Real-time vote counts update automatically.'}
             </p>
           </GlassCard>
         </div>
-      </section>
-
-      {/* Mandatory Non-Affiliation Disclaimer Banner */}
-      <section>
-        <DisclaimerBanner />
-      </section>
-
-      {/* Active Featured Poll Glass Card */}
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-              {language === 'hi' ? 'विशेष सक्रिय जनमत सर्वेक्षण' : 'Featured Active Opinion Poll'}
-            </h2>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {language === 'hi'
-                ? 'स्वतंत्र नागरिक अनुसंधान के लिए सार्वजनिक राय'
-                : 'Independent civic public opinion research sample'}
-            </p>
-          </div>
-          <Link
-            href="/polls"
-            className="text-xs sm:text-sm font-semibold text-[var(--accent)] hover:underline inline-flex items-center gap-1"
-          >
-            {language === 'hi' ? 'सभी सर्वेक्षण देखें' : 'View All Polls'}
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <GlassCard elevated className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[var(--border-glass)]">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <GlassBadge variant="success">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)]" />
-                  {t.common.liveBadge}
-                </GlassBadge>
-                <span className="text-xs text-[var(--text-tertiary)] font-mono">
-                  ID: POLL-2029-NAT
-                </span>
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
-                {language === 'hi'
-                  ? '2029 राष्ट्रीय नागरिक जनमत सर्वेक्षण'
-                  : '2029 National Civic Opinion Poll'}
-              </h3>
-            </div>
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-              <Link href="/polls/national-opinion-poll-2029" className="w-full sm:w-auto">
-                <GlassButton size="md" className="w-full sm:w-auto gap-2">
-                  <span>{t.polls.participateButton}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </GlassButton>
-              </Link>
-              <Link href="/polls/national-opinion-poll-2029/results" className="w-full sm:w-auto">
-                <GlassButton variant="secondary" size="md" className="w-full sm:w-auto gap-1.5">
-                  <BarChart3 className="w-4 h-4" />
-                  <span>{language === 'hi' ? 'लाइव परिणाम देखें' : 'View Live Results'}</span>
-                </GlassButton>
-              </Link>
-            </div>
-          </div>
-
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            {language === 'hi'
-              ? 'एक गैर-बाध्यकारी, स्वतंत्र नागरिक सर्वेक्षण जो विभिन्न राजनीतिक दलों के प्रति भारतीय मतदाताओं के वर्तमान रुझानों और जनमत को मापता है। सभी प्रतिक्रियाएं पूरी तरह से गुमनाम और सुरक्षित हैं।'
-              : 'A non-binding, independent civic public opinion poll measuring public sentiment and preference across major political parties. All responses are cryptographically decoupled from voter identity.'}
-          </p>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-2">
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
-              <span className="text-[11px] text-[var(--text-tertiary)] uppercase font-semibold">
-                {language === 'hi' ? 'कुल प्रतिक्रियाएं' : 'Total Responses'}
-              </span>
-              <p className="text-lg font-bold text-[var(--text-primary)] mt-0.5">128,420</p>
-            </div>
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
-              <span className="text-[11px] text-[var(--text-tertiary)] uppercase font-semibold">
-                {language === 'hi' ? 'पात्रता मानक' : 'Eligibility'}
-              </span>
-              <p className="text-lg font-bold text-[var(--text-primary)] mt-0.5">
-                {language === 'hi' ? 'सत्यापित मतदाता' : 'Verified Citizens'}
-              </p>
-            </div>
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
-              <span className="text-[11px] text-[var(--text-tertiary)] uppercase font-semibold">
-                {language === 'hi' ? 'गोपनीयता स्तर' : 'Privacy Tier'}
-              </span>
-              <p className="text-lg font-bold text-[var(--success)] mt-0.5">
-                {language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage'}
-              </p>
-            </div>
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
-              <span className="text-[11px] text-[var(--text-tertiary)] uppercase font-semibold">
-                {language === 'hi' ? 'समापन' : 'Poll Closes'}
-              </span>
-              <p className="text-lg font-bold text-[var(--text-primary)] mt-0.5">
-                31 Dec 2029
-              </p>
-            </div>
-          </div>
-        </GlassCard>
       </section>
 
       {/* How It Works Section */}
@@ -263,7 +353,7 @@ export default function HomePage() {
       {/* Trust & Architecture Guarantees */}
       <KeyGuaranteesSection />
 
-      {/* About Creator Section (Moved to the very bottom of the page as requested by Anurag) */}
+      {/* About Creator Section (At the very bottom of the page) */}
       <AboutCreatorSection />
     </div>
   );

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <!-- Shiv Sena (UBT) Flaming Torch / Mashaal Official Symbol -->
+  <rect width="512" height="512" rx="48" fill="#c2410c"/>
+  <g transform="translate(256, 270)">
+    <!-- Torch Handle -->
+    <path d="M-24 60 L-14 180 C-14 195 14 195 14 180 L24 60 Z" fill="#78350f" stroke="#451a03" stroke-width="6"/>
+    <!-- Torch Bowl / Head -->
+    <path d="M-60 60 L-40 -10 C-40 -20 40 -20 40 -10 L60 60 Z" fill="#9a3412" stroke="#7c2d12" stroke-width="6"/>
+    <!-- Rim -->
+    <ellipse cx="0" cy="-10" rx="48" ry="14" fill="#ea580c" stroke="#7c2d12" stroke-width="4"/>
+    <!-- Outer Flame -->
+    <path d="M0 -220 C60 -150 90 -70 50 -10 C30 10 -30 10 -50 -10 C-90 -70 -60 -150 0 -220 Z" fill="#f97316"/>
+    <!-- Inner Flame -->
+    <path d="M0 -180 C40 -120 60 -60 30 -10 C15 5 -15 5 -30 -10 C-60 -60 -40 -120 0 -180 Z" fill="#facc15"/>
+    <!-- Core Bright Flame -->
+    <ellipse cx="0" cy="-25" rx="18" ry="35" fill="#fef08a"/>
+  </g>
+</svg>

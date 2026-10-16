@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { useI18n } from '@/lib/i18n/context';
-import { KOFI_CONFIG, addSupporter } from '@/lib/kofi/config';
+import { BUYMEACHAI_CONFIG, addSupporter } from '@/lib/buymeachai/config';
 import {
   containsLink,
   sanitizeText,
@@ -38,8 +38,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
   const { language } = useI18n();
 
   // Modal flow states:
-  // 1. 'form' -> Choose amount, enter name, rate 1-5 stars, write optional message, click Pay on Ko-fi
-  // 2. 'auto_verifying' -> Live real-time polling: automatically detects when payment is completed on Ko-fi (NO transaction ID required!)
+  // 1. 'form' -> Choose amount, enter name, rate 1-5 stars, write optional message, click Pay on Buy Me a Chai
+  // 2. 'auto_verifying' -> Live real-time polling: automatically detects when payment is completed on Buy Me a Chai
   // 3. 'payment_success' -> Animated success: payment detected automatically, support recorded
   // 4. 'payment_failed' -> Animated failure: no payment was detected, no charge
   const [step, setStep] = useState<'form' | 'auto_verifying' | 'payment_success' | 'payment_failed'>('form');
@@ -120,10 +120,9 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
       });
     }, 1000);
 
-    // 2. Poll every 2.5 seconds for incoming Ko-fi webhook verification
+    // 2. Poll every 2.5 seconds for incoming payment verification
     const pollForVerification = async () => {
       try {
-        // First try same-origin API endpoint
         let verified = false;
         let supporterData: DbSupporter | null = null;
 
@@ -156,7 +155,6 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
         }
 
         if (verified && supporterData) {
-          // MATCH FOUND! Ko-fi webhook arrived and verified payment automatically!
           clearTimers();
 
           // Update supporter record with user's rating and message if provided
@@ -176,7 +174,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
             estimatedCups,
             starRating,
             message,
-            supporterData.payment_id || `kofi-${Date.now()}`,
+            supporterData.payment_id || `chai-${Date.now()}`,
             true
           );
 
@@ -208,7 +206,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
 
   if (!isOpen) return null;
 
-  // STEP 1 -> STEP 2: Proceed to Pay on Ko-fi & Start Auto-Verification
+  // STEP 1 -> STEP 2: Proceed to Pay on Buy Me a Chai & Start Auto-Verification
   const handleProceedToPayment = () => {
     setFormError('');
     if (hasProhibitedLink) {
@@ -224,8 +222,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
     setPaymentInitiatedAt(now);
     setPollCountdown(45);
 
-    // Open Ko-fi payment in a new tab
-    window.open(KOFI_CONFIG.url, '_blank', 'noopener,noreferrer');
+    // Open Buy Me a Chai payment in a new tab
+    window.open(BUYMEACHAI_CONFIG.url, '_blank', 'noopener,noreferrer');
 
     // Automatically transition to the auto-verification state
     setStep('auto_verifying');
@@ -285,7 +283,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
           estimatedCups,
           starRating,
           message,
-          supporterData.payment_id || `kofi-${Date.now()}`,
+          supporterData.payment_id || `chai-${Date.now()}`,
           true
         );
 
@@ -302,8 +300,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
       } else {
         setFormError(
           language === 'hi'
-            ? 'भुगतान अभी तक सर्वर पर नहीं मिला। कृपया सुनिश्चित करें कि आपने Ko-fi पर भुगतान पूरा कर लिया है।'
-            : 'Payment not detected yet. Please ensure you completed payment on Ko-fi.'
+            ? 'भुगतान अभी तक सर्वर पर नहीं मिला। कृपया सुनिश्चित करें कि आपने Buy Me a Chai पर भुगतान पूरा कर लिया है।'
+            : 'Payment not detected yet. Please ensure you completed payment on Buy Me a Chai.'
         );
         setTimeout(() => setFormError(''), 4500);
       }
@@ -318,8 +316,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
     }
   };
 
-  // Fallback: User completed payment on Ko-fi, but webhook is taking time
-  // Allows submitting for 1-click creator approval without requiring a transaction ID
+  // Fallback: User completed payment on Buy Me a Chai, but webhook is taking time
   const handleSubmitForCreatorApproval = async () => {
     setIsSubmittingApproval(true);
     setFormError('');
@@ -334,7 +331,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
         cups: estimatedCups,
         rating: starRating,
         message: cleanMessage,
-        paymentId: `kofi-pending-${Date.now()}`,
+        paymentId: `chai-pending-${Date.now()}`,
         verified: false,
       });
 
@@ -405,7 +402,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                 </div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
                   <Coffee className="w-3.5 h-3.5" />
-                  <span>Ko-fi • Automatic Verification</span>
+                  <span>Buy Me a Chai • Automatic Verification</span>
                 </div>
               </div>
 
@@ -417,8 +414,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
 
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-md mx-auto">
                 {language === 'hi'
-                  ? 'यह स्वतंत्र मंच उत्तर प्रदेश के एक 20 वर्षीय युवा (अनुराग) द्वारा बनाया गया है। बिना किसी कॉर्पोरेट या राजनीतिक फंडिंग के सर्वर चालू रखने में अपना योगदान दें।'
-                  : 'Mera Vote is an independent civic platform built by 20-year-old developer Anurag from Uttar Pradesh with zero corporate or party funding. Your support keeps our servers live and ad-free.'}
+                  ? 'यह स्वतंत्र मंच उत्तर प्रदेश के एक 20 वर्षीय युवा (अनुराग) द्वारा बनाया गया है। बिना किसी कॉर्पोरेट या राजनीतिक फंडिंग के सर्वर चालू रखने में एक कप चाय भेंट करें।'
+                  : 'Mera Vote is an independent civic platform built by 20-year-old developer Anurag from Uttar Pradesh with zero corporate or party funding. Buy a chai to keep our servers live and independent.'}
               </p>
             </div>
 
@@ -437,9 +434,9 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
               </label>
               <div className="grid grid-cols-3 gap-2.5">
                 {[
-                  { amount: 50, label: '₹50', sub: '1 Cup' },
-                  { amount: 100, label: '₹100', sub: '2 Cups' },
-                  { amount: 250, label: '₹250', sub: 'Snacks & Coffee' },
+                  { amount: 50, label: '₹50', sub: '1 Cup Chai' },
+                  { amount: 100, label: '₹100', sub: '2 Cups Chai' },
+                  { amount: 250, label: '₹250', sub: 'Chai & Samosa' },
                 ].map((tier) => (
                   <button
                     key={tier.amount}
@@ -549,7 +546,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                   {language === 'hi' ? '4. डेवलपर के लिए संदेश (वैकल्पिक)' : '4. Message to Developer (Optional)'}
                 </label>
                 <span className="text-[10px] text-[var(--text-tertiary)]">
-                  {message.length}/350
+                  {message.length} / 350
                 </span>
               </div>
               <textarea
@@ -557,30 +554,29 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                 maxLength={350}
                 placeholder={
                   language === 'hi'
-                    ? 'अपना अनुभव या प्रोत्साहन साझा करें...'
-                    : 'Share your feedback or message to keep this platform running...'
+                    ? 'नागरिक निष्पक्षता और सर्वर को जीवित रखने के लिए अपनी बात लिखें...'
+                    : 'Leave a brief encouraging review or message for Anurag...'
                 }
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className={`w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border text-base sm:text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none ${
+                className={`w-full px-4 py-2.5 rounded-xl bg-[var(--bg-surface)] border text-base sm:text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none ${
                   messageHasLink ? 'border-[var(--error)] focus:ring-[var(--error)]' : 'border-[var(--border-glass)]'
                 }`}
               />
             </div>
 
-            {/* 5. Proceed to Pay Button */}
-            <div className="pt-1">
+            {/* CTA Button */}
+            <div className="pt-2">
               <button
                 type="button"
-                disabled={hasProhibitedLink}
                 onClick={handleProceedToPayment}
-                className="w-full py-3.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.99]"
+                className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-black text-sm shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer flex items-center justify-center gap-2"
               >
                 <Coffee className="w-4 h-4 shrink-0" />
                 <span>
                   {language === 'hi'
-                    ? `Ko-fi पर ₹${currentAmount} का भुगतान करें`
-                    : `Pay ₹${currentAmount} on Ko-fi`}
+                    ? `Buy Me a Chai पर ₹${currentAmount} का भुगतान करें`
+                    : `Pay ₹${currentAmount} on Buy Me a Chai`}
                 </span>
                 <ExternalLink className="w-4 h-4 shrink-0 opacity-80" />
               </button>
@@ -588,8 +584,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
 
             <div className="text-center text-[11px] text-[var(--text-tertiary)] leading-relaxed font-normal">
               {language === 'hi'
-                ? 'भुगतान Ko-fi पर सुरक्षित रूप से संसाधित होता है। भुगतान के तुरंत बाद, यह विंडो स्वचालित रूप से सत्यापन का पता लगाएगी।'
-                : 'Payment is processed securely on Ko-fi. After payment, your contribution is automatically verified in real-time.'}
+                ? 'भुगतान Buy Me a Chai पर सुरक्षित रूप से संसाधित होता है। भुगतान के तुरंत बाद, यह विंडो स्वचालित रूप से सत्यापन का पता लगाएगी।'
+                : 'Payment is processed securely on Buy Me a Chai. After payment, your contribution is automatically verified in real-time.'}
             </div>
           </div>
         )}
@@ -621,17 +617,17 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
               </div>
 
               <h3 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] tracking-tight">
-                {language === 'hi' ? 'Ko-fi पर भुगतान पूरा करें' : 'Complete Payment on Ko-fi'}
+                {language === 'hi' ? 'Buy Me a Chai पर भुगतान पूरा करें' : 'Complete Payment on Buy Me a Chai'}
               </h3>
 
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-sm mx-auto leading-relaxed font-normal">
                 {language === 'hi' ? (
                   <>
-                    हमने एक नए टैब में <strong className="text-[var(--text-primary)]">ko-fi.com/ryper</strong> खोला है। कृपया वहां अपना <strong className="text-amber-600 dark:text-amber-400 font-bold">₹{currentAmount}</strong> का योगदान पूरा करें।
+                    हमने एक नए टैब में <strong className="text-[var(--text-primary)]">buymeachai.in/ryper</strong> खोला है। कृपया वहां अपना <strong className="text-amber-600 dark:text-amber-400 font-bold">₹{currentAmount}</strong> का योगदान पूरा करें।
                   </>
                 ) : (
                   <>
-                    We opened <strong className="text-[var(--text-primary)]">ko-fi.com/ryper</strong> in a new tab. Please complete your <strong className="text-amber-600 dark:text-amber-400 font-bold">₹{currentAmount}</strong> contribution there.
+                    We opened <strong className="text-[var(--text-primary)]">buymeachai.in/ryper</strong> in a new tab. Please complete your <strong className="text-amber-600 dark:text-amber-400 font-bold">₹{currentAmount}</strong> contribution there.
                   </>
                 )}
               </p>
@@ -656,8 +652,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
               </div>
               <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
                 {language === 'hi'
-                  ? 'किसी ट्रांजेक्शन आईडी की आवश्यकता नहीं है। जैसे ही Ko-fi आपके योगदान की पुष्टि करेगा, यह विंडो स्वतः अनलॉक हो जाएगी।'
-                  : 'No transaction ID required. As soon as Ko-fi confirms your contribution, this window will automatically unlock and verify your support.'}
+                  ? 'किसी ट्रांजेक्शन आईडी की आवश्यकता नहीं है। जैसे ही Buy Me a Chai आपके योगदान की पुष्टि करेगा, यह विंडो स्वतः अनलॉक हो जाएगी।'
+                  : 'No transaction ID required. As soon as Buy Me a Chai confirms your contribution, this window will automatically unlock and verify your support.'}
               </p>
             </div>
 
@@ -672,7 +668,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                 {isManualChecking ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-white" />
-                    <span>{language === 'hi' ? 'Ko-fi लेज़र की जांच जारी...' : 'Checking Ko-fi Ledger...'}</span>
+                    <span>{language === 'hi' ? 'पेमेंट लेज़र की जांच जारी...' : 'Checking Payment Ledger...'}</span>
                   </>
                 ) : (
                   <>
@@ -688,26 +684,26 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
 
               <button
                 type="button"
-                onClick={() => window.open(KOFI_CONFIG.url, '_blank', 'noopener,noreferrer')}
+                onClick={() => window.open(BUYMEACHAI_CONFIG.url, '_blank', 'noopener,noreferrer')}
                 className="w-full py-2 px-4 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-amber-600 dark:text-amber-400 text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-1.5"
               >
-                <span>{language === 'hi' ? 'Ko-fi पेमेंट टैब फिर से खोलें' : 'Re-open Ko-fi Payment Tab'}</span>
+                <span>{language === 'hi' ? 'Buy Me a Chai पेमेंट टैब फिर से खोलें' : 'Re-open Payment Tab'}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </button>
 
               {/* 1-click fallback if 45s timer completes */}
               {pollCountdown === 0 && (
                 <div className="pt-2 space-y-2">
-                  <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/25 text-[11px] text-amber-700 dark:text-amber-300 leading-relaxed text-left">
                     {language === 'hi'
-                      ? 'भुगतान किया पर वेबहुक समय ले रहा है? बिना आईडी के तुरंत सबमिट करें:'
-                      : 'Paid but webhook taking time? Submit review directly for creator approval:'}
-                  </p>
+                      ? 'यदि आपने भुगतान पूरा कर लिया है परंतु ऑटो-वेरिफिकेशन में समय लग रहा है, तो आप 1-क्लिक में अपनी समीक्षा अनुराग को अनुमोदन के लिए भेज सकते हैं:'
+                      : 'If you finished payment but auto-verification is taking extra time, submit for 1-click creator approval:'}
+                  </div>
                   <button
                     type="button"
                     disabled={isSubmittingApproval}
                     onClick={handleSubmitForCreatorApproval}
-                    className="w-full py-2 px-4 rounded-full bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-700 dark:text-amber-300 font-bold text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 px-4 rounded-full bg-[var(--accent)] hover:bg-[var(--accent-hover)] text-white font-bold text-xs shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
                   >
                     {isSubmittingApproval ? (
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -716,8 +712,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
                     )}
                     <span>
                       {language === 'hi'
-                        ? 'निर्माता अनुमोदन के लिए सबमिट करें'
-                        : 'Submit Review for Creator Approval'}
+                        ? 'अनुमोदन के लिए समीक्षा सबमिट करें'
+                        : 'Submit Review for Approval'}
                     </span>
                   </button>
                 </div>
@@ -725,28 +721,27 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
 
               <button
                 type="button"
-                onClick={() => {
-                  clearTimers();
-                  setStep('payment_failed');
-                }}
-                className="text-[11px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors pt-2 cursor-pointer"
+                onClick={() => setStep('payment_failed')}
+                className="text-[11px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] underline cursor-pointer pt-1"
               >
-                {language === 'hi' ? 'रद्द करें / भुगतान नहीं किया' : "Cancelled / Didn't Pay"}
+                {language === 'hi' ? 'मैंने भुगतान रद्द कर दिया' : 'I cancelled or did not complete payment'}
               </button>
             </div>
           </div>
         )}
 
-        {/* ── STAGE 3: AUTOMATICALLY VERIFIED (SUCCESS WINDOW) ─────────────── */}
+        {/* ── STAGE 3: PAYMENT DETECTED & VERIFIED ────────────────────────── */}
         {step === 'payment_success' && (
-          <div className="text-center py-6 space-y-6 animate-in fade-in duration-300">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <div className="w-10 h-10 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-xs">
-                <Image src="/meravote-logo.png" alt="Mera Vote" width={36} height={36} className="w-full h-full object-contain" />
-              </div>
-              <span className="text-xs font-black tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20">
-                {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
-              </span>
+          <div className="text-center py-6 space-y-5 animate-in zoom-in-95 duration-300">
+            {/* Meravote Badge with verified check */}
+            <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shadow-lg overflow-hidden mx-auto">
+              <Image
+                src="/meravote-logo.png"
+                alt="Mera Vote Logo"
+                width={56}
+                height={56}
+                className="w-full h-full object-contain"
+              />
             </div>
 
             <div className="w-16 h-16 rounded-full bg-[var(--success-soft)] text-[var(--success)] flex items-center justify-center mx-auto shadow-md">
@@ -766,8 +761,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
 
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-sm mx-auto leading-relaxed font-normal">
                 {language === 'hi'
-                  ? `आपका ₹${currentAmount} का योगदान Ko-fi से सीधे सत्यापित हो गया है। आपका यह समर्थन 'मेरा वोट' को स्वतंत्र, निष्पक्ष और चालू रखने में अमूल्य है।`
-                  : `Your contribution of ₹${currentAmount} was verified directly from Ko-fi. Your generous support keeps Mera Vote independent, transparent, and operational for Indian citizens.`}
+                  ? `आपका ₹${currentAmount} का योगदान Buy Me a Chai से सीधे सत्यापित हो गया है। आपका यह समर्थन 'मेरा वोट' को स्वतंत्र, निष्पक्ष और चालू रखने में अमूल्य है।`
+                  : `Your contribution of ₹${currentAmount} was verified directly via Buy Me a Chai. Your generous support keeps Mera Vote independent, transparent, and operational for Indian citizens.`}
               </p>
             </div>
 
@@ -826,8 +821,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 100 }: SupportMo
 
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-sm mx-auto leading-relaxed font-normal">
                 {language === 'hi'
-                  ? 'हमें Ko-fi से कोई पूर्ण भुगतान प्राप्त नहीं हुआ। आपसे कोई शुल्क नहीं लिया गया है।'
-                  : 'We did not receive a completed payment from Ko-fi. You were not charged, and no record was published.'}
+                  ? 'हमें Buy Me a Chai से कोई पूर्ण भुगतान प्राप्त नहीं हुआ। आपसे कोई शुल्क नहीं लिया गया है।'
+                  : 'We did not receive a completed payment from Buy Me a Chai. You were not charged, and no record was published.'}
               </p>
             </div>
 
