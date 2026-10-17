@@ -41,11 +41,11 @@ export function GlassButton({
   return (
     <button
       type={props.type || 'button'}
-      className={`glass-button-interactive inline-flex items-center justify-center text-center transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      className={`glass-button-interactive inline-flex items-center justify-center gap-2 text-center transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >
-      {isLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin text-current" />}
+      {isLoading && <Loader2 className="w-4 h-4 animate-spin text-current shrink-0" />}
       {children}
     </button>
   );

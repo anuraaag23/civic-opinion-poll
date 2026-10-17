@@ -33,6 +33,7 @@ import {
   ChevronDown,
   ChevronUp,
   RotateCcw,
+  Star,
   KeyRound,
   LogOut,
   Save,
@@ -1137,11 +1138,13 @@ export function AdminClient() {
                         <td className="py-3 px-4 font-bold text-[var(--text-primary)]">{sup.name}</td>
                         <td className="py-3 px-4">
                           <span className="font-bold text-amber-600 dark:text-amber-400">₹{sup.amount}</span>
-                          <span className="text-[11px] text-[var(--text-tertiary)] block">({sup.cups} ☕)</span>
+                          <span className="text-[11px] text-[var(--text-tertiary)] block">({sup.cups} cups)</span>
                         </td>
                         <td className="py-3 px-4">
-                          <div className="flex items-center text-amber-500 font-bold">
-                            {'★'.repeat(sup.rating || 5)}
+                          <div className="flex items-center gap-0.5 text-amber-500">
+                            {Array.from({ length: sup.rating || 5 }).map((_, i) => (
+                              <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                            ))}
                           </div>
                         </td>
                         <td className="py-3 px-4 max-w-xs text-[var(--text-secondary)]">

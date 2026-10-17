@@ -42,7 +42,8 @@ export function HomeClient() {
                   <span>{language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage Guaranteed'}</span>
                 </GlassBadge>
                 <GlassBadge variant="neutral">
-                  <span>🇮🇳 {language === 'hi' ? '2 अलग वर्ग: PM एवं CM' : '2 Dedicated Sections: PM & CM'}</span>
+                  <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+                  <span>{language === 'hi' ? '2 अलग वर्ग: PM एवं CM' : '2 Dedicated Sections: PM & CM'}</span>
                 </GlassBadge>
               </div>
             </div>
@@ -116,7 +117,7 @@ export function HomeClient() {
       </section>
 
       {/* Prominent Voter Assurance Card */}
-      <section>
+      <section className="-mt-8 sm:-mt-14">
         <VoterAssuranceCard />
       </section>
 
@@ -148,7 +149,8 @@ export function HomeClient() {
                   <span>{language === 'hi' ? '1. प्रधानमंत्री (PM) वर्ग' : '1. Prime Minister (PM) Section'}</span>
                 </div>
                 <GlassBadge variant="neutral">
-                  <span>🇮🇳 {language === 'hi' ? 'संपूर्ण भारत' : 'India Only'}</span>
+                  <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+                  <span>{language === 'hi' ? 'संपूर्ण भारत' : 'India Only'}</span>
                 </GlassBadge>
               </div>
 
@@ -275,7 +277,7 @@ export function HomeClient() {
             {/* CM Card Actions */}
             <div className="pt-3 border-t border-[var(--border-glass)] flex flex-col sm:flex-row items-center gap-2.5">
               <Link href="/cm" className="w-full sm:flex-1">
-                <GlassButton size="md" className="w-full gap-2 font-bold justify-center bg-emerald-600 hover:bg-emerald-500 text-white">
+                <GlassButton variant="primary" size="md" className="w-full gap-2 font-bold justify-center">
                   <Vote className="w-4 h-4" />
                   <span>{language === 'hi' ? `${currentState.name_hi} CM के लिए वोट करें` : `Vote in ${currentState.code} CM Poll`}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -295,10 +297,6 @@ export function HomeClient() {
       {/* ── LIVE LEADERBOARD: SINGLE POLL WITH MOST VOTERS ──────────────── */}
       <HomeTopPollLiveResult />
 
-      {/* Mandatory Non-Affiliation Disclaimer Banner */}
-      <section>
-        <DisclaimerBanner />
-      </section>
 
       {/* Super Simple 3-Step Walkthrough */}
       <section className="space-y-4">

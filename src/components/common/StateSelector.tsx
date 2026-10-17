@@ -58,33 +58,34 @@ export function StateSelector({
           aria-expanded={isOpen}
           aria-haspopup="listbox"
         >
-          <div className="flex items-center gap-3 min-w-0">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center font-black text-sm shrink-0 border border-[var(--accent)]/30">
               {currentState.code}
             </div>
-            <div className="min-w-0">
-              <span className="text-xs uppercase font-bold text-[var(--accent)] tracking-wider block">
+            <div className="min-w-0 flex-1">
+              <span className="text-[11px] uppercase font-bold text-[var(--accent)] tracking-wider block">
                 {language === 'hi' ? 'चयनित राज्य / केंद्र शासित प्रदेश' : 'Selected State / Union Territory'}
               </span>
-              <h3 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate">
-                {language === 'hi' ? currentState.name_hi : currentState.name_en}
-              </h3>
-              <span className="text-xs text-[var(--text-secondary)] font-medium">
+              <div className="flex items-center justify-between gap-3">
+                <h3 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate leading-normal">
+                  {language === 'hi' ? currentState.name_hi : currentState.name_en}
+                </h3>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="hidden sm:inline-flex items-center text-xs font-semibold text-[var(--accent)] px-2.5 py-1 rounded-full bg-[var(--accent-soft)]">
+                    {language === 'hi' ? 'राज्य बदलें' : 'Change State'}
+                  </span>
+                  <div className={`p-1.5 rounded-lg bg-[var(--bg-surface)] text-[var(--text-secondary)] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </div>
+              </div>
+              <span className="text-xs text-[var(--text-secondary)] font-medium block">
                 {currentState.assemblySeats
                   ? language === 'hi'
                     ? `विधानसभा सीटें: ${currentState.assemblySeats}`
                     : `Assembly Seats: ${currentState.assemblySeats}`
                   : currentState.type}
               </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="hidden sm:inline-block text-xs font-semibold text-[var(--accent)] px-2.5 py-1 rounded-full bg-[var(--accent-soft)]">
-              {language === 'hi' ? 'राज्य बदलें' : 'Change State'}
-            </span>
-            <div className={`p-1.5 rounded-lg bg-[var(--bg-surface)] text-[var(--text-secondary)] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
-              <ChevronDown className="w-4 h-4" />
             </div>
           </div>
         </button>

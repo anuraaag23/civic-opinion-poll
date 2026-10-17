@@ -50,22 +50,22 @@ export function PollsClient() {
 
         {/* Quick Nav Badges */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <Link href="/polls/national-opinion-poll-2029/results">
-            <GlassButton variant="primary" size="sm" className="gap-1.5 text-xs font-bold shadow-xs">
-              <BarChart3 className="w-3.5 h-3.5" />
-              <span>{language === 'hi' ? '📊 लाइव परिणाम देखें' : '📊 View Live Results'}</span>
+          <Link href="/polls/national-opinion-poll-2029/results" className="inline-flex">
+            <GlassButton variant="primary" size="sm" className="gap-2 text-xs font-bold shadow-xs">
+              <BarChart3 className="w-3.5 h-3.5 shrink-0" />
+              <span className="leading-none">{language === 'hi' ? 'लाइव परिणाम देखें' : 'View Live Results'}</span>
             </GlassButton>
           </Link>
-          <Link href="/pm">
-            <GlassButton variant="secondary" size="sm" className="gap-1.5 text-xs font-bold">
-              <Globe className="w-3.5 h-3.5 text-[var(--accent)]" />
-              <span>{language === 'hi' ? 'PM जनमत (संपूर्ण भारत)' : 'PM Poll (All India)'}</span>
+          <Link href="/pm" className="inline-flex">
+            <GlassButton variant="secondary" size="sm" className="gap-2 text-xs font-bold">
+              <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+              <span className="leading-none">{language === 'hi' ? 'PM जनमत (संपूर्ण भारत)' : 'PM Poll (All India)'}</span>
             </GlassButton>
           </Link>
-          <Link href="/cm">
-            <GlassButton variant="secondary" size="sm" className="gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
-              <Building2 className="w-3.5 h-3.5" />
-              <span>{language === 'hi' ? 'CM जनमत (राज्यवार)' : 'CM Poll (State-wise)'}</span>
+          <Link href="/cm" className="inline-flex">
+            <GlassButton variant="secondary" size="sm" className="gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
+              <Building2 className="w-3.5 h-3.5 shrink-0" />
+              <span className="leading-none">{language === 'hi' ? 'CM जनमत (राज्यवार)' : 'CM Poll (State-wise)'}</span>
             </GlassButton>
           </Link>
         </div>

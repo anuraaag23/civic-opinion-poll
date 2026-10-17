@@ -19,7 +19,7 @@ export function Footer() {
             <div className="space-y-3">
               <Link
                 href="/"
-                className="inline-flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl"
+                className="inline-flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl active:scale-95 transition-transform touch-manipulation cursor-pointer py-1"
                 aria-label="Mera Vote Home"
               >
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md overflow-hidden backdrop-blur-md shrink-0 group-hover:scale-105 transition-transform">
@@ -63,37 +63,37 @@ export function Footer() {
             <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">
               {language === 'hi' ? 'मंच नेविगेशन' : 'Platform Navigation'}
             </h3>
-            <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
+            <ul className="space-y-1 text-sm text-[var(--text-secondary)]">
               <li>
-                <Link href="/pm" className="hover:text-[var(--accent)] transition-colors flex items-center gap-1.5">
+                <Link href="/pm" className="hover:text-[var(--accent)] transition-colors inline-flex items-center gap-1.5 py-1 touch-manipulation cursor-pointer">
                   <span>{language === 'hi' ? 'PM जनमत (संपूर्ण भारत)' : 'PM Poll (All India)'}</span>
                 </Link>
               </li>
               <li>
-                <Link href="/cm" className="hover:text-[var(--accent)] transition-colors flex items-center gap-1.5">
+                <Link href="/cm" className="hover:text-[var(--accent)] transition-colors inline-flex items-center gap-1.5 py-1 touch-manipulation cursor-pointer">
                   <span>{language === 'hi' ? 'CM जनमत (राज्यवार)' : 'CM Poll (State-wise)'}</span>
                 </Link>
               </li>
               <li>
-                <Link href="/polls" className="hover:text-[var(--accent)] transition-colors">
+                <Link href="/polls" className="hover:text-[var(--accent)] transition-colors inline-block py-1 touch-manipulation cursor-pointer">
                   {t.nav.polls}
                 </Link>
               </li>
               <li>
                 <Link
                   href="/polls/national-opinion-poll-2029/results"
-                  className="hover:text-[var(--accent)] transition-colors"
+                  className="hover:text-[var(--accent)] transition-colors inline-block py-1 touch-manipulation cursor-pointer"
                 >
                   {t.nav.results}
                 </Link>
               </li>
               <li>
-                <Link href="/how-it-works" className="hover:text-[var(--accent)] transition-colors">
-                  {t.nav.howItWorks}
+                <Link href="/how-to-use" className="hover:text-[var(--accent)] transition-colors inline-flex items-center gap-1.5 font-medium py-1 touch-manipulation cursor-pointer">
+                  <span>{language === 'hi' ? 'उपयोग कैसे करें (गाइड)' : 'How to Use Guide'}</span>
                 </Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-[var(--accent)] transition-colors">
+                <Link href="/about" className="hover:text-[var(--accent)] transition-colors inline-block py-1 touch-manipulation cursor-pointer">
                   {language === 'hi' ? 'निर्माता के बारे में' : 'About the Creator'}
                 </Link>
               </li>
@@ -103,31 +103,32 @@ export function Footer() {
           {/* Col 3: Governance & Security */}
           <div className="space-y-3">
             <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">
-              {language === 'hi' ? 'सुरक्षा एवं नीतियां' : 'Security & Policy'}
+              {language === 'hi' ? 'सुरक्षा एवं नीतियां' : 'Safety, Terms & Policies'}
             </h3>
-            <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
+            <ul className="space-y-1 text-sm text-[var(--text-secondary)]">
               <li>
-                <Link href="/privacy" className="hover:text-[var(--accent)] transition-colors">
-                  {t.nav.privacy}
+                <Link href="/safety" className="hover:text-[var(--accent)] transition-colors inline-flex items-center gap-1.5 font-semibold text-[var(--text-primary)] py-1 touch-manipulation cursor-pointer">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  <span>{language === 'hi' ? 'नागरिक सुरक्षा गारंटी' : 'Safety & Voter Protection'}</span>
                 </Link>
               </li>
               <li>
-                <Link href="/terms" className="hover:text-[var(--accent)] transition-colors">
-                  {t.nav.terms}
+                <Link href="/terms" className="hover:text-[var(--accent)] transition-colors inline-block py-1 touch-manipulation cursor-pointer">
+                  {language === 'hi' ? 'नियम व शर्तें' : 'Terms & Conditions'}
                 </Link>
               </li>
               <li>
-                <Link href="/terms#methodology" className="hover:text-[var(--accent)] transition-colors">
+                <Link href="/privacy" className="hover:text-[var(--accent)] transition-colors inline-block py-1 touch-manipulation cursor-pointer">
+                  {language === 'hi' ? 'गोपनीयता वास्तुकला' : 'Privacy Architecture'}
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms#methodology" className="hover:text-[var(--accent)] transition-colors inline-block py-1 touch-manipulation cursor-pointer">
                   {language === 'hi' ? 'सर्वेक्षण कार्यप्रणाली' : 'Polling Methodology'}
                 </Link>
               </li>
               <li>
-                <Link href="/terms#accessibility" className="hover:text-[var(--accent)] transition-colors">
-                  {language === 'hi' ? 'सुगमता (Accessibility)' : 'Accessibility (WCAG 2.2)'}
-                </Link>
-              </li>
-              <li>
-                <Link href="/admin" className="hover:text-[var(--accent)] transition-colors">
+                <Link href="/admin" className="hover:text-[var(--accent)] transition-colors inline-block py-1 touch-manipulation cursor-pointer">
                   {t.nav.admin}
                 </Link>
               </li>

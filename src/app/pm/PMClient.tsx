@@ -69,7 +69,8 @@ export function PMClient() {
             <span>{language === 'hi' ? 'सक्रिय राष्ट्रीय सर्वेक्षण' : 'Live National Poll'}</span>
           </GlassBadge>
           <GlassBadge variant="neutral">
-            <span className="font-bold text-[var(--accent)]">🇮🇳 {language === 'hi' ? 'केवल भारत स्तर' : 'India Only'}</span>
+            <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+            <span className="font-bold text-[var(--accent)]">{language === 'hi' ? 'केवल भारत स्तर' : 'India Only'}</span>
           </GlassBadge>
           <GlassBadge variant="neutral">
             <Lock className="w-3 h-3 text-[var(--accent)]" />

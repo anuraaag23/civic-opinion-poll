@@ -253,8 +253,9 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
             <span>{pollStatus}</span>
           </GlassBadge>
           {scope === 'PM' ? (
-            <span className="text-xs font-bold text-[var(--accent)] px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)]">
-              🇮🇳 India Only
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--accent)] px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)]">
+              <Globe className="w-3 h-3 shrink-0" />
+              <span>India Only</span>
             </span>
           ) : (
             <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30">

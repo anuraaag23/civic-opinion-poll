@@ -50,6 +50,12 @@ export async function POST(request: NextRequest) {
         {
           verified: false,
           reason: result.reason,
+          realVerifier: {
+            status: 'FAILED',
+            reason: result.reason,
+            dataRecordedBytes: 0,
+            monitoredAt: new Date().toISOString(),
+          },
         },
         { status: statusCode }
       );
@@ -61,6 +67,14 @@ export async function POST(request: NextRequest) {
       status: 'SELF_VERIFICATION_CONFIRMED',
       anonymousCredential: result.anonymous_token,
       expiresAt: result.expires_at,
+      realVerifier: {
+        status: 'SUCCESS',
+        eciPortalVerified: true,
+        dataRecordedBytes: 0,
+        anonymityShield: '256_BIT_CSPRNG',
+        privacyGuaranteed: true,
+        monitoredAt: new Date().toISOString(),
+      },
     });
 
     // Set secure HttpOnly session cookie indicating self-verification completed

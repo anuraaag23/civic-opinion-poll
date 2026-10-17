@@ -52,11 +52,11 @@ export function AboutCreatorSection() {
                   <span className="text-xs font-bold text-[var(--accent)]">
                     {language === 'hi' ? 'निर्माता की कहानी' : 'Story & Creator'}
                   </span>
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/25">
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-500/25">
                     {language === 'hi' ? '100% स्वतंत्र • किसी से कोई फंडिंग नहीं' : '100% Independent • Not Funded by Anyone'}
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm font-semibold text-[var(--text-primary)] truncate mt-0.5">
+                <p className="text-xs sm:text-sm font-semibold text-[var(--text-primary)] leading-snug mt-1">
                   {language === 'hi'
                     ? 'अनुराग (20 वर्ष, UP): "Mera Vote भारतीय राजनीति की हताशा से बनाई एक स्वतंत्र नागरिक पहल है — शून्य फंडिंग, शून्य पार्टी संबंध।"'
                     : 'Anurag (20, UP): "Mera Vote is 100% independent — I am not funded by anyone (zero corporate/party money)."' }
@@ -219,7 +219,7 @@ export function AboutCreatorSection() {
                         title={`Buy ${tier.chais} Chai (${tier.label})`}
                       >
                         <span>{tier.label}</span>
-                        <span className="text-[10px] opacity-75">({tier.chais} ☕)</span>
+                        <span className="text-[10px] opacity-75">({tier.chais} {tier.chais === 1 ? 'chai' : 'chais'})</span>
                       </a>
                     ))}
                   </div>

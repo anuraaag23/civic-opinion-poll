@@ -247,31 +247,32 @@ export function HomeTopPollLiveResult() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-            {/* Primary Button requested by User: View full results in detail -> Go to results/all polls tab */}
-            <Link href="/polls" className="w-full sm:w-auto">
+            {/* Primary Action: Vote in PM Poll (Main conversion goal) */}
+            <Link href="/pm" className="w-full sm:w-auto">
               <GlassButton
                 variant="primary"
                 size="md"
                 className="w-full sm:w-auto gap-2 font-bold justify-center shadow-md"
               >
-                <BarChart3 className="w-4 h-4" />
-                <span>
-                  {language === 'hi'
-                    ? 'सभी परिणाम विस्तार से देखें'
-                    : 'View Results in Detail'}
-                </span>
+                <Vote className="w-4 h-4" />
+                <span>{language === 'hi' ? 'PM जनमत में वोट करें' : 'Vote in PM Poll'}</span>
                 <ArrowRight className="w-4 h-4" />
               </GlassButton>
             </Link>
 
-            <Link href="/pm" className="w-full sm:w-auto">
+            {/* Secondary Action: View full results in detail */}
+            <Link href="/polls" className="w-full sm:w-auto">
               <GlassButton
                 variant="secondary"
                 size="md"
                 className="w-full sm:w-auto gap-1.5 font-bold justify-center"
               >
-                <Vote className="w-4 h-4 text-[var(--accent)]" />
-                <span>{language === 'hi' ? 'PM जनमत में वोट करें' : 'Vote in PM Poll'}</span>
+                <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
+                <span>
+                  {language === 'hi'
+                    ? 'सभी परिणाम विस्तार से देखें'
+                    : 'View Results in Detail'}
+                </span>
               </GlassButton>
             </Link>
           </div>

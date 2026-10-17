@@ -28,7 +28,7 @@ export function VoterAssuranceCard() {
             </p>
           </div>
         </div>
-        <span className="text-xs font-bold text-[var(--success)] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[var(--success-soft)] self-start sm:self-auto select-none">
+        <span className="text-xs font-bold text-[var(--success)] px-2.5 py-1 rounded-full bg-[var(--success-soft)] self-start sm:self-auto select-none">
           {language === 'hi' ? '100% सत्यापित गोपनीयता' : '100% Privacy Assured'}
         </span>
       </div>

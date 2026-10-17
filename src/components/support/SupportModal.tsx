@@ -463,7 +463,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
                     }`}
                   >
                     <div className="text-sm font-bold">{tier.label}</div>
-                    <div className="text-[10px] opacity-75">{tier.chais} ☕</div>
+                    <div className="text-[10px] opacity-75">{tier.chais} {tier.chais === 1 ? 'chai' : 'chais'}</div>
                   </button>
                 ))}
               </div>
@@ -520,7 +520,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
                   {language === 'hi' ? '3. मेरा वोट को रेटिंग दें' : '3. Rate Mera Vote'}
                 </label>
                 <span className="text-xs font-bold text-amber-500">
-                  {starRating}.0 / 5.0 ★
+                  {starRating}.0 / 5.0
                 </span>
               </div>
               <div className="flex items-center gap-1 sm:gap-1.5">
@@ -763,7 +763,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
 
             <div className="space-y-2">
               <span className="text-xs font-bold uppercase tracking-wider text-[var(--success)] block font-mono">
-                {language === 'hi' ? 'भुगतान स्वतः सत्यापित हुआ ✓' : 'Payment Automatically Verified ✓'}
+                {language === 'hi' ? 'भुगतान स्वतः सत्यापित हुआ' : 'Payment Automatically Verified'}
               </span>
 
               <h3 className="text-2xl font-black text-[var(--text-primary)] tracking-tight">
