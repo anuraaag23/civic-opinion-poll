@@ -31,10 +31,10 @@ export function SupportButton({
         href={BUYMEACHAI_CONFIG.url}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 transition-all cursor-pointer ${className}`}
+        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/35 shadow-xs transition-all cursor-pointer ${className}`}
         title={titleText}
       >
-        <Coffee className="w-3.5 h-3.5" />
+        <Coffee className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
         <span>{label}</span>
       </a>
     );
@@ -46,10 +46,10 @@ export function SupportButton({
         href={BUYMEACHAI_CONFIG.url}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all cursor-pointer ${className}`}
+        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-800 dark:text-amber-200 text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm transition-all cursor-pointer ${className}`}
         title={titleText}
       >
-        <Coffee className="w-4 h-4" />
+        <Coffee className="w-4 h-4 text-amber-600 dark:text-amber-400" />
         <span>{label}</span>
       </a>
     );
@@ -60,10 +60,10 @@ export function SupportButton({
       href={BUYMEACHAI_CONFIG.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-700 dark:text-amber-300 text-xs sm:text-sm font-bold transition-all cursor-pointer ${className}`}
+      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-800 dark:text-amber-200 text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm transition-all cursor-pointer ${className}`}
       title={titleText}
     >
-      <Coffee className="w-4 h-4" />
+      <Coffee className="w-4 h-4 text-amber-600 dark:text-amber-400" />
       <span>{titleText}</span>
     </a>
   );

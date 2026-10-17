@@ -33,11 +33,11 @@ export function DisclaimerBanner({ compact = false, className = '' }: Disclaimer
         <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] shrink-0 flex items-center justify-center">
           <ShieldAlert className="w-5 h-5" />
         </div>
-        <div className="space-y-1">
+        <div className="space-y-1 max-w-3xl">
           <h2 className="text-xs font-bold text-[var(--text-secondary)]">
             {language === 'hi' ? 'कानूनी अस्वीकरण एवं गैर-संबद्धता सूचना' : 'Legal Disclaimer & Non-Affiliation Notice'}
           </h2>
-          <p className="text-sm leading-relaxed text-[var(--text-primary)] font-medium">
+          <p className="text-sm leading-relaxed text-[var(--text-primary)] font-medium max-w-3xl">
             {t.common.officialDisclaimer}
           </p>
         </div>

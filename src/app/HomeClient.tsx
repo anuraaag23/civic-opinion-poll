@@ -79,9 +79,14 @@ export function HomeClient() {
                 </GlassButton>
               </Link>
               <Link href="/polls/national-opinion-poll-2029/results" className="w-full sm:w-auto">
-                <GlassButton variant="ghost" size="lg" className="w-full sm:w-auto gap-1.5">
+                <GlassButton
+                  variant="secondary"
+                  size="lg"
+                  className="w-full sm:w-auto gap-2 font-bold bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-[var(--text-primary)] shadow-xs"
+                >
                   <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
                   <span>{language === 'hi' ? 'लाइव परिणाम' : 'Live Results'}</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[var(--text-tertiary)]" />
                 </GlassButton>
               </Link>
             </div>

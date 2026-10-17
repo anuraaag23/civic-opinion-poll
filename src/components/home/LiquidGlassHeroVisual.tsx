@@ -38,7 +38,7 @@ export function LiquidGlassHeroVisual() {
           <span className="text-xs sm:text-base font-black tracking-tight text-[var(--text-primary)]">
             Mera Vote
           </span>
-          <span className="text-xs text-[var(--accent)] mt-0.5 font-bold uppercase tracking-wider">
+          <span className="text-xs text-[var(--accent)] mt-0.5 font-bold tracking-normal">
             मेरा वोट • Bharat
           </span>
         </div>
