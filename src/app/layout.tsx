@@ -21,9 +21,12 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://meravote.in'),
-  title: 'Mera Vote | Independent Civic Opinion Poll Platform',
+  title: {
+    default: 'Mera Vote | Independent Civic Opinion Poll Platform',
+    template: '%s | Mera Vote',
+  },
   description:
-    'Mera Vote (मेरा वोट) — Independent civic opinion poll platform for India. Participate with privacy-preserving self-verification and cryptographically anonymous responses. Not affiliated with the Election Commission of India.',
+    'Mera Vote (मेरा वोट) — Independent civic opinion poll platform for India. Participate with privacy-preserving self-verification and cryptographically anonymous responses. Zero ID storage. Not affiliated with the Election Commission of India.',
   keywords: [
     'Mera Vote',
     'मेरा वोट',
@@ -32,16 +35,22 @@ export const metadata: Metadata = {
     'Civic Technology',
     'Anonymous Opinion Poll',
     'स्वतंत्र नागरिक जनमत सर्वेक्षण',
+    'Prime Minister Opinion Poll 2029',
+    'Chief Minister Opinion Poll',
+    'Lok Sabha Polls',
+    'State Assembly Polls',
   ],
   icons: {
     icon: [
-      { url: '/meravote-logo.png' },
-      { url: '/favicon.ico' },
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/meravote-logo.png', sizes: '512x512', type: 'image/png' },
     ],
-    shortcut: '/meravote-logo.png',
-    apple: '/meravote-logo.png',
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
-  authors: [{ name: 'Civic Technology Research' }],
+  authors: [{ name: 'Anurag (Civic Technology Research)' }],
   robots: {
     index: true,
     follow: true,
@@ -58,6 +67,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
+      <head>
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+      </head>
       <body className="min-h-screen min-h-[100dvh] flex flex-col antialiased overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
         <ThemeProvider>
           <I18nProvider>
@@ -83,6 +96,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
             {/* Footer */}
             <Footer />
+
+            {/* Accessible Dedicated Custom Portal Root for Modals & Dialogs */}
+            <div id="modal-root" />
           </I18nProvider>
         </ThemeProvider>
       </body>

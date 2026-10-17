@@ -24,6 +24,8 @@ export function VoteConfirmationSheet({
 }: VoteConfirmationSheetProps) {
   const { t, language } = useI18n();
 
+  const [imgError, setImgError] = React.useState(false);
+
   if (!selectedParty) return null;
 
   const partyName = language === 'hi' ? selectedParty.name_hi : selectedParty.name_en;
@@ -43,12 +45,13 @@ export function VoteConfirmationSheet({
         {/* Selected Party Summary Card */}
         <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-4">
           <div className="w-14 h-14 rounded-xl p-2 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
-            {selectedParty.logo_url ? (
+            {selectedParty.logo_url && !imgError ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={selectedParty.logo_url}
                 alt={selectedParty.short_name}
                 className="w-full h-full object-contain"
+                onError={() => setImgError(true)}
               />
             ) : (
               <div

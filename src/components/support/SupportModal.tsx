@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Portal } from '@/components/ui/Portal';
 import {
   X,
   ExternalLink,
@@ -366,52 +368,58 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
-    >
-      {/* Translucent Backdrop */}
+    <Portal containerId="modal-root">
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
-        onClick={handleModalClose}
-        aria-hidden="true"
-      />
-
-      {/* Modal Dialog Card (Bottom-sheet on mobile, centered card on tablet/desktop) */}
-      <div className="relative z-10 w-full max-w-lg glass-panel-elevated p-5 sm:p-8 shadow-2xl transition-all my-0 sm:my-8 max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto border border-amber-500/25 rounded-t-3xl sm:rounded-3xl pb-safe">
-        {/* Mobile Pull / Drag Indicator */}
-        <div className="w-12 h-1.5 rounded-full bg-[var(--text-tertiary)]/30 mx-auto mb-3 sm:hidden" />
-
-        {/* Close Button with 40x40 tap target */}
-        <button
+        role="dialog"
+        aria-modal="true"
+        className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 overflow-y-auto animate-in fade-in duration-200"
+      >
+        {/* Translucent Backdrop */}
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
           onClick={handleModalClose}
-          className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-glass)] active:scale-95 transition-all cursor-pointer"
-          aria-label="Close dialog"
-        >
-          <X className="w-5 h-5" />
-        </button>
+          aria-hidden="true"
+        />
 
-        {/* ── STAGE 1: CONTRIBUTION FORM ─────────────────────────────────── */}
-        {step === 'form' && (
-          <div className="space-y-6">
-            {/* Header with Mera Vote Logo */}
-            <div className="text-center space-y-2.5 pt-1">
-              <div className="flex items-center justify-center gap-2 mb-1">
-                <div className="w-11 h-11 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
-                  <Image
-                    src="/meravote-logo.png"
-                    alt="Mera Vote Logo"
-                    width={44}
-                    height={44}
-                    className="w-full h-full object-contain"
-                  />
+        {/* Modal Dialog Card (Bottom-sheet on mobile, centered card on tablet/desktop) */}
+        <div className="relative z-10 w-full max-w-lg glass-panel-elevated p-5 sm:p-8 shadow-2xl transition-all my-0 sm:my-8 max-h-[92dvh] sm:max-h-[90vh] overflow-y-auto border border-amber-500/25 rounded-t-3xl sm:rounded-3xl pb-safe">
+          {/* Mobile Pull / Drag Indicator */}
+          <div className="w-12 h-1.5 rounded-full bg-[var(--text-tertiary)]/30 mx-auto mb-3 sm:hidden" />
+
+          {/* Close Button with 40x40 tap target */}
+          <button
+            onClick={handleModalClose}
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--border-glass)] active:scale-95 transition-all cursor-pointer"
+            aria-label="Close dialog"
+          >
+            <X className="w-5 h-5" />
+          </button>
+
+          {/* ── STAGE 1: CONTRIBUTION FORM ─────────────────────────────────── */}
+          {step === 'form' && (
+            <div className="space-y-6">
+              {/* Header with Mera Vote Logo */}
+              <div className="text-center space-y-2.5 pt-1">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <Link
+                    href="/"
+                    onClick={handleModalClose}
+                    className="w-11 h-11 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-sm overflow-hidden hover:scale-105 transition-transform"
+                    aria-label="Mera Vote Home"
+                  >
+                    <Image
+                      src="/meravote-logo.png"
+                      alt="Mera Vote Logo"
+                      width={44}
+                      height={44}
+                      className="w-full h-full object-contain"
+                    />
+                  </Link>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
+                    <Coffee className="w-3.5 h-3.5" />
+                    <span>Buy Me a Chai • Automatic Verification</span>
+                  </div>
                 </div>
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
-                  <Coffee className="w-3.5 h-3.5" />
-                  <span>Buy Me a Chai • Automatic Verification</span>
-                </div>
-              </div>
 
               <h3 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] tracking-tight">
                 {language === 'hi'
@@ -853,5 +861,6 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
         )}
       </div>
     </div>
+    </Portal>
   );
 }

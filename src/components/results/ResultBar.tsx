@@ -14,18 +14,21 @@ export function ResultBar({ result, maxPercentage }: ResultBarProps) {
 
   const partyName = language === 'hi' ? result.party_name_hi : result.party_name_en;
 
+  const [imgError, setImgError] = React.useState(false);
+
   return (
     <div className="space-y-2 p-3 sm:p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] shadow-xs transition-all hover:border-[var(--accent)]/40">
       <div className="flex items-center justify-between gap-4">
         {/* Party Identity */}
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-9 h-9 rounded-lg p-1.5 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
-            {result.logo_url ? (
+            {result.logo_url && !imgError ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={result.logo_url}
                 alt={result.party_short_name}
                 className="w-full h-full object-contain"
+                onError={() => setImgError(true)}
               />
             ) : (
               <div

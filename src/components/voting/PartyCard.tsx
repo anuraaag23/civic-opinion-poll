@@ -32,6 +32,8 @@ export function PartyCard({
     }
   };
 
+  const [imgError, setImgError] = React.useState(false);
+
   return (
     <div
       role="radio"
@@ -55,13 +57,14 @@ export function PartyCard({
           className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl p-1.5 sm:p-2 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 shadow-sm overflow-hidden"
           title={symbolAlt}
         >
-          {party.logo_url ? (
+          {party.logo_url && !imgError ? (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img
               src={party.logo_url}
               alt={symbolAlt}
               className="w-full h-full object-contain"
               loading="lazy"
+              onError={() => setImgError(true)}
             />
           ) : (
             <div
@@ -78,9 +81,9 @@ export function PartyCard({
               {party.short_name}
             </span>
           </div>
-          <h4 className="text-base sm:text-lg font-bold text-[var(--text-primary)] truncate">
+          <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] leading-snug">
             {partyName}
-          </h4>
+          </h3>
         </div>
       </div>
 

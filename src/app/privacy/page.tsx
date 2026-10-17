@@ -1,156 +1,19 @@
-'use client';
+import type { Metadata } from 'next';
+import { PrivacyClient } from './PrivacyClient';
 
-import React from 'react';
-import { useI18n } from '@/lib/i18n/context';
-import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
-import { GlassCard } from '@/components/ui/GlassCard';
-import { Lock, AlertTriangle, Database, Trash2 } from 'lucide-react';
+export const metadata: Metadata = {
+  title: 'Privacy Architecture & Data Guarantees',
+  description:
+    'Our unbreakable pledge: zero EPIC or voter ID storage, keyed HMAC participation fingerprints, and complete cryptographic identity separation. 100% anonymous.',
+  keywords: [
+    'Privacy Policy Mera Vote',
+    'Zero ID Storage Guarantee',
+    'Decoupled Voting System',
+    'HMAC Fingerprints',
+    'गोपनीयता नीति',
+  ],
+};
 
 export default function PrivacyPage() {
-  const { t, language } = useI18n();
-
-  return (
-    <div className="max-w-4xl mx-auto space-y-10 py-4">
-      {/* Header */}
-      <div className="space-y-3">
-        <span className="text-xs font-bold uppercase tracking-wider text-[var(--success)] px-3 py-1 rounded-full bg-[var(--success-soft)]">
-          {language === 'hi' ? 'गोपनीयता नीति एवं वास्तुकला' : 'Privacy Architecture & Guarantees'}
-        </span>
-        <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-[var(--text-primary)]">
-          {t.privacy.title}
-        </h1>
-        <p className="text-base text-[var(--text-secondary)] leading-relaxed">
-          {t.privacy.subtitle}
-        </p>
-      </div>
-
-      <DisclaimerBanner />
-
-      {/* Core Architectural Pillars */}
-      <div className="space-y-8">
-        {/* Section: What We Do Not Collect (Mode A) */}
-        <GlassCard elevated className="border-l-4 border-l-[var(--success)] space-y-4 bg-[var(--bg-glass-elevated)]">
-          <div className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]">
-            <div className="p-2 rounded-xl bg-[var(--success-soft)] text-[var(--success)]">
-              <Lock className="w-5 h-5" />
-            </div>
-            <h2>
-              {language === 'hi' ? 'हम क्या एकत्र नहीं करते' : 'What We Do Not Collect'}
-            </h2>
-          </div>
-          <p className="text-sm text-[var(--text-primary)] font-semibold leading-relaxed">
-            {language === 'hi'
-              ? 'हम आपसे \'मेरा वोट\' (Mera Vote) पर आपका EPIC नंबर या कोई भी पहचान पत्र जमा करने के लिए कभी नहीं कहते। मतदाता पंजीकरण की जांच सीधे आपके द्वारा आधिकारिक ECI वेबसाइट पर की जाती है।'
-              : 'We never ask you to submit your EPIC number or any personal identity proof to Mera Vote. Electoral-registration checks are performed directly by you on the official ECI website.'}
-          </p>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            {language === 'hi'
-              ? 'आपकी सर्वेक्षण प्रतिक्रिया को स्व-सत्यापन पुष्टि से अलग संग्रहीत किया जाता है।'
-              : 'Your poll response is stored separately from the self-verification confirmation.'}
-          </p>
-          <p className="text-xs text-[var(--text-tertiary)] leading-relaxed">
-            {language === 'hi'
-              ? 'हमने व्यक्तिगत जानकारी के संग्रह और प्रदर्शन को कम से कम करने के लिए इस प्रणाली को डिज़ाइन किया है।'
-              : 'We designed the system to minimize the collection and exposure of personal information.'}
-          </p>
-        </GlassCard>
-
-        {/* 1. Identity Separation Guarantee */}
-        <GlassCard elevated className="space-y-4">
-          <div className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]">
-            <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)]">
-              <Lock className="w-5 h-5" />
-            </div>
-            <h2>{t.privacy.architectureTitle}</h2>
-          </div>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            {t.privacy.architectureDesc}
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
-              <span className="font-bold text-[var(--error)] block mb-1">
-                ✕ {language === 'hi' ? 'कभी संग्रहीत नहीं किया जाता' : 'Never Stored'}
-              </span>
-              <ul className="text-[var(--text-tertiary)] space-y-1 list-disc list-inside">
-                <li>Voter Name or Father&apos;s Name</li>
-                <li>Residential Address / Polling Booth</li>
-                <li>Date of Birth or Gender</li>
-                <li>Raw EPIC number in the voting database</li>
-                <li>Any link between identity and chosen party</li>
-              </ul>
-            </div>
-            <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
-              <span className="font-bold text-[var(--success)] block mb-1">
-                ✓ {language === 'hi' ? 'केवल न्यूनतम अवयव' : 'Retained with Minimization'}
-              </span>
-              <ul className="text-[var(--text-tertiary)] space-y-1 list-disc list-inside">
-                <li>Server-keyed HMAC participation fingerprint</li>
-                <li>Ephemeral anonymous token hash (expires in 15m)</li>
-                <li>Aggregate vote counters per party</li>
-                <li>Sanitized security audit counters</li>
-              </ul>
-            </div>
-          </div>
-        </GlassCard>
-
-        {/* 2. Keyed Participation Fingerprints */}
-        <GlassCard className="space-y-4">
-          <div className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]">
-            <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)]">
-              <Database className="w-5 h-5" />
-            </div>
-            <h2>{t.privacy.fingerprintTitle}</h2>
-          </div>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            {t.privacy.fingerprintDesc}
-          </p>
-        </GlassCard>
-
-        {/* 3. Important: Do Not Claim Hash = Anonymous */}
-        <GlassCard className="border-l-4 border-l-[var(--warning)] space-y-4 bg-[var(--bg-glass-elevated)]">
-          <div className="flex items-center gap-3 text-lg font-bold text-[var(--warning)]">
-            <AlertTriangle className="w-5 h-5" />
-            <h2>
-              {language === 'hi'
-                ? 'महत्वपूर्ण: हैश को निरपेक्ष रूप से गुमनाम नहीं माना जाता'
-                : 'Responsible Privacy: We Do Not Claim Hash Equals Anonymity'}
-            </h2>
-          </div>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            {t.privacy.noClaimAbsolute}
-          </p>
-          <p className="text-xs text-[var(--text-tertiary)] leading-relaxed">
-            Cryptographic fingerprints can still be subject to correlation under sophisticated threat models if secrets are compromised. Therefore, our security defense is layered: strict access controls, short token lifecycles, absence of identity-vote tables, and scheduled cryptographic purge routines.
-          </p>
-        </GlassCard>
-
-        {/* 4. Data Retention Policy */}
-        <GlassCard className="space-y-4">
-          <div className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]">
-            <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)]">
-              <Trash2 className="w-5 h-5" />
-            </div>
-            <h2>{t.privacy.retentionTitle}</h2>
-          </div>
-          <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
-            {t.privacy.retentionDesc}
-          </p>
-          <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] space-y-2">
-            <div className="flex justify-between items-center py-1 border-b border-[var(--border-glass)]">
-              <span className="font-semibold text-[var(--text-primary)]">Active Poll:</span>
-              <span>Retains participation fingerprints to prevent ballot stuffing</span>
-            </div>
-            <div className="flex justify-between items-center py-1 border-b border-[var(--border-glass)]">
-              <span className="font-semibold text-[var(--text-primary)]">Post Poll Closure:</span>
-              <span>Fingerprints scheduled for permanent deletion</span>
-            </div>
-            <div className="flex justify-between items-center py-1">
-              <span className="font-semibold text-[var(--text-primary)]">Aggregate Results:</span>
-              <span>Retained indefinitely as public historical civic data</span>
-            </div>
-          </div>
-        </GlassCard>
-      </div>
-    </div>
-  );
+  return <PrivacyClient />;
 }
