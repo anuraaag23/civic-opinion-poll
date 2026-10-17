@@ -60,9 +60,9 @@ export function Footer() {
 
           {/* Col 2: Platform Navigation */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-primary)]">
+            <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">
               {language === 'hi' ? 'मंच नेविगेशन' : 'Platform Navigation'}
-            </h4>
+            </h3>
             <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
               <li>
                 <Link href="/pm" className="hover:text-[var(--accent)] transition-colors flex items-center gap-1.5">
@@ -102,9 +102,9 @@ export function Footer() {
 
           {/* Col 3: Governance & Security */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-primary)]">
+            <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">
               {language === 'hi' ? 'सुरक्षा एवं नीतियां' : 'Security & Policy'}
-            </h4>
+            </h3>
             <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
               <li>
                 <Link href="/privacy" className="hover:text-[var(--accent)] transition-colors">
@@ -134,11 +134,11 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Col 4: Contact & Inquiries (Clickable Phone & Email) */}
+          {/* Col 4: Contact & Inquiries (Clickable Email) */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-primary)]">
+            <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">
               {language === 'hi' ? 'संपर्क एवं नागरिक पूछताछ' : 'Contact & Citizen Inquiries'}
-            </h4>
+            </h3>
             <div className="space-y-2.5 text-xs text-[var(--text-secondary)]">
               <div className="flex items-start gap-2">
                 <User className="w-4 h-4 text-[var(--accent)] shrink-0 mt-0.5" />
@@ -160,7 +160,7 @@ export function Footer() {
                 </a>
               </div>
 
-              <div className="flex items-center gap-2 pt-1 text-[11px] text-[var(--text-tertiary)]">
+              <div className="flex items-center gap-2 pt-1 text-xs text-[var(--text-tertiary)]">
                 <MapPin className="w-3.5 h-3.5 text-[var(--error)] shrink-0" />
                 <span>Uttar Pradesh, India (शून्य पार्टी फंडिंग)</span>
               </div>
@@ -183,7 +183,7 @@ export function Footer() {
           </div>
           <div className="mt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-[var(--text-tertiary)] gap-2">
             <span>© 2026 Mera Vote. All rights reserved. Independent Civic Opinion Poll Platform.</span>
-            <span>{language === 'hi' ? 'गोपनीयता-प्रथम वास्तुकला • WCAG 2.2 AA' : 'Privacy-First Architecture • WCAG 2.2 AA'}</span>
+            <span>{language === 'hi' ? 'गोपनीयता-प्रथम संरचना • WCAG 2.2 AA' : 'Privacy-First Architecture • WCAG 2.2 AA'}</span>
           </div>
         </div>
       </div>

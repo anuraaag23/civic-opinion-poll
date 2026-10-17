@@ -27,10 +27,10 @@ export function KeyGuaranteesSection() {
     },
     {
       icon: Cpu,
-      title: language === 'hi' ? 'परमाणु (Atomic) लेनदेन' : 'Atomic Vote Increment',
+      title: language === 'hi' ? 'अखंड (Atomic) डेटाबेस लेनदेन' : 'Atomic Vote Increment',
       desc:
         language === 'hi'
-          ? 'सभी वोट डेटाबेस में परमाणु ट्रांजेक्शन से गिने जाते हैं। टोकन की केवल एक बार खपत होती है, जिससे रेस कंडीशन असंभव है।'
+          ? 'सभी वोट डेटाबेस में अखंड (atomic) ट्रांजेक्शन से गिने जाते हैं। टोकन की केवल एक बार खपत होती है, जिससे रेस कंडीशन असंभव है।'
           : 'Responses are tallied through strict atomic database operations. Credentials are consumed in the same transaction to eliminate race conditions.',
     },
     {
@@ -38,7 +38,7 @@ export function KeyGuaranteesSection() {
       title: language === 'hi' ? 'पूर्ण राजनीतिक तटस्थता' : 'Uncompromising Neutrality',
       desc:
         language === 'hi'
-          ? 'कोई दल सिफ़ारिश नहीं, कोई प्रायोजित कार्ड नहीं। सभी विकल्पों को समान दृश्य पदानुक्रम और तटस्थ क्रम में प्रस्तुत किया जाता है।'
+          ? 'किसी भी दल की कोई सिफ़ारिश नहीं, कोई प्रायोजित कार्ड नहीं। सभी विकल्पों को समान दृश्य पदानुक्रम और तटस्थ क्रम में प्रस्तुत किया जाता है।'
           : 'Zero recommendations, zero sponsored cards, and zero persuasive framing. Every party is rendered with identical visual hierarchy.',
     },
   ];
@@ -59,11 +59,11 @@ export function KeyGuaranteesSection() {
           {guarantees.map((g, idx) => {
             const Icon = g.icon;
             return (
-              <GlassCard key={idx} className="flex gap-4 items-start">
+              <GlassCard key={idx} className="flex gap-4 items-start h-full p-5 sm:p-6">
                 <div className="p-3 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] shrink-0">
                   <Icon className="w-6 h-6" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1.5 flex-1">
                   <h3 className="text-base font-bold text-[var(--text-primary)]">
                     {g.title}
                   </h3>

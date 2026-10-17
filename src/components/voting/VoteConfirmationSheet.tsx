@@ -60,14 +60,14 @@ export function VoteConfirmationSheet({
               />
             )}
           </div>
-          <div className="space-y-0.5 min-w-0">
+          <div className="space-y-0.5 min-w-0 flex-1">
             <span className="text-xs text-[var(--text-tertiary)] uppercase font-semibold">
               {t.voting.confirmSelectedParty}
             </span>
-            <h4 className="text-lg font-bold text-[var(--text-primary)] truncate">
+            <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)] leading-snug break-words">
               {partyName}
-            </h4>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)]">
+            </h3>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block mt-0.5">
               {selectedParty.short_name}
             </span>
           </div>

@@ -45,9 +45,9 @@ export function PMClient() {
     <div className="space-y-8 sm:space-y-10 py-4 max-w-4xl mx-auto">
       {/* Scope Header: All India / National */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/30 text-[var(--accent)] text-xs font-black uppercase tracking-wider">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/30 text-[var(--accent)] text-xs font-semibold">
           <Globe className="w-3.5 h-3.5" />
-          <span>{language === 'hi' ? 'संपूर्ण भारत • राष्ट्रीय जनमत' : 'All India • National Scope (India Only)'}</span>
+          <span>{language === 'hi' ? 'संपूर्ण भारत • राष्ट्रीय जनमत (केवल भारत)' : 'All India • National Scope (India Only)'}</span>
         </div>
 
         <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[var(--text-primary)]">
@@ -142,13 +142,13 @@ export function PMClient() {
                             />
                           )}
                         </div>
-                        <div className="min-w-0">
-                          <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block mb-0.5">
+                        <div className="min-w-0 flex-1">
+                          <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block mb-0.5">
                             {party.short_name}
                           </span>
-                          <h4 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] truncate">
+                          <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] leading-snug break-words">
                             {language === 'hi' ? party.name_hi : party.name_en}
-                          </h4>
+                          </h3>
                         </div>
                       </div>
                     ))}
@@ -171,10 +171,10 @@ export function PMClient() {
                 </div>
 
                 {/* CTA to start voting */}
-                <div className="pt-2">
+                <div className="pt-2 flex justify-center">
                   <GlassButton
                     size="lg"
-                    className="w-full gap-2 shadow-md font-bold"
+                    className="w-full sm:w-auto min-w-[260px] max-w-sm gap-2 shadow-md font-bold px-8 justify-center"
                     onClick={() => setStep('VERIFY')}
                   >
                     <Vote className="w-5 h-5" />
@@ -218,7 +218,7 @@ export function PMClient() {
       {/* Switch to CM Section Banner */}
       <GlassCard className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4 border border-[var(--accent)]/30 bg-gradient-to-r from-[var(--accent-soft)] via-[var(--bg-glass)] to-transparent">
         <div className="space-y-1 text-center sm:text-left">
-          <span className="text-[11px] font-bold uppercase text-[var(--accent)] tracking-wider block">
+          <span className="text-xs font-bold text-[var(--accent)] tracking-normal block">
             {language === 'hi' ? 'राज्य स्तर पर वोट करना चाहते हैं?' : 'Want to vote for your State Assembly?'}
           </span>
           <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
@@ -226,13 +226,13 @@ export function PMClient() {
           </h3>
           <p className="text-xs text-[var(--text-secondary)]">
             {language === 'hi'
-              ? 'अपना राज्य चुनें और अपनी क्षेत्रीय पार्टियों के असली चुनाव चिन्हों के साथ वोट करें।'
+              ? 'अपना राज्य चुनें और अपनी क्षेत्रीय पार्टियों के असली चुनाव चिह्नों के साथ वोट करें।'
               : 'Select your state and cast your vote among regional parties contesting in your state.'}
           </p>
         </div>
 
         <Link href="/cm" className="w-full sm:w-auto shrink-0">
-          <GlassButton size="md" className="w-full sm:w-auto gap-2">
+          <GlassButton variant="secondary" size="md" className="w-full sm:w-auto gap-2">
             <span>{language === 'hi' ? 'CM जनमत पेज खोलें' : 'Go to CM Poll'}</span>
             <ArrowRight className="w-4 h-4" />
           </GlassButton>

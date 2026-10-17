@@ -204,3 +204,40 @@ export async function fetchSupporters(): Promise<DbSupporter[]> {
   }
   return [];
 }
+
+/**
+ * Fetch all supporters (both verified and pending moderation) for admin panel.
+ */
+export async function fetchAllSupporters(): Promise<DbSupporter[]> {
+  if (supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('supporters')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (!error && data) return data;
+      console.error('Error fetching all supporters from Supabase:', error);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  return [];
+}
+
+/**
+ * Delete a supporter review by ID (admin moderation).
+ */
+export async function deleteSupporter(id: string): Promise<boolean> {
+  if (supabase && id) {
+    try {
+      const { error } = await supabase.from('supporters').delete().eq('id', id);
+      if (!error) return true;
+      console.error('Error deleting supporter:', error);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  return false;
+}
+

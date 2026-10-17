@@ -144,51 +144,51 @@ export function VerificationForm({
 
             {/* Three-Step Process Explanation */}
             <div className="pt-2">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-tertiary)] mb-3 text-center sm:text-left">
+              <h3 className="text-xs font-bold uppercase tracking-wider text-[var(--text-tertiary)] mb-3 text-center sm:text-left">
                 {language === 'hi' ? 'प्रक्रिया विवरण' : 'Process Explanation'}
-              </h4>
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Step 01 */}
-                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1 flex flex-col justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
+                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)] shrink-0 flex items-center justify-center min-w-[24px]">
                       01
                     </span>
                     <span className="text-xs font-bold text-[var(--text-primary)]">
                       {t.verification.step1Title}
                     </span>
                   </div>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed pt-1">
                     {t.verification.step1Desc}
                   </p>
                 </div>
 
                 {/* Step 02 */}
-                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1 flex flex-col justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
+                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)] shrink-0 flex items-center justify-center min-w-[24px]">
                       02
                     </span>
                     <span className="text-xs font-bold text-[var(--text-primary)]">
                       {t.verification.step2Title}
                     </span>
                   </div>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed pt-1">
                     {t.verification.step2Desc}
                   </p>
                 </div>
 
                 {/* Step 03 */}
-                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
+                <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1 flex flex-col justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)]">
+                    <span className="text-xs font-black px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)] shrink-0 flex items-center justify-center min-w-[24px]">
                       03
                     </span>
                     <span className="text-xs font-bold text-[var(--text-primary)]">
                       {t.verification.step3Title}
                     </span>
                   </div>
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed pt-1">
                     {t.verification.step3Desc}
                   </p>
                 </div>

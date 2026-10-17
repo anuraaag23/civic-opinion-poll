@@ -44,7 +44,7 @@ export function HowItWorksSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto mb-14 space-y-3">
           <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)] px-3 py-1 rounded-full bg-[var(--accent-soft)]">
-            {language === 'hi' ? 'सिद्धांत एवं वास्तुकला' : 'Integrity & Architecture'}
+            {language === 'hi' ? 'सिद्धांत एवं कार्यप्रणाली' : 'Integrity & Architecture'}
           </span>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[var(--text-primary)]">
             {t.howItWorks.title}
@@ -80,7 +80,7 @@ export function HowItWorksSection() {
                   </p>
                 </div>
                 <div className="pt-6 mt-4 border-t border-[var(--border-glass)]">
-                  <span className="text-[11px] font-semibold tracking-wide uppercase text-[var(--accent)]">
+                  <span className="text-xs font-semibold tracking-wide uppercase text-[var(--accent)]">
                     {step.tag}
                   </span>
                 </div>

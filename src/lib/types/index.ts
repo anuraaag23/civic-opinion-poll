@@ -116,8 +116,24 @@ export interface AuditEvent {
     | 'duplicate_vote_blocked'
     | 'admin_login'
     | 'admin_poll_update'
-    | 'admin_party_update';
+    | 'admin_party_update'
+    | 'admin_settings_update'
+    | 'admin_votes_reset'
+    | 'admin_poll_create'
+    | 'admin_poll_delete';
   poll_id?: string;
   timestamp: string;
   metadata_sanitized: Record<string, unknown>; // STRICTLY NO EPIC, NO PII, NO VOTE CHOICE
 }
+
+export interface SiteSettings {
+  maintenanceMode: boolean;
+  emergencyBannerEnabled: boolean;
+  emergencyBannerTextEn: string;
+  emergencyBannerTextHi: string;
+  emergencyBannerType: 'info' | 'warning' | 'alert';
+  allowVoting: boolean;
+  rateLimitPerHour: number;
+  lastUpdated: string;
+}
+

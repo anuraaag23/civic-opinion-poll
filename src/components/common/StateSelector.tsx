@@ -63,7 +63,7 @@ export function StateSelector({
               {currentState.code}
             </div>
             <div className="min-w-0">
-              <span className="text-[10px] uppercase font-bold text-[var(--accent)] tracking-wider block">
+              <span className="text-xs uppercase font-bold text-[var(--accent)] tracking-wider block">
                 {language === 'hi' ? 'चयनित राज्य / केंद्र शासित प्रदेश' : 'Selected State / Union Territory'}
               </span>
               <h3 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate">
@@ -89,7 +89,7 @@ export function StateSelector({
           </div>
         </button>
 
-        {/* Dropdown Popover */}
+        {/* Dropdown Popover - 100% Solid Opaque Background to prevent double-exposure */}
         {isOpen && (
           <>
             <div
@@ -97,7 +97,7 @@ export function StateSelector({
               onClick={() => setIsOpen(false)}
               aria-hidden="true"
             />
-            <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-[var(--bg-surface)] dark:bg-[#15181D] p-3.5 sm:p-4 rounded-2xl shadow-2xl border border-[var(--border-glass)] ring-1 ring-black/10 dark:ring-white/10 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150 max-h-[380px] flex flex-col w-full max-w-full overflow-hidden">
+            <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-white dark:bg-[#15181D] p-3.5 sm:p-4 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 space-y-3 animate-in fade-in slide-in-from-top-2 duration-150 max-h-[380px] flex flex-col w-full max-w-full overflow-hidden">
               {/* Search Field */}
               <div className="relative shrink-0">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]" />
@@ -110,7 +110,7 @@ export function StateSelector({
                   }
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-gray-50 dark:bg-[#0D0F12] border border-gray-200 dark:border-gray-800 text-sm text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                   autoFocus
                 />
               </div>
@@ -138,7 +138,7 @@ export function StateSelector({
                       className={`w-full p-2.5 sm:p-3 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer ${
                         isSelected
                           ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-bold border border-[var(--accent)]/30'
-                          : 'bg-[var(--bg-surface)] hover:bg-[var(--bg-primary)] text-[var(--text-primary)] border border-transparent'
+                          : 'bg-white dark:bg-[#15181D] hover:bg-gray-100 dark:hover:bg-[#1E232B] text-[var(--text-primary)] border border-transparent'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">

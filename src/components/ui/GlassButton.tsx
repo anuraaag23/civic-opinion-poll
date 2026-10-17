@@ -40,7 +40,8 @@ export function GlassButton({
 
   return (
     <button
-      className={`glass-button-interactive inline-flex items-center justify-center transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
+      type={props.type || 'button'}
+      className={`glass-button-interactive inline-flex items-center justify-center text-center transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed select-none ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       disabled={disabled || isLoading}
       {...props}
     >

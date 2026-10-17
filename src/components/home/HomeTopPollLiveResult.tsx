@@ -214,7 +214,7 @@ export function HomeTopPollLiveResult() {
                     <span className="font-black text-sm sm:text-base text-[var(--text-primary)]">
                       {item.percentage.toFixed(1)}%
                     </span>
-                    <span className="text-[11px] text-[var(--text-tertiary)] block sm:inline sm:ml-2">
+                    <span className="text-xs text-[var(--text-tertiary)] block sm:inline sm:ml-2">
                       ({item.count.toLocaleString()} {language === 'hi' ? 'मत' : 'votes'})
                     </span>
                   </div>

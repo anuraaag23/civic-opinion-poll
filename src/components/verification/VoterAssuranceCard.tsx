@@ -28,49 +28,55 @@ export function VoterAssuranceCard() {
             </p>
           </div>
         </div>
-        <span className="text-[11px] font-bold text-[var(--success)] uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[var(--success-soft)] self-start sm:self-auto">
+        <span className="text-xs font-bold text-[var(--success)] uppercase tracking-wider px-2.5 py-1 rounded-full bg-[var(--success-soft)] self-start sm:self-auto select-none">
           {language === 'hi' ? '100% सत्यापित गोपनीयता' : '100% Privacy Assured'}
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1 items-stretch">
         {/* Assurance 1: We NEVER ask for your EPIC or ID */}
-        <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--success)]">
-            <Lock className="w-4 h-4 shrink-0" />
-            <span>{language === 'hi' ? '1. कभी ID नहीं मांगते' : '1. We NEVER Collect Your ID'}</span>
+        <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 flex flex-col justify-between">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--success)]">
+              <Lock className="w-4 h-4 shrink-0" />
+              <span>{language === 'hi' ? '1. कभी ID नहीं मांगते' : '1. We NEVER Collect Your ID'}</span>
+            </div>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+              {language === 'hi'
+                ? 'हम आपसे इस मंच पर अपना EPIC नंबर या कोई भी पहचान पत्र जमा करने के लिए कभी नहीं कहते। मतदाता पंजीकरण की जांच सीधे आपके द्वारा आधिकारिक ECI वेबसाइट पर की जाती है। आपकी पहचान आपके पास सुरक्षित रहती है।'
+                : 'We NEVER ask you to submit your EPIC number or any ID proof on this platform. Electoral registration checks are performed directly by you on the official ECI portal. Your identity stays private.'}
+            </p>
           </div>
-          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-            {language === 'hi'
-              ? 'हम आपसे इस मंच पर अपना EPIC नंबर या कोई भी पहचान पत्र जमा करने के लिए कभी नहीं कहते। मतदाता पंजीकरण की जांच सीधे आपके द्वारा आधिकारिक ECI वेबसाइट पर की जाती है। आपकी पहचान आपके पास सुरक्षित रहती है।'
-              : 'We NEVER ask you to submit your EPIC number or any ID proof on this platform. Electoral registration checks are performed directly by you on the official ECI portal. Your identity stays private.'}
-          </p>
         </div>
 
         {/* Assurance 2: Vote Once, Never Changes - Be Smart */}
-        <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--accent)]">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>{language === 'hi' ? '2. केवल 1 बार मत, कभी नहीं बदलेगा' : '2. Vote Once, Never Changes'}</span>
+        <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 flex flex-col justify-between">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--accent)]">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>{language === 'hi' ? '2. केवल 1 बार मत, कभी नहीं बदलेगा' : '2. Vote Once, Never Changes'}</span>
+            </div>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+              {language === 'hi'
+                ? 'एक सर्वेक्षण में आप केवल एक ही बार अपनी राय दर्ज कर सकते हैं। सबमिट करने के बाद आपका मत कभी भी बदला या मिटाया नहीं जा सकता — इसलिए अपनी राय समझदारी से चुनें।'
+                : 'You can only vote ONCE per poll. Once confirmed, your response is final and can NEVER be changed or re-cast — so choose thoughtfully and be smart with your opinion.'}
+            </p>
           </div>
-          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-            {language === 'hi'
-              ? 'एक सर्वेक्षण में आप केवल एक ही बार अपनी राय दर्ज कर सकते हैं। सबमिट करने के बाद आपका मत कभी भी बदला या मिटाया नहीं जा सकता — इसलिए अपनी राय समझदारी से चुनें।'
-              : 'You can only vote ONCE per poll. Once confirmed, your response is final and can NEVER be changed or re-cast — so choose thoughtfully and be smart with your opinion.'}
-          </p>
         </div>
 
         {/* Assurance 3: 100% Real - Honest Self-Verification */}
-        <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--warning)]">
-            <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>{language === 'hi' ? '3. 100% ईमानदार स्व-सत्यापन' : '3. 100% Honest Self-Verification'}</span>
+        <div className="p-3.5 sm:p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 flex flex-col justify-between">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5 text-xs font-bold text-[var(--warning)]">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>{language === 'hi' ? '3. 100% ईमानदार स्व-सत्यापन' : '3. 100% Honest Self-Verification'}</span>
+            </div>
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+              {language === 'hi'
+                ? 'यह मंच असली नागरिकों की सच्ची आवाज़ है। आधिकारिक ECI पोर्टल पर सीधे जांच पूरी करें और ईमानदारी से पुष्टि करें। एक असली नागरिक, एक स्वतंत्र निष्पक्ष राय।'
+                : 'This platform reflects real people. Complete the electoral check on the official ECI portal and confirm honestly. One genuine citizen, one voice, one opinion.'}
+            </p>
           </div>
-          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-            {language === 'hi'
-              ? 'यह मंच असली नागरिकों की सच्ची आवाज है। आधिकारिक ECI पोर्टल पर सीधे जांच पूरी करें और ईमानदारी से पुष्टि करें। एक असली नागरिक, एक स्वतंत्र निष्पक्ष राय।'
-              : 'This platform reflects real people. Complete the electoral check on the official ECI portal and confirm honestly. One genuine citizen, one voice, one opinion.'}
-          </p>
         </div>
       </div>
     </GlassCard>

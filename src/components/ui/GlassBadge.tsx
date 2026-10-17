@@ -30,7 +30,7 @@ export function GlassBadge({
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border backdrop-blur-md ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-full border backdrop-blur-md leading-normal select-none ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
     >
       {children}
     </span>

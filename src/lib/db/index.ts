@@ -1,4 +1,4 @@
-import { Poll, PollResults, OptionResult, AuditEvent, ParticipationRecord } from '../types';
+import { Poll, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings } from '../types';
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
 import { OFFICIAL_PARTIES } from '../data/parties';
 
@@ -11,6 +11,17 @@ class StorageStore {
   participation: Map<string, ParticipationRecord> = new Map();
   // tokenHash -> { pollId, expiresAt, usedAt }
   tokens: Map<string, { pollId: string; expiresAt: string; usedAt?: string }> = new Map();
+  // Site & Emergency Configuration
+  siteSettings: SiteSettings = {
+    maintenanceMode: false,
+    emergencyBannerEnabled: false,
+    emergencyBannerTextEn: '',
+    emergencyBannerTextHi: '',
+    emergencyBannerType: 'info',
+    allowVoting: true,
+    rateLimitPerHour: 60,
+    lastUpdated: new Date().toISOString(),
+  };
   // Audit log
   auditEvents: AuditEvent[] = [];
 
@@ -227,4 +238,225 @@ export const db = {
         .length,
     };
   },
+
+  async getSiteSettings(): Promise<SiteSettings> {
+    return { ...civicStore.siteSettings };
+  },
+
+  async updateSiteSettings(updates: Partial<SiteSettings>): Promise<SiteSettings> {
+    civicStore.siteSettings = {
+      ...civicStore.siteSettings,
+      ...updates,
+      lastUpdated: new Date().toISOString(),
+    };
+    await this.recordAuditEvent('admin_settings_update', undefined, { updates });
+    return { ...civicStore.siteSettings };
+  },
+
+  async getDetailedPolls(): Promise<Array<Poll & { optionResults: OptionResult[] }>> {
+    const polls = Array.from(civicStore.polls.values());
+    const detailed = await Promise.all(
+      polls.map(async (p) => {
+        const resultsData = await this.getPollResults(p.id);
+        return {
+          ...p,
+          total_votes: resultsData?.total_responses ?? p.total_votes,
+          optionResults: resultsData?.results ?? [],
+        };
+      })
+    );
+    return detailed;
+  },
+
+  async createPoll(pollData: {
+    slug: string;
+    title_en: string;
+    title_hi: string;
+    description_en?: string;
+    description_hi?: string;
+    status?: Poll['status'];
+    start_at?: string;
+    end_at?: string;
+    party_ids?: string[];
+  }): Promise<Poll> {
+    const id = `poll-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const now = new Date().toISOString();
+
+    const selectedParties =
+      pollData.party_ids && pollData.party_ids.length > 0
+        ? OFFICIAL_PARTIES.filter((p) => pollData.party_ids!.includes(p.id))
+        : OFFICIAL_PARTIES.slice(0, 6);
+
+    const options = selectedParties.map((party, index) => ({
+      id: `opt-${id}-${party.id}`,
+      poll_id: id,
+      party_id: party.id,
+      party,
+      display_order: index + 1,
+      is_active: true,
+    }));
+
+    const newPoll: Poll = {
+      id,
+      slug: pollData.slug || `poll-${Date.now()}`,
+      title_en: pollData.title_en,
+      title_hi: pollData.title_hi,
+      description_en: pollData.description_en || '',
+      description_hi: pollData.description_hi || '',
+      status: pollData.status || 'LIVE',
+      start_at: pollData.start_at || now,
+      end_at: pollData.end_at || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+      results_visibility: 'PUBLIC',
+      total_votes: 0,
+      options,
+      created_at: now,
+      updated_at: now,
+    };
+
+    civicStore.polls.set(id, newPoll);
+    const countsMap = new Map<string, number>();
+    options.forEach((opt) => countsMap.set(opt.id, 0));
+    civicStore.voteCounts.set(id, countsMap);
+
+    await this.recordAuditEvent('admin_poll_create', id, { slug: newPoll.slug });
+    return newPoll;
+  },
+
+  async updatePoll(id: string, updates: Partial<Poll>): Promise<Poll | null> {
+    const poll = civicStore.polls.get(id);
+    if (!poll) return null;
+
+    if (updates.title_en !== undefined) poll.title_en = updates.title_en;
+    if (updates.title_hi !== undefined) poll.title_hi = updates.title_hi;
+    if (updates.description_en !== undefined) poll.description_en = updates.description_en;
+    if (updates.description_hi !== undefined) poll.description_hi = updates.description_hi;
+    if (updates.status !== undefined) poll.status = updates.status;
+    if (updates.end_at !== undefined) poll.end_at = updates.end_at;
+    if (updates.start_at !== undefined) poll.start_at = updates.start_at;
+    if (updates.results_visibility !== undefined) poll.results_visibility = updates.results_visibility;
+    poll.updated_at = new Date().toISOString();
+
+    await this.recordAuditEvent('admin_poll_update', id, { updates });
+    return { ...poll };
+  },
+
+  async deletePoll(id: string): Promise<boolean> {
+    if (!civicStore.polls.has(id)) return false;
+    civicStore.polls.delete(id);
+    civicStore.voteCounts.delete(id);
+    await this.recordAuditEvent('admin_poll_delete', id);
+    return true;
+  },
+
+  async updateOptionVoteCount(pollId: string, optionId: string, newCount: number): Promise<boolean> {
+    const poll = civicStore.polls.get(pollId);
+    if (!poll) return false;
+
+    let countsMap = civicStore.voteCounts.get(pollId);
+    if (!countsMap) {
+      countsMap = new Map<string, number>();
+      civicStore.voteCounts.set(pollId, countsMap);
+    }
+
+    countsMap.set(optionId, Math.max(0, Number(newCount) || 0));
+
+    let sum = 0;
+    countsMap.forEach((v) => {
+      sum += v;
+    });
+    poll.total_votes = sum;
+    poll.updated_at = new Date().toISOString();
+
+    await this.recordAuditEvent('admin_poll_update', pollId, { optionId, newCount });
+    return true;
+  },
+
+  async resetPollVotes(pollId: string): Promise<boolean> {
+    const poll = civicStore.polls.get(pollId);
+    if (!poll) return false;
+
+    const countsMap = civicStore.voteCounts.get(pollId);
+    if (countsMap) {
+      countsMap.forEach((_, key) => {
+        countsMap.set(key, 0);
+      });
+    }
+
+    poll.total_votes = 0;
+    poll.updated_at = new Date().toISOString();
+
+    Array.from(civicStore.participation.entries()).forEach(([key, record]) => {
+      if (record.poll_id === pollId) {
+        civicStore.participation.delete(key);
+      }
+    });
+
+    Array.from(civicStore.tokens.entries()).forEach(([key, token]) => {
+      if (token.pollId === pollId) {
+        civicStore.tokens.delete(key);
+      }
+    });
+
+    await this.recordAuditEvent('admin_votes_reset', pollId);
+    return true;
+  },
+
+  async getAuditEvents(limit = 60): Promise<AuditEvent[]> {
+    return [...civicStore.auditEvents].slice(-limit).reverse();
+  },
+
+  async exportAllData() {
+    const pollsDetailed = await this.getDetailedPolls();
+    return {
+      version: '1.0.0',
+      exportedAt: new Date().toISOString(),
+      platform: 'Mera Vote - Independent Civic Opinion Poll',
+      siteSettings: civicStore.siteSettings,
+      auditStats: await this.getAuditStats(),
+      polls: pollsDetailed,
+      recentAuditEvents: civicStore.auditEvents.slice(-60),
+    };
+  },
+
+  async exportPollsCsv(): Promise<string> {
+    const polls = await this.getDetailedPolls();
+    const rows = [
+      [
+        'Poll ID',
+        'Slug',
+        'Poll Title (EN)',
+        'Poll Title (HI)',
+        'Status',
+        'Option ID',
+        'Party Name (EN)',
+        'Party (HI)',
+        'Short Code',
+        'Vote Count',
+        'Percentage',
+      ].join(','),
+    ];
+
+    polls.forEach((poll) => {
+      poll.optionResults.forEach((opt) => {
+        rows.push(
+          [
+            `"${poll.id}"`,
+            `"${poll.slug}"`,
+            `"${poll.title_en.replace(/"/g, '""')}"`,
+            `"${poll.title_hi.replace(/"/g, '""')}"`,
+            `"${poll.status}"`,
+            `"${opt.option_id}"`,
+            `"${opt.party_name_en.replace(/"/g, '""')}"`,
+            `"${opt.party_name_hi.replace(/"/g, '""')}"`,
+            `"${opt.party_short_name}"`,
+            opt.count,
+            `"${opt.percentage}%"`,
+          ].join(',')
+        );
+      });
+    });
+
+    return rows.join('\n');
+  },
 };
+

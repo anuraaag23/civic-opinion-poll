@@ -10,7 +10,7 @@ interface DisclaimerBannerProps {
 }
 
 export function DisclaimerBanner({ compact = false, className = '' }: DisclaimerBannerProps) {
-  const { t } = useI18n();
+  const { t, language } = useI18n();
 
   if (compact) {
     return (
@@ -29,13 +29,13 @@ export function DisclaimerBanner({ compact = false, className = '' }: Disclaimer
       className={`glass-panel p-4 sm:p-5 border-l-4 border-l-[var(--accent)] bg-[var(--bg-glass)] ${className}`}
       role="note"
     >
-      <div className="flex items-start gap-3">
-        <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] shrink-0">
+      <div className="flex items-center gap-3.5">
+        <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] shrink-0 flex items-center justify-center">
           <ShieldAlert className="w-5 h-5" />
         </div>
         <div className="space-y-1">
           <h2 className="text-xs font-bold text-[var(--text-secondary)]">
-            Legal Disclaimer & Non-Affiliation Notice
+            {language === 'hi' ? 'कानूनी अस्वीकरण एवं गैर-संबद्धता सूचना' : 'Legal Disclaimer & Non-Affiliation Notice'}
           </h2>
           <p className="text-sm leading-relaxed text-[var(--text-primary)] font-medium">
             {t.common.officialDisclaimer}

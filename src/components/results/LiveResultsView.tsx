@@ -100,8 +100,14 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
 
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
-    await loadResults();
-    setIsRefreshing(false);
+    try {
+      await Promise.all([
+        loadResults(),
+        new Promise((resolve) => setTimeout(resolve, 600)),
+      ]);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   useEffect(() => {
@@ -298,17 +304,17 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
               variant="secondary"
               size="sm"
               onClick={handleManualRefresh}
-              isLoading={isRefreshing}
-              className="gap-1.5 text-xs"
+              disabled={isRefreshing}
+              className="gap-1.5 text-xs active:scale-95 transition-all cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>{t.results.refreshResults}</span>
+              <RefreshCw className={`w-3.5 h-3.5 transition-transform ${isRefreshing ? 'animate-spin text-[var(--accent)]' : ''}`} />
+              <span>{isRefreshing ? (language === 'hi' ? 'रीफ्रेश हो रहा है...' : 'Refreshing...') : t.results.refreshResults}</span>
             </GlassButton>
             <GlassButton
               variant="secondary"
               size="sm"
               onClick={handleShare}
-              className="gap-1.5 text-xs"
+              className="gap-1.5 text-xs active:scale-95 transition-all cursor-pointer"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-[var(--success)]" /> : <Share2 className="w-3.5 h-3.5" />}
               <span>{copied ? (language === 'hi' ? 'कॉपी हुआ!' : 'Copied!') : t.results.shareResults}</span>

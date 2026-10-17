@@ -107,10 +107,10 @@ export function PollDetailClient({ idOrSlug }: PollDetailClientProps) {
 
             {/* Core Privacy Rules */}
             <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
+              <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[var(--success)]" />
                 <span>{t.polls.rulesTitle}</span>
-              </h4>
+              </h2>
               <ul className="text-xs text-[var(--text-secondary)] space-y-2 leading-relaxed">
                 <li className="flex items-start gap-2">
                   <span className="text-[var(--accent)] font-bold">•</span>

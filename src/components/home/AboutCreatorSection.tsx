@@ -1,15 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { BUYMEACHAI_CONFIG, CHAI_TIERS } from '@/lib/buymeachai/config';
-import { MapPin, Shield, User, Coffee, ArrowRight, Mail } from 'lucide-react';
+import { MapPin, Shield, User, Coffee, ArrowRight, Mail, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
 
 export function AboutCreatorSection() {
   const { language } = useI18n();
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <section id="about" className="py-12 sm:py-16 relative">
@@ -73,37 +74,83 @@ export function AboutCreatorSection() {
             </h2>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-medium">
               {language === 'hi'
-                ? 'निर्माता: अनुराग (20 वर्ष, उत्तर प्रदेश) • शून्य पार्टी संबंध • पूर्णतः स्वतंत्र नागरिक प्रौद्योगिकी'
-                : 'Built by Anurag (20 years old, from Uttar Pradesh) • Zero political party affiliation • 100% independent civic initiative.'}
+                ? 'निर्माता: अनुराग (20 वर्ष, उत्तर प्रदेश) • शून्य पार्टी संबंध • पूर्णतः स्वतंत्र नागरिक प्रौद्योगिकी • किसी से कोई फंडिंग नहीं'
+                : 'Built by Anurag (20 years old, from Uttar Pradesh) • Zero political party affiliation • 100% independent civic initiative • Not funded by anyone.'}
             </p>
           </div>
 
-          {/* Narrative Content */}
-          <div className="space-y-4 text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed font-normal">
-            {language === 'hi' ? (
-              <>
-                <p>
-                  नमस्ते, मैं <strong>अनुराग</strong> हूँ — उत्तर प्रदेश (UP) का एक 20 वर्षीय छात्र और डेवलपर। मैंने &quot;मेरा वोट&quot; (Mera Vote) भारतीय राजनीति के मौजूदा माहौल, पक्षपाती मीडिया सर्वेक्षणों, ज़हरीली टीवी बहसों और सोशल मीडिया के प्रायोजित एजेंडों से गहरी हताशा और निराशा के बाद बनाया है।
+          {/* Expandable Introduction: Single Compact Line by Default */}
+          <div className="space-y-3">
+            <div className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <span className="w-2.5 h-2.5 rounded-full bg-[var(--accent)] shrink-0 animate-pulse" />
+                <p className="text-xs sm:text-sm text-[var(--text-primary)] font-medium truncate">
+                  {language === 'hi'
+                    ? 'नमस्ते, मैं अनुराग हूँ — उत्तर प्रदेश का 20 वर्षीय छात्र। मैंने Mera Vote भारतीय राजनीति की हताशा से बनाया है और मुझे किसी से कोई फंडिंग नहीं मिलती (Not funded by anyone)...'
+                    : 'Hi, I am Anurag (20, UP) — I built Mera Vote out of sheer frustration with biased polls. I am completely independent and not funded by anyone...'}
                 </p>
-                <p>
-                  आज की राजनीति में आम नागरिक केवल एक &quot;वोट बैंक&quot; बनकर रह गया है। मुख्यधारा के मीडिया सर्वे अक्सर पहले से तय राजनीतिक एजेंडे को सच बताकर जनता पर थोपते हैं। नागरिकों के पास ऐसा कोई पारदर्शी, निष्पक्ष और सुरक्षित मंच नहीं था जहाँ वे बिना किसी डर या निगरानी के अपनी सच्ची राय दर्ज कर सकें।
-                </p>
-                <p>
-                  इसलिए मैंने अपने कोडिंग ज्ञान का उपयोग करके <strong>&quot;मेरा वोट&quot; (Mera Vote)</strong> खड़ा किया। यहाँ मतदाता पंजीकरण की जांच सीधे आधिकारिक ECI पोर्टल पर होती है, आपका कोई भी पहचान पत्र (EPIC) हमारे पास कभी सेव नहीं होता, और आपकी राय 100% अपरिवर्तनीय और गुमनाम रहती है। यह मंच किसी पार्टी के लिए नहीं, बल्कि <strong>आपकी वास्तविक नागरिक राय</strong> के लिए है।
-                </p>
-              </>
-            ) : (
-              <>
-                <p>
-                  Hi, I am <strong>Anurag</strong> — a 20-year-old student and developer from Uttar Pradesh, India. I built <strong>Mera Vote</strong> out of sheer, genuine frustration with the state of Indian politics, polarized news channels, sponsored social media narratives, and biased opinion polls that claim to speak on behalf of millions without transparency.
-                </p>
-                <p>
-                  In modern political discourse, everyday citizens are treated as mere statistics and vote banks. People are afraid to voice their true opinions because of tracking, social stigma, or surveillance. I wanted to prove that modern web engineering and cryptography can solve this problem once and for all.
-                </p>
-                <p>
-                  That is why I created <strong>Mera Vote</strong>. Electoral registration checks are performed directly by you on the official ECI portal, and our database never receives or stores your EPIC. I built this independent platform to give India a real, uncorrupted, untampered citizen mirror.
-                </p>
-              </>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="py-1.5 px-3 rounded-xl bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)]/80 text-[var(--accent)] font-bold text-xs flex items-center gap-1.5 self-start sm:self-auto shrink-0 transition-all cursor-pointer border border-[var(--accent)]/30 active:scale-95"
+                aria-expanded={isExpanded}
+              >
+                <span>
+                  {isExpanded
+                    ? language === 'hi'
+                      ? 'संक्षिप्त करें'
+                      : 'Show Less'
+                    : language === 'hi'
+                    ? 'पूरी कहानी पढ़ें'
+                    : 'Read Full Story'}
+                </span>
+                {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              </button>
+            </div>
+
+            {/* Expandable Full Story Container */}
+            {isExpanded && (
+              <div className="space-y-4 pt-1 animate-in fade-in duration-200">
+                {/* 100% NOT FUNDED BY ANYONE BANNER */}
+                <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-800 dark:text-emerald-300 text-xs sm:text-sm font-semibold flex items-center gap-2.5">
+                  <ShieldCheck className="w-5 h-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span>
+                    {language === 'hi'
+                      ? 'मैं किसी से भी फंडेड नहीं हूँ (I am not funded by anyone): शून्य कॉर्पोरेट फंडिंग, शून्य राजनीतिक पार्टी चंदा, शून्य बाहरी निवेशक। यह प्लेटफॉर्म 100% आत्मनिर्भर है।'
+                      : 'I am not funded by anyone: Zero corporate sponsors, zero political parties, zero venture capital, and zero external grants. Powered 100% independently by citizens.'}
+                  </span>
+                </div>
+
+                <div className="space-y-4 text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed font-normal">
+                  {language === 'hi' ? (
+                    <>
+                      <p>
+                        नमस्ते, मैं <strong>अनुराग</strong> हूँ — उत्तर प्रदेश (UP) का एक 20 वर्षीय छात्र और डेवलपर। मैंने &quot;मेरा वोट&quot; (Mera Vote) भारतीय राजनीति के मौजूदा माहौल, पक्षपाती मीडिया सर्वेक्षणों, ज़हरीली टीवी बहसों और सोशल मीडिया के प्रायोजित एजेंडों से गहरी हताशा और निराशा के बाद बनाया है।
+                      </p>
+                      <p>
+                        आज की राजनीति में आम नागरिक केवल एक &quot;वोट बैंक&quot; बनकर रह गया है। मुख्यधारा के मीडिया सर्वे अक्सर पहले से तय राजनीतिक एजेंडे को सच बताकर जनता पर थोपते हैं। नागरिकों के पास ऐसा कोई पारदर्शी, निष्पक्ष और सुरक्षित मंच नहीं था जहाँ वे बिना किसी डर या निगरानी के अपनी सच्ची राय दर्ज कर सकें।
+                      </p>
+                      <p>
+                        इसलिए मैंने अपने कोडिंग ज्ञान का उपयोग करके <strong>&quot;मेरा वोट&quot; (Mera Vote)</strong> खड़ा किया। यहाँ मतदाता पंजीकरण की जांच सीधे आधिकारिक ECI पोर्टल पर होती है, आपका कोई भी पहचान पत्र (EPIC) हमारे पास कभी सेव नहीं होता, और आपकी राय 100% अपरिवर्तनीय और गुमनाम रहती है। यह मंच किसी पार्टी के लिए नहीं, बल्कि <strong>आपकी वास्तविक नागरिक राय</strong> के लिए है।
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p>
+                        Hi, I am <strong>Anurag</strong> — a 20-year-old student and developer from Uttar Pradesh, India. I built <strong>Mera Vote</strong> out of sheer, genuine frustration with the state of Indian politics, polarized news channels, sponsored social media narratives, and biased opinion polls that claim to speak on behalf of millions without transparency.
+                      </p>
+                      <p>
+                        In modern political discourse, everyday citizens are treated as mere statistics and vote banks. People are afraid to voice their true opinions because of tracking, social stigma, or surveillance. I wanted to prove that modern web engineering and cryptography can solve this problem once and for all.
+                      </p>
+                      <p>
+                        That is why I created <strong>Mera Vote</strong>. Electoral registration checks are performed directly by you on the official ECI portal, and our database never receives or stores your EPIC. I built this independent platform to give India a real, uncorrupted, untampered citizen mirror.
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
             )}
           </div>
 

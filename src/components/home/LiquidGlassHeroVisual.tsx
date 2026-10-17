@@ -38,7 +38,7 @@ export function LiquidGlassHeroVisual() {
           <span className="text-xs sm:text-base font-black tracking-tight text-[var(--text-primary)]">
             Mera Vote
           </span>
-          <span className="text-[10px] sm:text-[11px] text-[var(--accent)] mt-0.5 font-bold uppercase tracking-wider">
+          <span className="text-xs text-[var(--accent)] mt-0.5 font-bold uppercase tracking-wider">
             मेरा वोट • Bharat
           </span>
         </div>
@@ -46,19 +46,17 @@ export function LiquidGlassHeroVisual() {
 
       {/* Floating Interactive Satellite Glass Badges */}
       <div
-        className="absolute top-0 right-1 sm:right-2 glass-panel-elevated py-1.5 sm:py-2 px-2.5 sm:px-3.5 flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold text-[var(--text-primary)] shadow-lg animate-bounce"
-        style={{ animationDuration: '4s' }}
+        className="absolute top-0 right-1 sm:right-2 glass-panel-elevated py-1.5 sm:py-2 px-2.5 sm:px-3.5 flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-[var(--text-primary)] shadow-lg transition-transform hover:scale-105"
       >
-        <div className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full bg-[var(--success)] animate-pulse" />
-        <Lock className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-[var(--accent)] shrink-0" />
+        <div className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
+        <Lock className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
         <span>Zero Identity Link</span>
       </div>
 
       <div
-        className="absolute bottom-0 left-1 sm:left-2 glass-panel-elevated py-1.5 sm:py-2 px-2.5 sm:px-3.5 flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-semibold text-[var(--text-primary)] shadow-lg animate-bounce"
-        style={{ animationDuration: '5s' }}
+        className="absolute bottom-0 left-1 sm:left-2 glass-panel-elevated py-1.5 sm:py-2 px-2.5 sm:px-3.5 flex items-center gap-1.5 sm:gap-2 text-xs font-semibold text-[var(--text-primary)] shadow-lg transition-transform hover:scale-105"
       >
-        <ShieldCheck className="w-3 sm:w-3.5 h-3 sm:h-3.5 text-[var(--success)] shrink-0" />
+        <ShieldCheck className="w-3.5 h-3.5 text-[var(--success)] shrink-0" />
         <span>1 Person, 1 Response</span>
       </div>
 

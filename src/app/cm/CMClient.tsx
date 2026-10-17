@@ -96,7 +96,7 @@ export function CMClient() {
 
         <p className="text-base sm:text-lg text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed">
           {language === 'hi'
-            ? 'अपने राज्य का चयन करें और उस राज्य में चुनाव लड़ने वाली पार्टियों के असली चुनाव चिन्हों के साथ मुख्यमंत्री पद के लिए अपनी राय दर्ज करें।'
+            ? 'अपने राज्य का चयन करें और उस राज्य में चुनाव लड़ने वाली पार्टियों के असली चुनाव चिह्नों के साथ मुख्यमंत्री पद के लिए अपनी राय दर्ज करें।'
             : 'Select your state to view the exact contesting parties and official symbols active in your Legislative Assembly.'}
         </p>
 
@@ -164,7 +164,7 @@ export function CMClient() {
                         {currentState.code} • {currentState.type}
                       </span>
                       {currentState.assemblySeats && (
-                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] font-bold">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] font-bold">
                           {currentState.assemblySeats} {language === 'hi' ? 'सीटें' : 'Seats'}
                         </span>
                       )}
@@ -192,7 +192,7 @@ export function CMClient() {
                 <div className="space-y-2">
                   <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
                     {language === 'hi'
-                      ? `${currentState.name_hi} के आधिकारिक चुनाव चिन्ह एवं दल:`
+                      ? `${currentState.name_hi} के आधिकारिक चुनाव चिह्न एवं दल:`
                       : `Official Party Symbols & Choices in ${currentState.name_en}:`}
                   </span>
 
@@ -220,11 +220,11 @@ export function CMClient() {
                           )}
                         </div>
 
-                        <div className="min-w-0">
-                          <span className="text-[11px] font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block mb-0.5">
+                        <div className="min-w-0 flex-1">
+                          <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block mb-0.5">
                             {party.short_name}
                           </span>
-                          <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] leading-snug">
+                          <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] leading-snug break-words">
                             {language === 'hi' ? party.name_hi : party.name_en}
                           </h3>
                           <span className="text-xs text-[var(--text-tertiary)] block mt-0.5">
@@ -252,10 +252,10 @@ export function CMClient() {
                 </div>
 
                 {/* CTA to start voting for CM */}
-                <div className="pt-2">
+                <div className="pt-2 flex justify-center">
                   <GlassButton
                     size="lg"
-                    className="w-full gap-2 shadow-md font-bold"
+                    className="w-full sm:w-auto min-w-[260px] max-w-sm gap-2 shadow-md font-bold px-8 justify-center"
                     onClick={() => setStep('VERIFY')}
                   >
                     <Vote className="w-5 h-5" />
@@ -303,7 +303,7 @@ export function CMClient() {
       {/* Switch to PM Section Banner */}
       <GlassCard className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4 border border-[var(--accent)]/30 bg-gradient-to-r from-[var(--accent-soft)] via-[var(--bg-glass)] to-transparent">
         <div className="space-y-1 text-center sm:text-left">
-          <span className="text-[11px] font-bold uppercase text-[var(--accent)] tracking-wider block">
+          <span className="text-xs font-bold text-[var(--accent)] tracking-normal block">
             {language === 'hi' ? 'राष्ट्रीय स्तर पर वोट करना चाहते हैं?' : 'Want to vote for Prime Minister (National)?'}
           </span>
           <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
@@ -317,7 +317,7 @@ export function CMClient() {
         </div>
 
         <Link href="/pm" className="w-full sm:w-auto shrink-0">
-          <GlassButton size="md" className="w-full sm:w-auto gap-2">
+          <GlassButton variant="secondary" size="md" className="w-full sm:w-auto gap-2">
             <span>{language === 'hi' ? 'PM जनमत पेज खोलें' : 'Go to PM Poll'}</span>
             <ArrowRight className="w-4 h-4" />
           </GlassButton>

@@ -58,7 +58,7 @@ export function HomeClient() {
 
             <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl font-normal">
               {language === 'hi'
-                ? 'प्रधानमंत्री (संपूर्ण भारत) और मुख्यमंत्री (राज्यवार) के लिए अलग-अलग जनमत सर्वेक्षण। आधिकारिक चुनाव चिन्हों के साथ 100% निष्पक्ष, सुरक्षित और गुमनाम।'
+                ? 'प्रधानमंत्री (संपूर्ण भारत) और मुख्यमंत्री (राज्यवार) के लिए अलग-अलग जनमत सर्वेक्षण। आधिकारिक चुनाव चिह्नों के साथ 100% निष्पक्ष, सुरक्षित और गुमनाम।'
                 : 'Two dedicated polling sections: One for Prime Minister (All India) and one for Chief Minister (State-by-State). Cast your voice anonymously with authentic party logos.'}
             </p>
 
@@ -155,15 +155,15 @@ export function HomeClient() {
                 </h3>
                 <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1 leading-relaxed">
                   {language === 'hi'
-                    ? 'संपूर्ण भारत के लिए एक राष्ट्रीय सर्वेक्षण। इसमें सभी राष्ट्रीय मान्यता प्राप्त दल अपने आधिकारिक चुनाव चिन्हों के साथ उपस्थित हैं।'
+                    ? 'संपूर्ण भारत के लिए एक राष्ट्रीय सर्वेक्षण। इसमें सभी राष्ट्रीय मान्यता प्राप्त दल अपने आधिकारिक चुनाव चिह्नों के साथ उपस्थित हैं।'
                     : 'Covers all 28 states and 8 union territories at the national level. Features national parties with their official ECI election symbols.'}
                 </p>
               </div>
 
               {/* National Parties Logos Preview */}
               <div className="space-y-2 pt-1">
-                <span className="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider block">
-                  {language === 'hi' ? 'शामिल राष्ट्रीय दल (असली चुनाव चिन्ह):' : 'Contesting National Parties with Official Logos:'}
+                <span className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider block">
+                  {language === 'hi' ? 'शामिल राष्ट्रीय दल (असली चुनाव चिह्न):' : 'Contesting National Parties with Official Logos:'}
                 </span>
                 <div className="grid grid-cols-3 gap-2">
                   {NATIONAL_PARTIES.slice(0, 6).map((p) => (
@@ -224,14 +224,14 @@ export function HomeClient() {
                 </h3>
                 <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1 leading-relaxed">
                   {language === 'hi'
-                    ? 'अपने राज्य का चयन करें और उस राज्य के अनुसार चुनाव लड़ने वाले दलों को उनके असली चुनाव चिन्ह के साथ देखकर वोट करें।'
+                    ? 'अपने राज्य का चयन करें और उस राज्य के अनुसार चुनाव लड़ने वाले दलों को उनके असली चुनाव चिह्न के साथ देखकर वोट करें।'
                     : 'Pick any Indian state to see the exact political parties and official symbols active in that state assembly election.'}
                 </p>
               </div>
 
               {/* Interactive State Selector Inline Preview */}
               <div className="space-y-2 pt-1">
-                <span className="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider block">
+                <span className="text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider block">
                   {language === 'hi' ? 'राज्य का चयन करें:' : 'Select State / Union Territory:'}
                 </span>
                 <StateSelector
@@ -242,7 +242,7 @@ export function HomeClient() {
 
                 {/* State Parties Preview with Logos */}
                 <div className="pt-2">
-                  <span className="text-[10px] text-[var(--text-tertiary)] font-bold uppercase tracking-wider block mb-1">
+                  <span className="text-xs text-[var(--text-tertiary)] font-bold uppercase tracking-wider block mb-1">
                     {language === 'hi'
                       ? `${currentState.name_hi} में सक्रिय दल (${stateParties.length} विकल्प):`
                       : `Parties active in ${currentState.name_en} (${stateParties.length} choices):`}
@@ -307,46 +307,52 @@ export function HomeClient() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <GlassCard className="space-y-2 p-5">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center">1</span>
-              <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                {language === 'hi' ? '1. ECI पोर्टल पर पंजीकरण जांचें' : '1. Check Registration on ECI'}
-              </h3>
+          <GlassCard className="space-y-2 p-5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center shrink-0">1</span>
+                <h3 className="font-bold text-sm text-[var(--text-primary)]">
+                  {language === 'hi' ? '1. ECI पोर्टल पर पंजीकरण जांचें' : '1. Check Registration on ECI'}
+                </h3>
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11 pt-1">
+                {language === 'hi'
+                  ? 'आधिकारिक ECI पोर्टल पर सीधे अपनी स्थिति जांचें और स्व-सत्यापन पूरा करें। 100% शून्य आईडी भंडारण।'
+                  : 'Check registration directly on official ECI portal and confirm. Zero personal ID stored.'}
+              </p>
             </div>
-            <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
-              {language === 'hi'
-                ? 'आधिकारिक ECI पोर्टल पर सीधे अपनी स्थिति जांचें और स्व-सत्यापन पूरा करें। 100% शून्य आईडी भंडारण।'
-                : 'Check registration directly on official ECI portal and confirm. Zero personal ID stored.'}
-            </p>
           </GlassCard>
 
-          <GlassCard className="space-y-2 p-5">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center">2</span>
-              <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                {language === 'hi' ? '2. PM या CM पार्टी चुनें' : '2. Select Your PM or CM Choice'}
-              </h3>
+          <GlassCard className="space-y-2 p-5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center shrink-0">2</span>
+                <h3 className="font-bold text-sm text-[var(--text-primary)]">
+                  {language === 'hi' ? '2. PM या CM पार्टी चुनें' : '2. Select Your PM or CM Choice'}
+                </h3>
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11 pt-1">
+                {language === 'hi'
+                  ? 'राष्ट्रीय या राज्य स्तर पर अपने पसंदीदा दल या नोटा का चयन करें। असली चुनाव चिह्नों के साथ।'
+                  : 'Pick your preferred national or state party option with authentic verified symbols.'}
+              </p>
             </div>
-            <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
-              {language === 'hi'
-                ? 'राष्ट्रीय या राज्य स्तर पर अपने पसंदीदा दल या नोटा का चयन करें। असली चुनाव चिन्हों के साथ।'
-                : 'Pick your preferred national or state party option with authentic verified symbols.'}
-            </p>
           </GlassCard>
 
-          <GlassCard className="space-y-2 p-5">
-            <div className="flex items-center gap-3">
-              <span className="w-8 h-8 rounded-full bg-[var(--success)] text-white text-xs font-black flex items-center justify-center">3</span>
-              <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                {language === 'hi' ? '3. पुष्टि करें और परिणाम देखें' : '3. Confirm & View Live Results'}
-              </h3>
+          <GlassCard className="space-y-2 p-5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="w-8 h-8 rounded-full bg-[var(--success)] text-white text-xs font-black flex items-center justify-center shrink-0">3</span>
+                <h3 className="font-bold text-sm text-[var(--text-primary)]">
+                  {language === 'hi' ? '3. पुष्टि करें और परिणाम देखें' : '3. Confirm & View Live Results'}
+                </h3>
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11 pt-1">
+                {language === 'hi'
+                  ? 'मतदान के बाद आपका वोट कभी नहीं बदलेगा। तुरंत राष्ट्रीय और राज्य-वार लाइव मतगणना देखें।'
+                  : 'Response is permanently sealed. Real-time vote counts update automatically.'}
+              </p>
             </div>
-            <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11">
-              {language === 'hi'
-                ? 'मतदान के बाद आपका वोट कभी नहीं बदलेगा। तुरंत राष्ट्रीय और राज्य-वार लाइव मतगणना देखें।'
-                : 'Response is permanently sealed. Real-time vote counts update automatically.'}
-            </p>
           </GlassCard>
         </div>
       </section>

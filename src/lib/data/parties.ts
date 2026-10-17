@@ -1,4 +1,4 @@
-import { Party } from '../types';
+﻿import { Party } from '../types';
 export type { Party };
 
 export const NATIONAL_PARTIES: Party[] = [
@@ -10,7 +10,7 @@ export const NATIONAL_PARTIES: Party[] = [
     logo_url: '/parties/bjp.svg',
     color: '#FF9933',
     symbol_alt_en: 'Lotus - Official Election Symbol of Bharatiya Janata Party (BJP)',
-    symbol_alt_hi: 'कमल - भारतीय जनता पार्टी (भाजपा) का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'कमल - भारतीय जनता पार्टी (भाजपा) का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-orange-600">
       <path d="M32 12C32 12 24 24 24 34C24 40 28 44 32 44C36 44 40 40 40 34C40 24 32 12 32 12Z" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="2"/>
       <path d="M32 44C26 44 14 38 14 28C14 22 20 26 24 34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -32,7 +32,7 @@ export const NATIONAL_PARTIES: Party[] = [
     logo_url: '/parties/inc.svg',
     color: '#0EA5E9',
     symbol_alt_en: 'Hand - Official Election Symbol of Indian National Congress (INC)',
-    symbol_alt_hi: 'हाथ का पंजा - भारतीय राष्ट्रीय कांग्रेस का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'हाथ का पंजा - भारतीय राष्ट्रीय कांग्रेस का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-cyan-700">
       <path d="M24 34V18C24 16 26 14 28 14C30 14 32 16 32 18V30M32 18C32 15 34 13 36 13C38 13 40 15 40 18V30M40 20C40 17 42 15 44 15C46 15 48 17 48 20V34C48 44 42 52 34 52C24 52 20 44 20 36V28C20 26 22 24 24 24C26 24 28 26 28 28V34" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>`,
@@ -50,7 +50,7 @@ export const NATIONAL_PARTIES: Party[] = [
     logo_url: '/parties/sp.svg',
     color: '#E11D48',
     symbol_alt_en: 'Bicycle - Official Election Symbol of Samajwadi Party (SP)',
-    symbol_alt_hi: 'साइकिल - समाजवादी पार्टी का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'साइकिल - समाजवादी पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
       <circle cx="18" cy="40" r="10" stroke="currentColor" stroke-width="2.5"/>
       <circle cx="46" cy="40" r="10" stroke="currentColor" stroke-width="2.5"/>
@@ -70,7 +70,7 @@ export const NATIONAL_PARTIES: Party[] = [
     logo_url: '/parties/aap.svg',
     color: '#0284C7',
     symbol_alt_en: 'Broom - Official Election Symbol of Aam Aadmi Party (AAP)',
-    symbol_alt_hi: 'झाड़ू - आम आदमी पार्टी का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'झाड़ू - आम आदमी पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-amber-700">
       <path d="M12 48L38 22L44 28L18 54Z" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="2"/>
       <line x1="38" y1="22" x2="52" y2="8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
@@ -89,7 +89,7 @@ export const NATIONAL_PARTIES: Party[] = [
     logo_url: '/parties/bsp.svg',
     color: '#1D4ED8',
     symbol_alt_en: 'Elephant - Official Election Symbol of Bahujan Samaj Party (BSP)',
-    symbol_alt_hi: 'हाथी - बहुजन समाज पार्टी का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'हाथी - बहुजन समाज पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-700">
       <path d="M14 42V30C14 24 20 18 32 18C44 18 50 24 50 30V42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
       <path d="M20 42V52M28 42V52M36 42V52M44 42V52" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
@@ -108,7 +108,7 @@ export const NATIONAL_PARTIES: Party[] = [
     logo_url: '/parties/cpim.svg',
     color: '#DC2626',
     symbol_alt_en: 'Hammer, Sickle and Star - Official Symbol of CPI(M)',
-    symbol_alt_hi: 'हथौड़ा, हंसिया और सितारा - माकपा का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'हथौड़ा, हंसिया और सितारा - माकपा का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
       <path d="M20 22L42 44M18 18L24 14L30 20L24 26L18 18Z" stroke="currentColor" stroke-width="2.5"/>
       <polygon points="32,10 35,18 43,18 36,23 39,31 32,26 25,31 28,23 21,18 29,18" fill="currentColor"/>
@@ -127,7 +127,7 @@ export const NATIONAL_PARTIES: Party[] = [
     logo_url: '/parties/tmc.svg',
     color: '#10B981',
     symbol_alt_en: 'Twin Flowers and Grass - Official Symbol of AITC',
-    symbol_alt_hi: 'जोड़ा फूल और घास - तृणमूल कांग्रेस का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'जोड़ा फूल और घास - तृणमूल कांग्रेस का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-emerald-600">
       <path d="M24 48C24 36 28 26 32 20C36 26 40 36 40 48" stroke="currentColor" stroke-width="2.5"/>
       <circle cx="28" cy="22" r="5" fill="currentColor"/>
@@ -189,7 +189,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/jdu.svg',
     color: '#15803d',
     symbol_alt_en: 'Arrow - Official Election Symbol of Janata Dal (United)',
-    symbol_alt_hi: 'तीर - जनता दल (यूनाइटेड) का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'तीर - जनता दल (यूनाइटेड) का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-emerald-700">
       <path d="M12 32h36M36 20l16 12-16 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
     </svg>`,
@@ -207,7 +207,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/rjd.svg',
     color: '#166534',
     symbol_alt_en: 'Hurricane Lantern - Official Election Symbol of RJD',
-    symbol_alt_hi: 'लालटेन - राष्ट्रीय जनता दल का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'लालटेन - राष्ट्रीय जनता दल का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-emerald-800">
       <path d="M24 16h16v8H24zM20 24h24v20H20zM22 44h20v8H22z" stroke="currentColor" stroke-width="2"/>
     </svg>`,
@@ -225,7 +225,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/dmk.svg',
     color: '#dc2626',
     symbol_alt_en: 'Rising Sun - Official Election Symbol of DMK',
-    symbol_alt_hi: 'उगता सूरज - द्रमुक का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'उगता सूरज - द्रमुक का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
       <circle cx="32" cy="40" r="16" fill="currentColor"/>
     </svg>`,
@@ -243,7 +243,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/aiadmk.svg',
     color: '#16a34a',
     symbol_alt_en: 'Two Leaves - Official Election Symbol of AIADMK',
-    symbol_alt_hi: 'दो पत्तियां - अन्नाद्रमुक का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'दो पत्तियां - अन्नाद्रमुक का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-600">
       <path d="M32 48C24 36 16 32 20 20C28 20 32 28 32 48Z" fill="currentColor"/>
       <path d="M32 48C40 36 48 32 44 20C36 20 32 28 32 48Z" fill="currentColor"/>
@@ -262,7 +262,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/shivsena.svg',
     color: '#ea580c',
     symbol_alt_en: 'Bow and Arrow - Official Election Symbol of Shiv Sena',
-    symbol_alt_hi: 'धनुष-बाण - शिवसेना का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'धनुष-बाण - शिवसेना का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-orange-600">
       <path d="M20 16C36 24 36 40 20 48" stroke="currentColor" stroke-width="3"/>
       <line x1="16" y1="32" x2="48" y2="32" stroke="currentColor" stroke-width="3"/>
@@ -281,7 +281,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/shivsena_ubt.svg',
     color: '#c2410c',
     symbol_alt_en: 'Flaming Torch - Official Election Symbol of Shiv Sena (UBT)',
-    symbol_alt_hi: 'मशाल - शिवसेना (उद्धव बालासाहेब ठाकरे) का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'मशाल - शिवसेना (उद्धव बालासाहेब ठाकरे) का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-amber-600">
       <path d="M28 32h8v20h-8z" fill="currentColor"/>
     </svg>`,
@@ -299,7 +299,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/ncp.svg',
     color: '#0284c7',
     symbol_alt_en: 'Clock - Official Election Symbol of Nationalist Congress Party',
-    symbol_alt_hi: 'घड़ी - राष्ट्रवादी कांग्रेस पार्टी का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'घड़ी - राष्ट्रवादी कांग्रेस पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-600">
       <circle cx="32" cy="34" r="16" stroke="currentColor" stroke-width="3"/>
       <polyline points="26,26 32,34 38,30" stroke="currentColor" stroke-width="2.5"/>
@@ -318,7 +318,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/ncp_sp.svg',
     color: '#0369a1',
     symbol_alt_en: 'Man Blowing Tutari - Official Symbol of NCP (SP)',
-    symbol_alt_hi: 'तुतारी बजाता व्यक्ति - राकांपा (शरदचंद्र पवार) का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'तुतारी बजाता व्यक्ति - राकांपा (शरदचंद्र पवार) का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-cyan-800">
       <path d="M24 32C32 20 44 24 48 30" stroke="currentColor" stroke-width="3"/>
     </svg>`,
@@ -336,7 +336,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/tdp.svg',
     color: '#eab308',
     symbol_alt_en: 'Bicycle on Yellow - Official Symbol of Telugu Desam Party (TDP)',
-    symbol_alt_hi: 'साइकिल - तेलुगु देशम पार्टी का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'साइकिल - तेलुगु देशम पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-yellow-600">
       <circle cx="18" cy="40" r="10" stroke="currentColor" stroke-width="2.5"/>
       <circle cx="46" cy="40" r="10" stroke="currentColor" stroke-width="2.5"/>
@@ -355,7 +355,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/ysrcp.svg',
     color: '#1e40af',
     symbol_alt_en: 'Ceiling Fan - Official Election Symbol of YSR Congress Party',
-    symbol_alt_hi: 'सीलिंग फैन - वाईएसआर कांग्रेस पार्टी का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'सीलिंग फैन - वाईएसआर कांग्रेस पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-700">
       <circle cx="32" cy="32" r="8" fill="currentColor"/>
     </svg>`,
@@ -373,7 +373,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/jsp.svg',
     color: '#dc2626',
     symbol_alt_en: 'Glass Tumbler - Official Election Symbol of Jana Sena Party',
-    symbol_alt_hi: 'कांच का गिलास - जन सेना पार्टी का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'कांच का गिलास - जन सेना पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
       <path d="M22 18L26 46H38L42 18Z" stroke="currentColor" stroke-width="2.5"/>
     </svg>`,
@@ -391,7 +391,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/brs.svg',
     color: '#ec4899',
     symbol_alt_en: 'Car - Official Election Symbol of Bharat Rashtra Samithi (BRS)',
-    symbol_alt_hi: 'कार - भारत राष्ट्र समिति का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'कार - भारत राष्ट्र समिति का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-pink-600">
       <rect x="14" y="26" width="36" height="16" rx="4" stroke="currentColor" stroke-width="2.5"/>
     </svg>`,
@@ -409,7 +409,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/bjd.svg',
     color: '#15803d',
     symbol_alt_en: 'Conch - Official Election Symbol of Biju Janata Dal (BJD)',
-    symbol_alt_hi: 'शंख - बीजू जनता दल का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'शंख - बीजू जनता दल का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-700">
       <path d="M20 40C16 32 24 20 36 18C44 24 44 36 32 42Z" fill="currentColor"/>
     </svg>`,
@@ -427,7 +427,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/jmm.svg',
     color: '#15803d',
     symbol_alt_en: 'Bow and Arrow - Official Election Symbol of JMM',
-    symbol_alt_hi: 'धनुष-बाण - झारखंड मुक्ति मोर्चा का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'धनुष-बाण - झारखंड मुक्ति मोर्चा का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-700">
       <path d="M20 16C36 24 36 40 20 48" stroke="currentColor" stroke-width="3"/>
       <line x1="16" y1="32" x2="48" y2="32" stroke="currentColor" stroke-width="3"/>
@@ -446,7 +446,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/sad.svg',
     color: '#1e3a8a',
     symbol_alt_en: 'Scales - Official Election Symbol of Shiromani Akali Dal',
-    symbol_alt_hi: 'तराजू - शिरोमणि अकाली दल का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'तराजू - शिरोमणि अकाली दल का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-900">
       <line x1="32" y1="14" x2="32" y2="48" stroke="currentColor" stroke-width="2.5"/>
       <line x1="16" y1="22" x2="48" y2="22" stroke="currentColor" stroke-width="2.5"/>
@@ -465,7 +465,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/jds.svg',
     color: '#15803d',
     symbol_alt_en: 'Lady Farmer with Paddy - Official Symbol of JD(S)',
-    symbol_alt_hi: 'सिर पर धान का बोझा उठाए महिला किसान - जद(एस) का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'सिर पर धान का बोझा उठाए महिला किसान - जद(एस) का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-700">
       <circle cx="32" cy="24" r="8" fill="currentColor"/>
     </svg>`,
@@ -483,7 +483,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/aimim.svg',
     color: '#14532d',
     symbol_alt_en: 'Kite - Official Election Symbol of AIMIM',
-    symbol_alt_hi: 'पतंग - एआईएमआईएम का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'पतंग - एआईएमआईएम का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-800">
       <polygon points="32,14 46,28 32,42 18,28" stroke="currentColor" stroke-width="2.5"/>
     </svg>`,
@@ -501,7 +501,7 @@ export const REGIONAL_PARTIES: Party[] = [
     logo_url: '/parties/ljp.svg',
     color: '#1e3a8a',
     symbol_alt_en: 'Helicopter - Official Election Symbol of LJP (Ram Vilas)',
-    symbol_alt_hi: 'हेलिकॉप्टर - लोक जनशक्ति पार्टी (रामविलास) का आधिकारिक चुनाव चिन्ह',
+    symbol_alt_hi: 'हेलिकॉप्टर - लोक जनशक्ति पार्टी (रामविलास) का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-800">
       <line x1="16" y1="20" x2="48" y2="20" stroke="currentColor" stroke-width="3"/>
       <rect x="20" y="24" width="24" height="14" rx="4" stroke="currentColor" stroke-width="2.5"/>
@@ -863,3 +863,4 @@ export const getPartiesForState = (stateId: string): Party[] => {
 
   return parties.length > 0 ? parties : NATIONAL_PARTIES;
 };
+
