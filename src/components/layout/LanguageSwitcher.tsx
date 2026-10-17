@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useI18n } from '@/lib/i18n/context';
-import { Globe } from 'lucide-react';
 
 export function LanguageSwitcher({ className = '' }: { className?: string }) {
   const { language, setLanguage } = useI18n();
@@ -14,7 +13,11 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
       aria-label="Language selector"
     >
       <div className="pl-2 pr-1 text-[var(--text-tertiary)] flex items-center">
-        <Globe className="w-3.5 h-3.5" />
+        <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+          <path d="M2 12h20" />
+        </svg>
       </div>
       <button
         onClick={() => setLanguage('en')}

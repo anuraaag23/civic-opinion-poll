@@ -70,6 +70,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                if ('serviceWorker' in navigator) {
+                  navigator.serviceWorker.getRegistrations().then(function(regs) {
+                    for (var i = 0; i < regs.length; i++) { regs[i].unregister(); }
+                  }).catch(function() {});
+                }
+                if ('caches' in window) {
+                  caches.keys().then(function(names) {
+                    for (var i = 0; i < names.length; i++) { caches.delete(names[i]); }
+                  }).catch(function() {});
+                }
+              }
+            `,
+          }}
+        />
       </head>
       <body className="min-h-screen min-h-[100dvh] flex flex-col antialiased overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
         <ThemeProvider>

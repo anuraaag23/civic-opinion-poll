@@ -8,7 +8,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { SupportButton } from '@/components/support/SupportButton';
-import { Menu, X, BarChart3, HelpCircle, HeartHandshake, Globe, Building2, Vote, Phone, Mail } from 'lucide-react';
+import { BarChart3, HelpCircle, HeartHandshake, Globe, Building2, Vote, Phone, Mail } from 'lucide-react';
 
 export function GlassNavbar() {
   const { t, language } = useI18n();
@@ -115,7 +115,18 @@ export function GlassNavbar() {
               aria-label="Toggle navigation menu"
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? (
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M18 6 6 18" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <line x1="4" x2="20" y1="12" y2="12" />
+                  <line x1="4" x2="20" y1="6" y2="6" />
+                  <line x1="4" x2="20" y1="18" y2="18" />
+                </svg>
+              )}
             </button>
           </div>
         </nav>
