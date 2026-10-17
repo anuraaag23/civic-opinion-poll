@@ -163,7 +163,9 @@ export function HomeTopPollLiveResult() {
           <div className="flex items-center gap-2 self-start sm:self-auto text-xs font-semibold px-3 py-1.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
             <Users className="w-4 h-4 text-[var(--accent)]" />
             <span>
-              <strong className="text-[var(--text-primary)]">{totalVotes.toLocaleString()}</strong>{' '}
+              <strong suppressHydrationWarning className="text-[var(--text-primary)]">
+                {totalVotes.toLocaleString('en-IN')}
+              </strong>{' '}
               {language === 'hi' ? 'कुल मत' : 'Total Votes'}
             </span>
           </div>
@@ -214,16 +216,16 @@ export function HomeTopPollLiveResult() {
                     <span className="font-black text-sm sm:text-base text-[var(--text-primary)]">
                       {item.percentage.toFixed(1)}%
                     </span>
-                    <span className="text-xs text-[var(--text-tertiary)] block sm:inline sm:ml-2">
-                      ({item.count.toLocaleString()} {language === 'hi' ? 'मत' : 'votes'})
+                    <span suppressHydrationWarning className="text-xs text-[var(--text-tertiary)] block sm:inline sm:ml-2">
+                      ({item.count.toLocaleString('en-IN')} {language === 'hi' ? 'मत' : 'votes'})
                     </span>
                   </div>
                 </div>
 
-                {/* Animated Progress Bar */}
-                <div className="h-2.5 sm:h-3 w-full rounded-full bg-[var(--bg-primary)] overflow-hidden p-0.5 border border-[var(--border-glass)]">
+                {/* Animated Progress Bar (Prominent, tactile & easily scannable) */}
+                <div className="h-4 sm:h-5 w-full rounded-xl bg-[var(--bg-primary)] overflow-hidden p-0.5 border border-[var(--border-glass)] shadow-inner">
                   <div
-                    className="h-full rounded-full transition-all duration-700 ease-out"
+                    className="h-full rounded-lg transition-all duration-700 ease-out"
                     style={{
                       width: `${Math.max(item.percentage, 3)}%`,
                       backgroundColor: item.color,

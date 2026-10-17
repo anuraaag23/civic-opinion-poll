@@ -69,13 +69,15 @@ export function GlassNavbar() {
               />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="text-sm sm:text-lg font-black tracking-tight text-[var(--text-primary)] flex items-center gap-1.5 truncate">
-                <span>{language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}</span>
-                <span className="hidden sm:inline-block text-[var(--accent)] font-bold text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/30 shrink-0">
-                  {language === 'hi' ? 'Mera Vote' : 'भारत'}
+              <div className="flex items-center gap-1.5 truncate">
+                <span className="text-base sm:text-xl font-black tracking-tight text-[var(--text-primary)] leading-none">
+                  {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
                 </span>
-              </span>
-              <span className="text-xs tracking-normal text-[var(--text-secondary)] font-medium truncate">
+                <span className="hidden sm:inline-flex items-center text-[var(--accent)] font-bold text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/30 shrink-0 leading-none">
+                  {language === 'hi' ? 'भारत' : 'India'}
+                </span>
+              </div>
+              <span className="text-[11px] sm:text-xs tracking-normal text-[var(--text-secondary)] font-medium truncate mt-0.5">
                 {language === 'hi' ? 'स्वतंत्र नागरिक जनमत' : 'Independent Civic Polls'}
               </span>
             </div>

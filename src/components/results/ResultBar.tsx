@@ -52,8 +52,8 @@ export function ResultBar({ result, maxPercentage }: ResultBarProps) {
           <span className="text-sm sm:text-base font-black text-[var(--text-primary)]">
             {result.percentage.toFixed(1)}%
           </span>
-          <span className="text-[10px] sm:text-xs text-[var(--text-tertiary)]">
-            ({result.count.toLocaleString()})
+          <span suppressHydrationWarning className="text-[10px] sm:text-xs text-[var(--text-tertiary)]">
+            ({result.count.toLocaleString('en-IN')})
           </span>
         </div>
       </div>

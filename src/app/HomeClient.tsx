@@ -27,9 +27,9 @@ export function HomeClient() {
     <div className="space-y-16 sm:space-y-24">
       {/* Hero Section */}
       <section className="pt-4 sm:pt-8 pb-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Column: Hero Typography & CTAs */}
-          <div className="lg:col-span-7 space-y-6 text-left">
+          <div className="lg:col-span-6 space-y-6 text-left">
             {/* Live Badges */}
             <div className="space-y-1">
               <div className="inline-flex items-center gap-2 flex-wrap">
@@ -109,8 +109,8 @@ export function HomeClient() {
             </div>
           </div>
 
-          {/* Right Column: 3D Liquid Glass Visual */}
-          <div className="lg:col-span-5 flex justify-center">
+          {/* Right Column: 3D Liquid Glass Visual (Centered 50/50 balance) */}
+          <div className="lg:col-span-6 flex items-center justify-center self-center w-full">
             <LiquidGlassHeroVisual />
           </div>
         </div>
@@ -124,7 +124,7 @@ export function HomeClient() {
       {/* ── TWO DEDICATED SECTIONS: PM & CM SHOWCASE ───────────────────────── */}
       <section className="space-y-6">
         <div className="text-center max-w-2xl mx-auto space-y-1.5">
-          <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
+          <span className="text-xs font-bold text-[var(--accent)]">
             {language === 'hi' ? 'दो अलग-अलग सर्वेक्षण वर्ग' : 'Two Distinct Polling Sections'}
           </span>
           <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
@@ -139,10 +139,10 @@ export function HomeClient() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
           {/* SECTION 1: PRIME MINISTER (PM) POLL */}
-          <GlassCard elevated className="space-y-5 border-t-4 border-t-[var(--accent)] flex flex-col justify-between">
-            <div className="space-y-4">
+          <GlassCard elevated className="space-y-5 border-t-4 border-t-[var(--accent)] flex flex-col justify-between h-full">
+            <div className="space-y-4 flex-1 flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-black uppercase tracking-wider">
                   <Globe className="w-3.5 h-3.5" />
@@ -165,6 +165,33 @@ export function HomeClient() {
                     ? 'संपूर्ण भारत के लिए एक राष्ट्रीय सर्वेक्षण। इसमें सभी राष्ट्रीय मान्यता प्राप्त दल अपने आधिकारिक चुनाव चिह्नों के साथ उपस्थित हैं।'
                     : 'Covers all 28 states and 8 union territories at the national level. Features national parties with their official ECI election symbols.'}
                 </p>
+              </div>
+
+              {/* National Scope Card (Mirrors CM StateSelector for equal height) */}
+              <div className="w-full glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center justify-between gap-3 border-2 border-[var(--accent)]/40 shadow-xs">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center font-black text-sm shrink-0 border border-[var(--accent)]/30">
+                    IND
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-xs font-bold text-[var(--accent)] block mb-0.5">
+                      {language === 'hi' ? 'राष्ट्रीय स्तर • 543 लोकसभा सीटें' : 'National Scope • 543 Lok Sabha Seats'}
+                    </span>
+                    <div className="flex items-center justify-between gap-3">
+                      <h4 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate leading-normal">
+                        {language === 'hi' ? 'संपूर्ण भारत जनमत' : 'All-India National Scope'}
+                      </h4>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="hidden sm:inline-flex items-center text-xs font-semibold text-[var(--accent)] px-2.5 py-1 rounded-full bg-[var(--accent-soft)]">
+                          {language === 'hi' ? 'राष्ट्रीय वर्ग' : 'National'}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-xs text-[var(--text-secondary)] font-medium block">
+                      {language === 'hi' ? '28 राज्य एवं 8 केंद्र शासित प्रदेश' : '28 States & 8 Union Territories'}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               {/* National Parties Logos Preview */}
@@ -192,17 +219,21 @@ export function HomeClient() {
             </div>
 
             {/* PM Card Actions */}
-            <div className="pt-3 border-t border-[var(--border-glass)] flex flex-col sm:flex-row items-center gap-2.5">
+            <div className="pt-3 border-t border-[var(--border-glass)] flex flex-col sm:flex-row items-center gap-2.5 mt-auto">
               <Link href="/pm" className="w-full sm:flex-1">
-                <GlassButton size="md" className="w-full gap-2 font-bold justify-center">
+                <GlassButton variant="primary" size="md" className="w-full gap-2 font-bold justify-center shadow-md">
                   <Vote className="w-4 h-4" />
                   <span>{language === 'hi' ? 'PM के लिए वोट करें' : 'Vote in PM Poll'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </GlassButton>
               </Link>
               <Link href="/polls/national-opinion-poll-2029/results" className="w-full sm:w-auto">
-                <GlassButton variant="secondary" size="md" className="w-full justify-center gap-1.5">
-                  <BarChart3 className="w-4 h-4" />
+                <GlassButton
+                  variant="secondary"
+                  size="md"
+                  className="w-full justify-center gap-1.5 font-bold border-2 border-[var(--border-glass)] bg-[var(--bg-primary)]/80 hover:bg-[var(--accent-soft)]/40 shadow-xs"
+                >
+                  <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
                   <span>{language === 'hi' ? 'राष्ट्रीय परिणाम' : 'National Results'}</span>
                 </GlassButton>
               </Link>
@@ -210,8 +241,8 @@ export function HomeClient() {
           </GlassCard>
 
           {/* SECTION 2: CHIEF MINISTER (CM) POLL */}
-          <GlassCard elevated className="space-y-5 border-t-4 border-t-emerald-500 flex flex-col justify-between">
-            <div className="space-y-4">
+          <GlassCard elevated className="space-y-5 border-t-4 border-t-emerald-500 flex flex-col justify-between h-full">
+            <div className="space-y-4 flex-1 flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider">
                   <Building2 className="w-3.5 h-3.5" />
@@ -275,17 +306,21 @@ export function HomeClient() {
             </div>
 
             {/* CM Card Actions */}
-            <div className="pt-3 border-t border-[var(--border-glass)] flex flex-col sm:flex-row items-center gap-2.5">
+            <div className="pt-3 border-t border-[var(--border-glass)] flex flex-col sm:flex-row items-center gap-2.5 mt-auto">
               <Link href="/cm" className="w-full sm:flex-1">
-                <GlassButton variant="primary" size="md" className="w-full gap-2 font-bold justify-center">
+                <GlassButton variant="primary" size="md" className="w-full gap-2 font-bold justify-center shadow-md">
                   <Vote className="w-4 h-4" />
                   <span>{language === 'hi' ? `${currentState.name_hi} CM के लिए वोट करें` : `Vote in ${currentState.code} CM Poll`}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </GlassButton>
               </Link>
               <Link href={`/polls/national-opinion-poll-2029/results?state=${currentState.id}`} className="w-full sm:w-auto">
-                <GlassButton variant="secondary" size="md" className="w-full justify-center gap-1.5">
-                  <BarChart3 className="w-4 h-4" />
+                <GlassButton
+                  variant="secondary"
+                  size="md"
+                  className="w-full justify-center gap-1.5 font-bold border-2 border-[var(--border-glass)] bg-[var(--bg-primary)]/80 hover:bg-[var(--accent-soft)]/40 shadow-xs"
+                >
+                  <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
                   <span>{language === 'hi' ? 'राज्य परिणाम' : 'State Results'}</span>
                 </GlassButton>
               </Link>

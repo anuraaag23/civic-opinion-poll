@@ -24,7 +24,7 @@ export function AboutCreatorSection() {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <section id="about" className="py-6 sm:py-10 relative">
+    <section id="about" className="pt-0 pb-8 sm:pb-12 -mt-4 sm:-mt-8 relative">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <GlassCard
           elevated

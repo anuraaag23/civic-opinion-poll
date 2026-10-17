@@ -291,8 +291,8 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
                 : language === 'hi' ? `${currentState?.name_hi} कुल प्रतिक्रियाएं` : `${currentState?.name_en} Total Responses`}
             </span>
             <div className="flex items-baseline gap-2">
-              <span className="text-4xl sm:text-5xl font-black text-[var(--text-primary)] tracking-tight">
-                {totalResponses.toLocaleString()}
+              <span suppressHydrationWarning className="text-4xl sm:text-5xl font-black text-[var(--text-primary)] tracking-tight">
+                {totalResponses.toLocaleString('en-IN')}
               </span>
               <span className="text-xs text-[var(--text-secondary)] font-semibold">
                 {language === 'hi' ? 'सत्यापित मत' : 'verified responses'}

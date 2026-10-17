@@ -83,12 +83,12 @@ export function PollCard({ poll }: PollCardProps) {
           <div className="flex items-center gap-1.5">
             <Users className="w-4 h-4 text-[var(--accent)]" />
             <span>
-              <strong>{poll.total_votes.toLocaleString()}</strong> {t.polls.totalResponses}
+              <strong suppressHydrationWarning>{poll.total_votes.toLocaleString('en-IN')}</strong> {t.polls.totalResponses}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-[var(--text-tertiary)]" />
-            <span>{new Date(poll.end_at).toLocaleDateString()}</span>
+            <span suppressHydrationWarning>{new Date(poll.end_at).toLocaleDateString('en-IN')}</span>
           </div>
         </div>
 
