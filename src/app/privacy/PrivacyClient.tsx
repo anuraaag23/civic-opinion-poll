@@ -4,7 +4,7 @@ import React from 'react';
 import { useI18n } from '@/lib/i18n/context';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { Lock, AlertTriangle, Database, Trash2, Mail, Phone } from 'lucide-react';
+import { Lock, AlertTriangle, Database, Trash2, Mail } from 'lucide-react';
 
 export function PrivacyClient() {
   const { t, language } = useI18n();
@@ -157,14 +157,9 @@ export function PrivacyClient() {
             Questions regarding cryptographic privacy or architecture?
           </span>
           <div className="flex items-center gap-3">
-            <a href="mailto:contact@meravote.in" className="inline-flex items-center gap-1.5 font-bold text-[var(--accent)] hover:underline">
+            <a href="mailto:contact@meravote.in" className="inline-flex items-center gap-1.5 font-bold text-[var(--accent)] hover:underline" title="Email contact@meravote.in">
               <Mail className="w-3.5 h-3.5" />
               <span>contact@meravote.in</span>
-            </a>
-            <span>•</span>
-            <a href="tel:+918005552026" className="inline-flex items-center gap-1.5 font-bold text-emerald-600 hover:underline">
-              <Phone className="w-3.5 h-3.5" />
-              <span>+91 800 555 2026</span>
             </a>
           </div>
         </div>

@@ -6,7 +6,6 @@ import { TopSloganBanner } from '@/components/layout/TopSloganBanner';
 import { GlassNavbar } from '@/components/layout/GlassNavbar';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { Footer } from '@/components/layout/Footer';
-import { FloatingSupportWidget } from '@/components/support/FloatingSupportWidget';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -70,6 +69,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&display=swap"
+          rel="stylesheet"
+        />
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -108,9 +113,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <main className="flex-1 w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 relative z-10 overflow-x-hidden">
               {children}
             </main>
-
-            {/* Floating Buy Me a Chai Support Widget */}
-            <FloatingSupportWidget />
 
             {/* Footer */}
             <Footer />

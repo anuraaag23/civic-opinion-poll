@@ -7,7 +7,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ArrowRight, BarChart3, Calendar, Users, Globe, Building2 } from 'lucide-react';
+import { ArrowRight, BarChart3, Calendar, Users, Globe, Building2, Vote } from 'lucide-react';
 
 interface PollCardProps {
   poll: Poll;
@@ -92,23 +92,29 @@ export function PollCard({ poll }: PollCardProps) {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 pt-2">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2">
           {isLive ? (
             <Link href={targetLink} className="flex-1">
-              <GlassButton size="md" className="w-full gap-1.5">
-                <span>{t.polls.participateButton}</span>
-                <ArrowRight className="w-4 h-4" />
+              <GlassButton size="md" className="w-full gap-1.5 justify-center font-bold">
+                <Vote className="w-4 h-4" />
+                <span>{language === 'hi' ? 'वोट दर्ज करें' : 'Cast Vote'}</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </GlassButton>
             </Link>
           ) : (
-            <GlassButton size="md" disabled className="flex-1">
+            <GlassButton size="md" disabled className="flex-1 justify-center">
               {statusLabel}
             </GlassButton>
           )}
-          <Link href={resultsLink}>
-            <GlassButton variant="secondary" size="md" className="gap-1.5" title={t.polls.viewResultsButton}>
+          <Link href={resultsLink} className="flex-1 sm:flex-initial">
+            <GlassButton
+              variant="secondary"
+              size="md"
+              className="w-full sm:w-auto gap-1.5 justify-center font-bold border-[var(--accent)]/30 text-[var(--accent)]"
+              title={t.polls.viewResultsButton}
+            >
               <BarChart3 className="w-4 h-4" />
-              <span className="hidden sm:inline">{t.polls.viewResultsButton}</span>
+              <span>{language === 'hi' ? 'लाइव परिणाम' : 'Live Results'}</span>
             </GlassButton>
           </Link>
         </div>

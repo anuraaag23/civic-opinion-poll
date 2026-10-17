@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { BUYMEACHAI_CONFIG, CHAI_TIERS } from '@/lib/buymeachai/config';
-import { MapPin, Shield, User, Coffee, ArrowRight, Mail, Phone } from 'lucide-react';
+import { MapPin, Shield, User, Coffee, ArrowRight, Mail } from 'lucide-react';
 
 export function AboutCreatorSection() {
   const { language } = useI18n();
@@ -51,16 +51,6 @@ export function AboutCreatorSection() {
                 <MapPin className="w-3.5 h-3.5 text-[var(--error)]" />
                 {language === 'hi' ? 'उत्तर प्रदेश, भारत' : 'Uttar Pradesh, India'}
               </span>
-              <span>•</span>
-              {/* Clickable Phone */}
-              <a
-                href="tel:+918005552026"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/25 hover:bg-emerald-500/20 transition-colors"
-                title="Call citizen inquiry helpline"
-              >
-                <Phone className="w-3 h-3" />
-                <span>+91 800 555 2026</span>
-              </a>
               <span>•</span>
               {/* Clickable Email */}
               <a

@@ -7,6 +7,7 @@ import { LiquidGlassHeroVisual } from '@/components/home/LiquidGlassHeroVisual';
 import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { KeyGuaranteesSection } from '@/components/home/KeyGuaranteesSection';
 import { AboutCreatorSection } from '@/components/home/AboutCreatorSection';
+import { HomeTopPollLiveResult } from '@/components/home/HomeTopPollLiveResult';
 import { VoterAssuranceCard } from '@/components/verification/VoterAssuranceCard';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { StateSelector } from '@/components/common/StateSelector';
@@ -285,6 +286,9 @@ export function HomeClient() {
           </GlassCard>
         </div>
       </section>
+
+      {/* ── LIVE LEADERBOARD: SINGLE POLL WITH MOST VOTERS ──────────────── */}
+      <HomeTopPollLiveResult />
 
       {/* Mandatory Non-Affiliation Disclaimer Banner */}
       <section>

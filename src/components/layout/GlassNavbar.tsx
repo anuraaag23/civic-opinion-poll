@@ -8,7 +8,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { SupportButton } from '@/components/support/SupportButton';
-import { BarChart3, HelpCircle, HeartHandshake, Globe, Building2, Vote, Phone, Mail } from 'lucide-react';
+import { BarChart3, HelpCircle, HeartHandshake, Globe, Building2, Vote, Mail } from 'lucide-react';
 
 export function GlassNavbar() {
   const { t, language } = useI18n();
@@ -101,9 +101,8 @@ export function GlassNavbar() {
             })}
           </div>
 
-          {/* Controls: Language, Theme, Buy Me a Chai Support & Mobile Toggle */}
+          {/* Controls: Language, Theme, & Mobile Toggle (No SupportButton in header to preserve clean layout on phones) */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            <SupportButton variant="compact" className="hidden sm:inline-flex" />
             <LanguageSwitcher />
             <ThemeSwitcher className="hidden sm:inline-flex" />
 
@@ -156,26 +155,20 @@ export function GlassNavbar() {
               })}
             </div>
 
-            {/* Support Developer CTA */}
+            {/* Support Developer CTA in Drawer */}
             <div className="pt-2">
               <SupportButton variant="pill" className="w-full justify-center min-h-[48px]" />
             </div>
 
-            {/* Clickable Mobile Contact Channels */}
-            <div className="pt-3 border-t border-[var(--border-glass)] grid grid-cols-2 gap-2 text-xs">
-              <a
-                href="tel:+918005552026"
-                className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--accent)] min-h-[44px]"
-              >
-                <Phone className="w-3.5 h-3.5 text-[var(--accent)]" />
-                <span className="font-semibold">+91 800 555 2026</span>
-              </a>
+            {/* Clickable Mobile Email Contact (Zero Phone Numbers) */}
+            <div className="pt-3 border-t border-[var(--border-glass)]">
               <a
                 href="mailto:contact@meravote.in"
-                className="flex items-center justify-center gap-2 p-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--accent)] min-h-[44px]"
+                className="flex items-center justify-center gap-2 p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--accent)] min-h-[44px] transition-colors"
+                title="Email contact@meravote.in"
               >
-                <Mail className="w-3.5 h-3.5 text-[var(--accent)]" />
-                <span className="font-semibold">contact@meravote.in</span>
+                <Mail className="w-4 h-4 text-[var(--accent)]" />
+                <span className="font-semibold text-xs">contact@meravote.in</span>
               </a>
             </div>
 

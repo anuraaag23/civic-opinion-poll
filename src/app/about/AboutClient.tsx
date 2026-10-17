@@ -8,7 +8,7 @@ import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import Link from 'next/link';
-import { Globe, Building2, ArrowRight, Mail, Phone, MapPin, User, ShieldCheck } from 'lucide-react';
+import { Globe, Building2, ArrowRight, Mail, MapPin, User, ShieldCheck } from 'lucide-react';
 
 export function AboutClient() {
   const { language } = useI18n();
@@ -38,39 +38,21 @@ export function AboutClient() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-          {/* Clickable Email Box */}
+        <div className="pt-1">
+          {/* Clickable Official Email Box */}
           <a
             href="mailto:contact@meravote.in"
-            className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] hover:border-[var(--accent)] transition-all flex items-center gap-3.5 group cursor-pointer active:scale-98 shadow-xs"
+            className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] hover:border-[var(--accent)] transition-all flex items-center gap-3.5 group cursor-pointer active:scale-98 shadow-xs max-w-md mx-auto"
           >
             <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
               <Mail className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <span className="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider block">
-                {language === 'hi' ? 'आधिकारिक ईमेल' : 'Official Email'}
+                {language === 'hi' ? 'आधिकारिक नागरिक ईमेल' : 'Official Citizen Email'}
               </span>
               <span className="text-sm font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors truncate block">
                 contact@meravote.in
-              </span>
-            </div>
-          </a>
-
-          {/* Clickable Phone Box */}
-          <a
-            href="tel:+918005552026"
-            className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] hover:border-emerald-500 transition-all flex items-center gap-3.5 group cursor-pointer active:scale-98 shadow-xs"
-          >
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-              <Phone className="w-5 h-5" />
-            </div>
-            <div className="min-w-0">
-              <span className="text-[11px] font-bold text-[var(--text-tertiary)] uppercase tracking-wider block">
-                {language === 'hi' ? 'नागरिक हेल्पलाइन' : 'Citizen Helpline'}
-              </span>
-              <span className="text-sm font-bold text-[var(--text-primary)] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors truncate block">
-                +91 800 555 2026
               </span>
             </div>
           </a>

@@ -5,14 +5,14 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { SupportButton } from '@/components/support/SupportButton';
-import { ShieldCheck, Lock, CheckCircle2, Phone, Mail, MapPin, User, HeartHandshake } from 'lucide-react';
+import { ShieldCheck, Lock, CheckCircle2, Mail, MapPin, User, HeartHandshake } from 'lucide-react';
 
 export function Footer() {
   const { t, language } = useI18n();
 
   return (
     <footer className="w-full mt-auto border-t border-[var(--border-glass)] bg-[var(--bg-glass)] backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 pb-28 sm:pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
           {/* Col 1: Brand & Purpose with Clickable Logo */}
           <div className="space-y-4">
@@ -157,18 +157,6 @@ export function Footer() {
                   title="Send email to Mera Vote"
                 >
                   contact@meravote.in
-                </a>
-              </div>
-
-              {/* Clickable Phone */}
-              <div className="flex items-center gap-2">
-                <Phone className="w-4 h-4 text-[var(--success)] shrink-0" />
-                <a
-                  href="tel:+918005552026"
-                  className="font-medium hover:text-[var(--success)] hover:underline transition-colors"
-                  title="Call civic helpline"
-                >
-                  +91 800 555 2026
                 </a>
               </div>
 

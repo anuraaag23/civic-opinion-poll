@@ -7,7 +7,7 @@ import { PollCard } from '@/components/polls/PollCard';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ShieldCheck, Vote, Loader2, Globe, Building2, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Vote, Loader2, Globe, Building2, ArrowRight, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 
 export function PollsClient() {
@@ -50,6 +50,12 @@ export function PollsClient() {
 
         {/* Quick Nav Badges */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
+          <Link href="/polls/national-opinion-poll-2029/results">
+            <GlassButton variant="primary" size="sm" className="gap-1.5 text-xs font-bold shadow-xs">
+              <BarChart3 className="w-3.5 h-3.5" />
+              <span>{language === 'hi' ? '📊 लाइव परिणाम देखें' : '📊 View Live Results'}</span>
+            </GlassButton>
+          </Link>
           <Link href="/pm">
             <GlassButton variant="secondary" size="sm" className="gap-1.5 text-xs font-bold">
               <Globe className="w-3.5 h-3.5 text-[var(--accent)]" />
