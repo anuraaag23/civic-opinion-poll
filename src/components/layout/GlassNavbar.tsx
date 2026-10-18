@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { SupportButton } from '@/components/support/SupportButton';
+import { MeraVoteLogo } from '@/components/common/MeraVoteLogo';
 import { BarChart3, HelpCircle, HeartHandshake, Globe, Building2, Vote, Mail } from 'lucide-react';
 
 export function GlassNavbar() {
@@ -57,27 +58,17 @@ export function GlassNavbar() {
             className="flex items-center gap-2.5 sm:gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl min-w-0"
             aria-label="Mera Vote Home"
           >
-            {/* Authentic 3D Liquid Glass Mera Vote Logo */}
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md transition-transform duration-200 group-hover:scale-105 overflow-hidden backdrop-blur-md shrink-0">
-              <Image
-                src="/meravote-logo.png"
-                alt="Mera Vote Logo"
-                width={40}
-                height={40}
-                className="w-full h-full object-contain drop-shadow"
-                priority
-              />
+            {/* Official Mera Vote Civic Logo */}
+            <div className="transition-transform duration-200 group-hover:scale-105 shrink-0">
+              <MeraVoteLogo size={40} className="w-9 h-9 sm:w-10 sm:h-10 drop-shadow-xs" />
             </div>
-            <div className="flex flex-col min-w-0">
-              <div className="flex items-center gap-1.5 truncate">
-                <span className="text-base sm:text-xl font-black tracking-tight text-[var(--text-primary)] leading-none">
-                  {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
-                </span>
-                <span className="hidden sm:inline-flex items-center text-[var(--accent)] font-bold text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/30 shrink-0 leading-none">
-                  {language === 'hi' ? 'भारत' : 'India'}
-                </span>
-              </div>
-              <span className="text-[11px] sm:text-xs tracking-normal text-[var(--text-secondary)] font-medium truncate mt-0.5">
+
+            {/* Brand Title and Subtitle - Balanced, Centered & Clean */}
+            <div className="flex flex-col justify-center min-w-0">
+              <span className="text-base sm:text-xl font-black tracking-tight text-[var(--text-primary)] leading-tight">
+                {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
+              </span>
+              <span className="text-[11px] sm:text-xs tracking-normal text-[var(--text-secondary)] font-medium truncate leading-snug">
                 {language === 'hi' ? 'स्वतंत्र नागरिक जनमत' : 'Independent Civic Polls'}
               </span>
             </div>

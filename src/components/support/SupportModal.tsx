@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Portal } from '@/components/ui/Portal';
+import { MeraVoteLogo } from '@/components/common/MeraVoteLogo';
 import {
   X,
   ExternalLink,
@@ -404,16 +405,10 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
                   <Link
                     href="/"
                     onClick={handleModalClose}
-                    className="w-11 h-11 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-sm overflow-hidden hover:scale-105 transition-transform"
+                    className="w-11 h-11 flex items-center justify-center shrink-0 hover:scale-105 transition-transform"
                     aria-label="Mera Vote Home"
                   >
-                    <Image
-                      src="/meravote-logo.png"
-                      alt="Mera Vote Logo"
-                      width={44}
-                      height={44}
-                      className="w-full h-full object-contain"
-                    />
+                    <MeraVoteLogo size={44} className="w-11 h-11 drop-shadow-xs" />
                   </Link>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-800 dark:text-amber-300 text-xs font-bold uppercase tracking-wider">
                     <Coffee className="w-3.5 h-3.5" />
@@ -610,14 +605,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
             <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
               <div className="absolute inset-0 rounded-full border-2 border-amber-500/40 animate-pulse-ring" />
               <div className="absolute -inset-2 rounded-full border border-amber-500/20 animate-ping opacity-40" />
-              <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shadow-lg overflow-hidden shrink-0">
-                <Image
-                  src="/meravote-logo.png"
-                  alt="Mera Vote Logo"
-                  width={56}
-                  height={56}
-                  className="w-full h-full object-contain"
-                />
+              <div className="w-16 h-16 flex items-center justify-center shrink-0 drop-shadow-md">
+                <MeraVoteLogo size={60} className="w-15 h-15" />
               </div>
             </div>
 
@@ -747,14 +736,8 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
         {step === 'payment_success' && (
           <div className="text-center py-6 space-y-5 animate-in zoom-in-95 duration-300">
             {/* Meravote Badge with verified check */}
-            <div className="w-16 h-16 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shadow-lg overflow-hidden mx-auto">
-              <Image
-                src="/meravote-logo.png"
-                alt="Mera Vote Logo"
-                width={56}
-                height={56}
-                className="w-full h-full object-contain"
-              />
+            <div className="w-16 h-16 flex items-center justify-center mx-auto drop-shadow-md">
+              <MeraVoteLogo size={60} className="w-15 h-15" />
             </div>
 
             <div className="w-16 h-16 rounded-full bg-[var(--success-soft)] text-[var(--success)] flex items-center justify-center mx-auto shadow-md">
