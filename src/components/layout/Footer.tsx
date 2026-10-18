@@ -19,7 +19,7 @@ export function Footer() {
             <div className="space-y-3">
               <Link
                 href="/"
-                className="inline-flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl active:scale-95 transition-transform touch-manipulation cursor-pointer py-1"
+                className="inline-flex items-center gap-3 group outline-none focus:outline-none focus:ring-0 focus-visible:outline-none active:outline-none select-none rounded-xl active:scale-95 transition-transform touch-manipulation cursor-pointer py-1"
                 aria-label="Mera Vote Home"
               >
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md overflow-hidden backdrop-blur-md shrink-0 group-hover:scale-105 transition-transform">

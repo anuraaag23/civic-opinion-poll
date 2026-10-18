@@ -51,11 +51,11 @@ export function GlassNavbar() {
     <>
       <header className="sticky top-0 z-40 w-full px-3 sm:px-6 lg:px-8 pt-2 sm:pt-3 pb-1 sm:pb-2">
         <nav className="max-w-7xl mx-auto glass-panel px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between transition-all">
-          {/* Logo and Brand - Fully Clickable to Home */}
+          {/* Logo and Brand - Fully Clickable to Home without outline */}
           <Link
             href="/"
             onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center gap-2.5 sm:gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl min-w-0"
+            className="flex items-center gap-2.5 sm:gap-3 group outline-none focus:outline-none focus:ring-0 focus-visible:outline-none active:outline-none select-none rounded-xl min-w-0"
             aria-label="Mera Vote Home"
           >
             {/* Authentic Mera Vote 3D Glass Logo */}
@@ -76,7 +76,7 @@ export function GlassNavbar() {
                 {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}
               </span>
               <span className="text-[11px] sm:text-xs tracking-normal text-[var(--text-secondary)] font-medium truncate leading-snug">
-                {language === 'hi' ? 'स्वतंत्र नागरिक जनमत' : 'Independent Civic Polls'}
+                {language === 'hi' ? 'जनमत सर्वेक्षण' : 'Opinion Polls'}
               </span>
             </div>
           </Link>
