@@ -214,3 +214,36 @@ CREATE POLICY "Public Read Vote Counts" ON vote_counts FOR SELECT USING (true);
 CREATE POLICY "Deny Public Participation" ON participation FOR ALL USING (false);
 CREATE POLICY "Deny Public Anon Tokens" ON anonymous_tokens FOR ALL USING (false);
 CREATE POLICY "Deny Public Direct Audit" ON audit_events FOR ALL USING (false);
+
+-- 8. SUPPORTERS TABLE (For Chai Support & Donor Recognition)
+CREATE TABLE IF NOT EXISTS supporters (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name VARCHAR(255) NOT NULL,
+    amount NUMERIC NOT NULL,
+    cups INT NOT NULL DEFAULT 1,
+    rating INT NOT NULL DEFAULT 5,
+    message TEXT,
+    payment_id VARCHAR(255),
+    verified BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 9. SITE SETTINGS TABLE (Platform & Emergency Announcements)
+CREATE TABLE IF NOT EXISTS site_settings (
+    id VARCHAR(50) PRIMARY KEY DEFAULT 'global',
+    maintenance_mode BOOLEAN NOT NULL DEFAULT false,
+    emergency_banner_enabled BOOLEAN NOT NULL DEFAULT false,
+    emergency_banner_text_en TEXT DEFAULT '',
+    emergency_banner_text_hi TEXT DEFAULT '',
+    emergency_banner_type VARCHAR(30) DEFAULT 'info',
+    allow_voting BOOLEAN NOT NULL DEFAULT true,
+    rate_limit_per_hour INT NOT NULL DEFAULT 60,
+    last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE supporters ENABLE ROW LEVEL SECURITY;
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public Read Verified Supporters" ON supporters FOR SELECT USING (verified = true);
+CREATE POLICY "Public Read Site Settings" ON site_settings FOR SELECT USING (true);
+
