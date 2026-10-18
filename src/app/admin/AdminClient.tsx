@@ -837,7 +837,7 @@ export function AdminClient() {
               <p className="text-2xl sm:text-3xl font-black text-[var(--text-primary)]">
                 ₹{supporters.reduce((acc, s) => acc + (Number(s.amount) || 0), 0)}
               </p>
-              <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+              <span className="text-xs text-amber-800 dark:text-amber-300 font-semibold">
                 {supporters.reduce((acc, s) => acc + (Number(s.cups) || 0), 0)} cups contributed
               </span>
             </GlassCard>
@@ -1283,7 +1283,7 @@ export function AdminClient() {
                       <tr key={sup.id || index} className="hover:bg-[var(--bg-surface)] transition-colors">
                         <td className="py-3 px-4 font-bold text-[var(--text-primary)]">{sup.name}</td>
                         <td className="py-3 px-4">
-                          <span className="font-bold text-amber-600 dark:text-amber-400">₹{sup.amount}</span>
+                          <span className="font-bold text-amber-800 dark:text-amber-300">₹{sup.amount}</span>
                           <span className="text-[11px] text-[var(--text-tertiary)] block">({sup.cups} cups)</span>
                         </td>
                         <td className="py-3 px-4">

@@ -415,7 +415,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
                       className="w-full h-full object-contain"
                     />
                   </Link>
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-600 dark:text-amber-400 text-xs font-bold uppercase tracking-wider">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/25 text-amber-800 dark:text-amber-300 text-xs font-bold uppercase tracking-wider">
                     <Coffee className="w-3.5 h-3.5" />
                     <span>Buy Me a Chai • Automatic Verification</span>
                   </div>
@@ -458,7 +458,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
                     }}
                     className={`p-2.5 rounded-2xl border text-center transition-all cursor-pointer ${
                       selectedAmount === tier.amount && !customAmount
-                        ? 'border-amber-500 bg-amber-500/15 shadow-sm text-amber-600 dark:text-amber-400 font-bold'
+                        ? 'border-amber-500 bg-amber-500/15 shadow-sm text-amber-900 dark:text-amber-300 font-bold'
                         : 'border-[var(--border-glass)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:border-amber-500/50 hover:text-[var(--text-primary)]'
                     }`}
                   >
@@ -622,7 +622,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
             </div>
 
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-mono text-[11px] font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 font-mono text-[11px] font-bold uppercase tracking-wider">
                 <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
                 <span>
                   {language === 'hi' ? 'भुगतान का स्वतः पता लगाया जा रहा है...' : 'Auto-Detecting Payment...'}
@@ -636,18 +636,18 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-sm mx-auto leading-relaxed font-normal">
                 {language === 'hi' ? (
                   <>
-                    हमने एक नए टैब में <strong className="text-[var(--text-primary)]">buymeachai.in/ryper</strong> खोला है। कृपया वहां अपना <strong className="text-amber-600 dark:text-amber-400 font-bold">₹{currentAmount}</strong> का योगदान पूरा करें।
+                    हमने एक नए टैब में <strong className="text-[var(--text-primary)]">buymeachai.in/ryper</strong> खोला है। कृपया वहां अपना <strong className="text-amber-800 dark:text-amber-300 font-bold">₹{currentAmount}</strong> का योगदान पूरा करें।
                   </>
                 ) : (
                   <>
-                    We opened <strong className="text-[var(--text-primary)]">buymeachai.in/ryper</strong> in a new tab. Please complete your <strong className="text-amber-600 dark:text-amber-400 font-bold">₹{currentAmount}</strong> contribution there.
+                    We opened <strong className="text-[var(--text-primary)]">buymeachai.in/ryper</strong> in a new tab. Please complete your <strong className="text-amber-800 dark:text-amber-300 font-bold">₹{currentAmount}</strong> contribution there.
                   </>
                 )}
               </p>
             </div>
 
             {formError && (
-              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs max-w-sm mx-auto animate-shake">
+              <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs max-w-sm mx-auto animate-shake">
                 {formError}
               </div>
             )}
@@ -698,7 +698,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
               <button
                 type="button"
                 onClick={() => window.open(BUYMEACHAI_CONFIG.url, '_blank', 'noopener,noreferrer')}
-                className="w-full py-2 px-4 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-amber-600 dark:text-amber-400 text-xs font-semibold cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                className="w-full py-2 px-4 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-1.5"
               >
                 <span>{language === 'hi' ? 'Buy Me a Chai पेमेंट टैब फिर से खोलें' : 'Re-open Payment Tab'}</span>
                 <ExternalLink className="w-3.5 h-3.5" />

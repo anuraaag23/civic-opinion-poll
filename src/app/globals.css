@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, [data-theme="dark"], .dark *, [data-theme="dark"] *));
+
 :root {
   /* Light Mode Palette - Crisp, High-Contrast & Accessible */
   --bg-primary: #F8F9FA;
@@ -301,5 +303,32 @@ body,
 
 .animate-shake {
   animation: shake 0.5s ease-in-out;
+}
+
+/* Animated Chai / Coffee Cup Animations for Mobile, Tablet, and Desktop */
+@keyframes cupTilt {
+  0%, 100% {
+    transform: rotate(0deg) scale(1);
+  }
+  15% {
+    transform: rotate(-12deg) scale(1.1);
+  }
+  30% {
+    transform: rotate(10deg) scale(1.1);
+  }
+  45% {
+    transform: rotate(-6deg) scale(1.05);
+  }
+  60% {
+    transform: rotate(4deg) scale(1.02);
+  }
+  75% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+.animate-cup-tilt {
+  animation: cupTilt 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  transform-origin: bottom center;
 }
 

@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { Coffee } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
 import { BUYMEACHAI_CONFIG } from '@/lib/buymeachai/config';
@@ -7,18 +8,25 @@ import { BUYMEACHAI_CONFIG } from '@/lib/buymeachai/config';
 interface SupportButtonProps {
   className?: string;
   variant?: 'primary' | 'secondary' | 'compact' | 'pill';
+  showLabelOnMobile?: boolean;
 }
 
 export function SupportButton({
   className = '',
   variant = 'primary',
+  showLabelOnMobile = true,
 }: SupportButtonProps) {
   const { language } = useI18n();
 
   const label =
     language === 'hi'
-      ? 'समर्थन करें'
+      ? 'डेवलपर का समर्थन करें'
       : 'Support Developer';
+
+  const shortLabel =
+    language === 'hi'
+      ? 'समर्थन'
+      : 'Support';
 
   const titleText =
     language === 'hi'
@@ -31,11 +39,16 @@ export function SupportButton({
         href={BUYMEACHAI_CONFIG.url}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-200 border border-amber-500/35 shadow-xs transition-all cursor-pointer ${className}`}
+        className={`group inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-black bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-white shadow-xs hover:shadow-md transition-all cursor-pointer active:scale-95 border border-amber-300/40 select-none ${className}`}
         title={titleText}
+        aria-label={label}
       >
-        <Coffee className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-        <span>{label}</span>
+        <span className="relative flex items-center justify-center shrink-0">
+          <Coffee className="w-3.5 h-3.5 text-white animate-cup-tilt" />
+        </span>
+        <span className={`text-white drop-shadow-2xs ${showLabelOnMobile ? 'inline' : 'hidden sm:inline'}`}>
+          {label}
+        </span>
       </a>
     );
   }
@@ -46,11 +59,14 @@ export function SupportButton({
         href={BUYMEACHAI_CONFIG.url}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-800 dark:text-amber-200 text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm transition-all cursor-pointer ${className}`}
+        className={`group inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-white text-xs sm:text-sm font-black shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95 border border-amber-300/40 select-none ${className}`}
         title={titleText}
+        aria-label={label}
       >
-        <Coffee className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-        <span>{label}</span>
+        <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center shrink-0 shadow-inner">
+          <Coffee className="w-3.5 h-3.5 text-white animate-cup-tilt" />
+        </div>
+        <span className="text-white drop-shadow-2xs">{label}</span>
       </a>
     );
   }
@@ -60,11 +76,15 @@ export function SupportButton({
       href={BUYMEACHAI_CONFIG.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/35 text-amber-800 dark:text-amber-200 text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm transition-all cursor-pointer ${className}`}
+      className={`group inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 via-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-800 text-white text-xs sm:text-sm font-black shadow-sm hover:shadow-md transition-all cursor-pointer active:scale-95 border border-amber-300/40 select-none ${className}`}
       title={titleText}
+      aria-label={label}
     >
-      <Coffee className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-      <span>{titleText}</span>
+      <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center shrink-0 shadow-inner">
+        <Coffee className="w-4 h-4 text-white animate-cup-tilt" />
+      </div>
+      <span className="text-white drop-shadow-2xs">{label}</span>
     </a>
   );
 }
+

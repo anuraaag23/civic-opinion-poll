@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { BUYMEACHAI_CONFIG, CHAI_TIERS } from '@/lib/buymeachai/config';
+import { SupportButton } from '@/components/support/SupportButton';
 import {
   MapPin,
   Shield,
@@ -64,23 +65,26 @@ export function AboutCreatorSection() {
               </div>
             </div>
 
-            <button
-              type="button"
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="py-2 px-4 rounded-xl bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)]/80 text-[var(--accent)] font-bold text-xs flex items-center gap-2 self-start sm:self-auto shrink-0 transition-all cursor-pointer border border-[var(--accent)]/30 active:scale-95 shadow-xs"
-              aria-expanded={isExpanded}
-            >
-              <span>
-                {isExpanded
-                  ? language === 'hi'
-                    ? 'संक्षिप्त करें'
-                    : 'Show Less'
-                  : language === 'hi'
-                  ? 'पूरी कहानी पढ़ें'
-                  : 'Read Full Story'}
-              </span>
-              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
+              <SupportButton variant="compact" />
+              <button
+                type="button"
+                onClick={() => setIsExpanded(!isExpanded)}
+                className="py-1.5 px-3.5 rounded-xl bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)]/80 text-[var(--accent)] font-bold text-xs flex items-center gap-2 shrink-0 transition-all cursor-pointer border border-[var(--accent)]/30 active:scale-95 shadow-xs min-h-[32px]"
+                aria-expanded={isExpanded}
+              >
+                <span>
+                  {isExpanded
+                    ? language === 'hi'
+                      ? 'संक्षिप्त करें'
+                      : 'Show Less'
+                    : language === 'hi'
+                    ? 'पूरी कहानी पढ़ें'
+                    : 'Read Full Story'}
+                </span>
+                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           {/* ── EXPANDABLE CONTENT: THE WHOLE STORY, PROMISE & CHAI SUPPORT ── */}
@@ -176,6 +180,46 @@ export function AboutCreatorSection() {
                       ? 'यह मंच कभी भी किसी पार्टी को प्रमोट नहीं करेगा, न ही कभी आपका डेटा बेचेगा। आपका मत पूरी तरह अपरिवर्तनीय और गुमनाम रहेगा।'
                       : 'This platform will NEVER promote any party, will NEVER sell user data, and will NEVER compromise on identity separation. Your opinion remains yours alone.'}
                   </p>
+                </div>
+              </div>
+
+              {/* Dedicated Developer Support Card */}
+              <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border-2 border-amber-500/35 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+                <div className="space-y-2 max-w-lg">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/35 text-amber-900 dark:text-amber-200 text-xs font-bold uppercase tracking-wider">
+                    <Coffee className="w-3.5 h-3.5 animate-cup-tilt text-amber-600 dark:text-amber-400" />
+                    <span>{language === 'hi' ? 'नागरिक सहयोग • Buy Me a Chai' : 'Citizen Support • Buy Me a Chai'}</span>
+                  </div>
+                  <h3 className="text-lg sm:text-xl font-black text-[var(--text-primary)] tracking-tight">
+                    {language === 'hi'
+                      ? 'इस स्वतंत्र नागरिक मंच को जीवित रखने के लिए अनुराग का समर्थन करें'
+                      : 'Support Anurag to Keep Mera Vote 100% Free & Alive'}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+                    {language === 'hi'
+                      ? 'सर्वर लागत और निष्पक्षता बनाए रखने के लिए 20 वर्षीय युवा को सीधे Buy Me a Chai पर एक कप चाय भेंट करें। शून्य कॉरपोरेट या पार्टी फंडिंग।'
+                      : 'Every contribution covers cloud servers, anti-tamper cryptography, and privacy databases. Zero corporate money, zero political ads.'}
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:items-end gap-3 shrink-0 w-full sm:w-auto">
+                  <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+                    {CHAI_TIERS.map((tier) => (
+                      <a
+                        key={tier.amount}
+                        href={BUYMEACHAI_CONFIG.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 sm:flex-initial px-3.5 py-2 sm:py-1.5 rounded-xl border border-amber-500/35 bg-amber-500/10 hover:bg-amber-500/20 text-xs font-bold text-amber-950 dark:text-amber-200 transition-all cursor-pointer active:scale-95 text-center min-h-[38px] flex items-center justify-center gap-1 shadow-2xs"
+                        title={`Buy ${tier.chais} Chai (${tier.label})`}
+                      >
+                        <span>{tier.label}</span>
+                        <span className="text-[10px] opacity-75">({tier.chais} {tier.chais === 1 ? 'chai' : 'chais'})</span>
+                      </a>
+                    ))}
+                  </div>
+
+                  <SupportButton variant="pill" className="w-full sm:w-auto" />
                 </div>
               </div>
             </div>

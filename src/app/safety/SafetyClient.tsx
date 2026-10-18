@@ -188,11 +188,11 @@ export function SafetyClient() {
       {/* Point 4: One Citizen, One Vote Integrity */}
       <GlassCard className="space-y-4 p-5 sm:p-7">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 flex items-center justify-center shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-700 dark:text-amber-400 border border-amber-500/25 flex items-center justify-center shrink-0">
             <CheckCircle2 className="w-5 h-5" />
           </div>
           <div>
-            <span className="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">
+            <span className="text-xs font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider block">
               {language === 'hi' ? 'बिंदु 04 • एक नागरिक, एक मत' : 'Point 04 • One Citizen, One Vote'}
             </span>
             <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)]">
