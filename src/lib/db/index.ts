@@ -1,4 +1,4 @@
-import { Poll, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings } from '../types';
+import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings } from '../types';
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
 import { OFFICIAL_PARTIES } from '../data/parties';
 
@@ -278,23 +278,85 @@ export const db = {
     start_at?: string;
     end_at?: string;
     party_ids?: string[];
+    custom_options?: Array<{
+      name_en: string;
+      name_hi: string;
+      short_name?: string;
+      logo_url?: string;
+      color?: string;
+      symbol_svg?: string;
+    }>;
+    results_visibility?: Poll['results_visibility'];
   }): Promise<Poll> {
     const id = `poll-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const now = new Date().toISOString();
 
-    const selectedParties =
-      pollData.party_ids && pollData.party_ids.length > 0
-        ? OFFICIAL_PARTIES.filter((p) => pollData.party_ids!.includes(p.id))
-        : OFFICIAL_PARTIES.slice(0, 6);
+    const options: PollOption[] = [];
 
-    const options = selectedParties.map((party, index) => ({
-      id: `opt-${id}-${party.id}`,
-      poll_id: id,
-      party_id: party.id,
-      party,
-      display_order: index + 1,
-      is_active: true,
-    }));
+    // 1. Add selected recognized official parties
+    if (pollData.party_ids && pollData.party_ids.length > 0) {
+      const selectedParties = OFFICIAL_PARTIES.filter((p) => pollData.party_ids!.includes(p.id));
+      selectedParties.forEach((party, index) => {
+        options.push({
+          id: `opt-${id}-${party.id}`,
+          poll_id: id,
+          party_id: party.id,
+          party,
+          display_order: index + 1,
+          is_active: true,
+        });
+      });
+    }
+
+    // 2. Add custom parties / candidates / choices with uploaded logos
+    if (pollData.custom_options && pollData.custom_options.length > 0) {
+      pollData.custom_options.forEach((cust, index) => {
+        const customPartyId = `custom-party-${Date.now()}-${index}`;
+        const shortName = cust.short_name || cust.name_en.slice(0, 4).toUpperCase();
+        const primaryColor = cust.color || '#1D4ED8';
+        const customParty: Party = {
+          id: customPartyId,
+          name_en: cust.name_en,
+          name_hi: cust.name_hi,
+          short_name: shortName,
+          symbol_svg:
+            cust.symbol_svg ||
+            `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="45" fill="${primaryColor}"/><text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" fill="#ffffff" font-size="28" font-family="sans-serif" font-weight="bold">${shortName.slice(0, 3)}</text></svg>`,
+          logo_url: cust.logo_url || undefined,
+          color: primaryColor,
+          symbol_alt_en: `${cust.name_en} Official Choice`,
+          symbol_alt_hi: `${cust.name_hi} आधिकारिक विकल्प`,
+          description_en: `Party / Choice: ${cust.name_en}`,
+          description_hi: `दल / विकल्प: ${cust.name_hi}`,
+          source_ref: 'Admin Custom Choice',
+          is_active: true,
+          display_order: options.length + 1,
+        };
+
+        options.push({
+          id: `opt-${id}-${customPartyId}`,
+          poll_id: id,
+          party_id: customPartyId,
+          party: customParty,
+          display_order: options.length + 1,
+          is_active: true,
+        });
+      });
+    }
+
+    // Fallback if no party or custom option was provided
+    if (options.length === 0) {
+      OFFICIAL_PARTIES.slice(0, 6).forEach((party, index) => {
+        options.push({
+          id: `opt-${id}-${party.id}`,
+          poll_id: id,
+          party_id: party.id,
+          party,
+          display_order: index + 1,
+          is_active: true,
+        });
+      });
+    }
 
     const newPoll: Poll = {
       id,
@@ -306,7 +368,7 @@ export const db = {
       status: pollData.status || 'LIVE',
       start_at: pollData.start_at || now,
       end_at: pollData.end_at || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
-      results_visibility: 'PUBLIC',
+      results_visibility: pollData.results_visibility || 'PUBLIC',
       total_votes: 0,
       options,
       created_at: now,
@@ -318,7 +380,7 @@ export const db = {
     options.forEach((opt) => countsMap.set(opt.id, 0));
     civicStore.voteCounts.set(id, countsMap);
 
-    await this.recordAuditEvent('admin_poll_create', id, { slug: newPoll.slug });
+    await this.recordAuditEvent('admin_poll_create', id, { slug: newPoll.slug, custom_count: pollData.custom_options?.length || 0 });
     return newPoll;
   },
 

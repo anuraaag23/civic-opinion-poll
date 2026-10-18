@@ -143,9 +143,9 @@ export function HomeClient() {
           {/* SECTION 1: PRIME MINISTER (PM) POLL */}
           <GlassCard elevated className="space-y-5 border-t-4 border-t-[var(--accent)] flex flex-col justify-between h-full">
             <div className="space-y-4 flex-1 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-black uppercase tracking-wider">
-                  <Globe className="w-3.5 h-3.5" />
+              <div className="flex items-center justify-between gap-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-700/60 text-xs font-bold whitespace-nowrap shadow-2xs">
+                  <Globe className="w-3.5 h-3.5 text-blue-700 dark:text-blue-300 shrink-0" />
                   <span>{language === 'hi' ? '1. प्रधानमंत्री (PM) वर्ग' : '1. Prime Minister (PM) Section'}</span>
                 </div>
                 <GlassBadge variant="neutral">
@@ -243,13 +243,13 @@ export function HomeClient() {
           {/* SECTION 2: CHIEF MINISTER (CM) POLL */}
           <GlassCard elevated className="space-y-5 border-t-4 border-t-emerald-500 flex flex-col justify-between h-full">
             <div className="space-y-4 flex-1 flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs font-black uppercase tracking-wider">
-                  <Building2 className="w-3.5 h-3.5" />
+              <div className="flex items-center justify-between gap-2">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700/60 text-xs font-bold whitespace-nowrap shadow-2xs">
+                  <Building2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-300 shrink-0" />
                   <span>{language === 'hi' ? '2. मुख्यमंत्री (CM) वर्ग' : '2. Chief Minister (CM) Section'}</span>
                 </div>
                 <GlassBadge variant="neutral">
-                  <MapPin className="w-3 h-3 text-[var(--accent)]" />
+                  <MapPin className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
                   <span>{language === 'hi' ? 'राज्यवार चयन' : 'State-by-State'}</span>
                 </GlassBadge>
               </div>

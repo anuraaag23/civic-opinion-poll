@@ -28,11 +28,6 @@ export function LanguageSwitcher({ className = '' }: { className?: string }) {
       <span className="text-xs font-bold text-[var(--text-primary)] tracking-tight">
         {isEn ? 'हिन्दी' : 'English'}
       </span>
-
-      {/* Mini Toggle indicator */}
-      <span className="text-[10px] font-semibold text-[var(--text-tertiary)] uppercase hidden xs:inline">
-        {isEn ? 'HI' : 'EN'}
-      </span>
     </button>
   );
 }

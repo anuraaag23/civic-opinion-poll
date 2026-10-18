@@ -27,7 +27,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
     }
     const body = await request.json();
-    const { slug, title_en, title_hi, description_en, description_hi, status, start_at, end_at, party_ids } = body;
+    const {
+      slug,
+      title_en,
+      title_hi,
+      description_en,
+      description_hi,
+      status,
+      start_at,
+      end_at,
+      party_ids,
+      custom_options,
+      results_visibility,
+    } = body;
 
     if (!title_en || !title_hi) {
       return NextResponse.json(
@@ -46,6 +58,8 @@ export async function POST(request: Request) {
       start_at,
       end_at,
       party_ids,
+      custom_options,
+      results_visibility,
     });
 
     return NextResponse.json({

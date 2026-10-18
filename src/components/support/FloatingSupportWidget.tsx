@@ -58,9 +58,9 @@ export function FloatingSupportWidget() {
             </span>
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
           </div>
-          <span className="text-[10px] text-white/80 font-medium leading-none mt-0.5">
+          <span className="text-[10px] text-white/90 font-medium leading-none mt-0.5 flex items-center gap-1">
             {stats.totalCups > 0
-              ? `${stats.totalCups} ☕ · ₹${stats.totalAmountInr.toLocaleString()}`
+              ? `${stats.totalCups} Cups · ₹${stats.totalAmountInr.toLocaleString()}`
               : language === 'hi'
               ? 'वेबसाइट चालू रखें'
               : 'Keep this alive'}

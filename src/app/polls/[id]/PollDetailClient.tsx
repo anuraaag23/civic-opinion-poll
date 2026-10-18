@@ -11,7 +11,7 @@ import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ShieldCheck, Vote, Loader2, ArrowRight, Lock } from 'lucide-react';
+import { ShieldCheck, Vote, Loader2, ArrowRight, Lock, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 
 type FlowStep = 'RULES' | 'VERIFY' | 'VOTE' | 'SUCCESS' | 'DUPLICATE';
@@ -127,15 +127,25 @@ export function PollDetailClient({ idOrSlug }: PollDetailClientProps) {
               </ul>
             </div>
 
-            <div className="flex items-center gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <GlassButton
                 size="lg"
-                className="w-full gap-2 shadow-md"
+                className="flex-1 gap-2 shadow-md font-bold"
                 onClick={() => setStep('VERIFY')}
               >
                 <span>{t.polls.continueToVerification}</span>
                 <ArrowRight className="w-4 h-4" />
               </GlassButton>
+              <Link href={`/polls/${poll.slug}/results`} className="w-full sm:w-auto">
+                <GlassButton
+                  variant="secondary"
+                  size="lg"
+                  className="w-full sm:w-auto gap-2 font-bold border-2 border-[var(--border-glass)] shadow-xs"
+                >
+                  <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
+                  <span>{language === 'hi' ? 'लाइव परिणाम देखें' : 'View Live Results'}</span>
+                </GlassButton>
+              </Link>
             </div>
           </GlassCard>
         </div>

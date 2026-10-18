@@ -7,6 +7,7 @@ import { GlassNavbar } from '@/components/layout/GlassNavbar';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { SiteAnnouncementBanner } from '@/components/layout/SiteAnnouncementBanner';
 import { Footer } from '@/components/layout/Footer';
+import { FloatingSupportWidget } from '@/components/support/FloatingSupportWidget';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -119,6 +120,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
             {/* Footer */}
             <Footer />
+
+            {/* Persistent Floating Support Widget */}
+            <FloatingSupportWidget />
 
             {/* Accessible Dedicated Custom Portal Root for Modals & Dialogs */}
             <div id="modal-root" />

@@ -92,31 +92,22 @@ export function PollCard({ poll }: PollCardProps) {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 pt-2">
+        <div className="pt-2">
           {isLive ? (
-            <Link href={targetLink} className="flex-1">
-              <GlassButton size="md" className="w-full gap-1.5 justify-center font-bold">
+            <Link href={targetLink} className="w-full block">
+              <GlassButton variant="primary" size="md" className="w-full gap-2 justify-center font-bold shadow-md">
                 <Vote className="w-4 h-4" />
-                <span>{language === 'hi' ? 'वोट दर्ज करें' : 'Cast Vote'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>{language === 'hi' ? 'पोल देखें और वोट करें' : 'Open Poll & Vote'}</span>
+                <ArrowRight className="w-4 h-4" />
               </GlassButton>
             </Link>
           ) : (
-            <GlassButton size="md" disabled className="flex-1 justify-center">
-              {statusLabel}
-            </GlassButton>
+            <Link href={targetLink} className="w-full block">
+              <GlassButton variant="secondary" size="md" className="w-full justify-center font-bold">
+                <span>{statusLabel} — {language === 'hi' ? 'विवरण देखें' : 'View Poll Details'}</span>
+              </GlassButton>
+            </Link>
           )}
-          <Link href={resultsLink} className="flex-1 sm:flex-initial">
-            <GlassButton
-              variant="secondary"
-              size="md"
-              className="w-full sm:w-auto gap-1.5 justify-center font-bold border-[var(--accent)]/30 text-[var(--accent)]"
-              title={t.polls.viewResultsButton}
-            >
-              <BarChart3 className="w-4 h-4" />
-              <span>{language === 'hi' ? 'लाइव परिणाम' : 'Live Results'}</span>
-            </GlassButton>
-          </Link>
         </div>
       </div>
     </GlassCard>

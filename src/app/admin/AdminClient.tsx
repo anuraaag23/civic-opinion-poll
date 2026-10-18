@@ -40,7 +40,12 @@ import {
   Check,
   AlertCircle,
   Info,
+  Upload,
+  Image as ImageIcon,
+  Languages,
+  Sparkles,
 } from 'lucide-react';
+import { translateEnToHi, translateHiToEn } from '@/lib/utils/translation';
 
 interface DetailedPoll extends Poll {
   optionResults?: OptionResult[];
@@ -92,7 +97,25 @@ export function AdminClient() {
   const [newPollSlug, setNewPollSlug] = useState('');
   const [newPollDescEn, setNewPollDescEn] = useState('');
   const [newPollDescHi, setNewPollDescHi] = useState('');
+  const [newPollStatus, setNewPollStatus] = useState<Poll['status']>('LIVE');
+  const [newPollVisibility, setNewPollVisibility] = useState<Poll['results_visibility']>('PUBLIC');
   const [newPollPartyIds, setNewPollPartyIds] = useState<string[]>(['bjp', 'inc', 'aap', 'bsp', 'cpi-m']);
+
+  // Custom Options & Party Logo Upload State
+  interface CustomPartyDraft {
+    id: string;
+    name_en: string;
+    name_hi: string;
+    short_name: string;
+    logo_url: string;
+    color: string;
+  }
+  const [customParties, setCustomParties] = useState<CustomPartyDraft[]>([]);
+  const [newPartyNameEn, setNewPartyNameEn] = useState('');
+  const [newPartyNameHi, setNewPartyNameHi] = useState('');
+  const [newPartyShort, setNewPartyShort] = useState('');
+  const [newPartyLogo, setNewPartyLogo] = useState('');
+  const [newPartyColor, setNewPartyColor] = useState('#1D4ED8');
 
   // Settings State
   const [tempSettings, setTempSettings] = useState<SiteSettings | null>(null);
@@ -336,10 +359,117 @@ export function AdminClient() {
     }
   };
 
+  // Bidirectional auto-translation handlers
+  const handleTitleEnChange = (val: string) => {
+    setNewPollTitleEn(val);
+    const hi = translateEnToHi(val);
+    setNewPollTitleHi(hi);
+    const generatedSlug = val
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    if (!newPollSlug || newPollSlug.startsWith('poll-') || newPollSlug === generatedSlug.slice(0, -1)) {
+      setNewPollSlug(generatedSlug);
+    }
+  };
+
+  const handleTitleHiChange = (val: string) => {
+    setNewPollTitleHi(val);
+    const en = translateHiToEn(val);
+    setNewPollTitleEn(en);
+    const generatedSlug = en
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    if (!newPollSlug || newPollSlug.startsWith('poll-')) {
+      setNewPollSlug(generatedSlug);
+    }
+  };
+
+  const handleDescEnChange = (val: string) => {
+    setNewPollDescEn(val);
+    setNewPollDescHi(translateEnToHi(val));
+  };
+
+  const handleDescHiChange = (val: string) => {
+    setNewPollDescHi(val);
+    setNewPollDescEn(translateHiToEn(val));
+  };
+
+  const handlePartyNameEnChange = (val: string) => {
+    setNewPartyNameEn(val);
+    setNewPartyNameHi(translateEnToHi(val));
+    if (!newPartyShort) {
+      const words = val.trim().split(/\s+/);
+      const abbr = words.map((w) => w[0]).join('').toUpperCase().slice(0, 5);
+      setNewPartyShort(abbr);
+    }
+  };
+
+  const handlePartyNameHiChange = (val: string) => {
+    setNewPartyNameHi(val);
+    setNewPartyNameEn(translateHiToEn(val));
+  };
+
+  const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Logo image must be smaller than 2MB', true);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (uploadEvt) => {
+      const dataUrl = uploadEvt.target?.result as string;
+      setNewPartyLogo(dataUrl);
+      showToast(language === 'hi' ? 'लोगो सफलतापूर्वक लोड हुआ' : 'Logo image loaded successfully');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleAddCustomParty = () => {
+    if (!newPartyNameEn.trim() && !newPartyNameHi.trim()) {
+      showToast('Please enter a party name in English or Hindi', true);
+      return;
+    }
+    const nameEn = newPartyNameEn.trim() || translateHiToEn(newPartyNameHi.trim());
+    const nameHi = newPartyNameHi.trim() || translateEnToHi(newPartyNameEn.trim());
+    const short = newPartyShort.trim() || nameEn.slice(0, 4).toUpperCase();
+
+    setCustomParties([
+      ...customParties,
+      {
+        id: `cust-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+        name_en: nameEn,
+        name_hi: nameHi,
+        short_name: short,
+        logo_url: newPartyLogo,
+        color: newPartyColor,
+      },
+    ]);
+
+    setNewPartyNameEn('');
+    setNewPartyNameHi('');
+    setNewPartyShort('');
+    setNewPartyLogo('');
+    showToast(language === 'hi' ? 'कस्टम पार्टी विकल्प जोड़ा गया' : 'Custom party option added');
+  };
+
+  const handleRemoveCustomParty = (id: string) => {
+    setCustomParties(customParties.filter((p) => p.id !== id));
+  };
+
   const handleCreateNewPoll = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPollTitleEn || !newPollTitleHi) {
       showToast('English and Hindi titles are required', true);
+      return;
+    }
+
+    if (newPollPartyIds.length === 0 && customParties.length === 0) {
+      showToast('Please select at least one party or add a custom choice', true);
       return;
     }
 
@@ -353,19 +483,30 @@ export function AdminClient() {
           title_hi: newPollTitleHi,
           description_en: newPollDescEn,
           description_hi: newPollDescHi,
-          status: 'LIVE',
+          status: newPollStatus,
+          results_visibility: newPollVisibility,
           party_ids: newPollPartyIds,
+          custom_options: customParties.map((p) => ({
+            name_en: p.name_en,
+            name_hi: p.name_hi,
+            short_name: p.short_name,
+            logo_url: p.logo_url || undefined,
+            color: p.color,
+          })),
         }),
       });
       const data = await res.json();
       if (data.success) {
-        showToast(language === 'hi' ? 'नया जनमत सर्वेक्षण बनाया गया' : 'New Poll Created Successfully');
+        showToast(language === 'hi' ? 'नया जनमत सर्वेक्षण सफलतापूर्वक बनाया गया' : 'New Poll Created Successfully');
         setIsCreatingPoll(false);
         setNewPollTitleEn('');
         setNewPollTitleHi('');
         setNewPollSlug('');
         setNewPollDescEn('');
         setNewPollDescHi('');
+        setNewPollStatus('LIVE');
+        setNewPollVisibility('PUBLIC');
+        setCustomParties([]);
         fetchAllData();
       } else {
         showToast(data.error || 'Failed to create poll', true);
@@ -1436,71 +1577,344 @@ export function AdminClient() {
 
       {/* CREATE NEW POLL MODAL */}
       {isCreatingPoll && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-          <div className="w-full max-w-xl rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md">
+          <div className="w-full max-w-2xl rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-glass)] p-5 sm:p-7 space-y-5 shadow-2xl max-h-[92vh] overflow-y-auto">
+            {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-glass)]">
-              <h3 className="text-lg font-bold text-[var(--text-primary)]">Launch New Opinion Poll</h3>
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] shrink-0">
+                  <Vote className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-black text-[var(--text-primary)]">
+                    {language === 'hi' ? 'नया नागरिक जनमत सर्वेक्षण बनाएं' : 'Launch New Opinion Poll'}
+                  </h3>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    {language === 'hi'
+                      ? 'द्विभाषी स्वतः-अनुवाद, कस्टम पार्टियां, लोगो अपलोड और पूर्ण प्रशासनिक नियंत्रण'
+                      : 'Full freedom with bidirectional auto-translation, custom party logos, and lifecycle control'}
+                  </p>
+                </div>
+              </div>
               <button
                 type="button"
                 onClick={() => setIsCreatingPoll(false)}
-                className="p-1 rounded-lg hover:bg-[var(--bg-surface)] text-[var(--text-tertiary)] cursor-pointer"
+                className="p-1.5 rounded-xl hover:bg-[var(--bg-glass-elevated)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] cursor-pointer transition-colors"
+                aria-label="Close dialog"
               >
                 <XCircle className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateNewPoll} className="space-y-3 text-xs">
-              <div className="space-y-1">
-                <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                  Poll Title (English) *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newPollTitleEn}
-                  onChange={(e) => setNewPollTitleEn(e.target.value)}
-                  placeholder="e.g. 2029 Delhi Assembly Civic Opinion Poll"
-                  className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
-                />
+            <form onSubmit={handleCreateNewPoll} className="space-y-4 text-xs">
+              {/* SECTION: TITLES WITH REAL-TIME BIDIRECTIONAL AUTO-TRANSLATION */}
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[var(--accent)] flex items-center gap-1.5 uppercase tracking-wider">
+                    <Languages className="w-3.5 h-3.5" />
+                    <span>{language === 'hi' ? 'द्विभाषी शीर्षक (स्वतः अनुवाद)' : 'Poll Titles (Bidirectional Sync)'}</span>
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] font-semibold flex items-center gap-1">
+                    <Sparkles className="w-2.5 h-2.5" />
+                    <span>Auto EN ⮂ HI</span>
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="font-bold text-[var(--text-secondary)] block">
+                      Title in English *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newPollTitleEn}
+                      onChange={(e) => handleTitleEnChange(e.target.value)}
+                      placeholder="e.g. 2029 Delhi Assembly Civic Opinion Poll"
+                      className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] shadow-2xs font-medium"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="font-bold text-[var(--text-secondary)] block">
+                      Title in Hindi (शीर्षक हिंदी में) *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={newPollTitleHi}
+                      onChange={(e) => handleTitleHiChange(e.target.value)}
+                      placeholder="उदा. 2029 दिल्ली विधानसभा नागरिक जनमत सर्वेक्षण"
+                      className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] shadow-2xs font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* Slug */}
+                <div className="space-y-1 pt-1">
+                  <label className="font-bold text-[var(--text-secondary)] block">
+                    URL Slug
+                  </label>
+                  <input
+                    type="text"
+                    value={newPollSlug}
+                    onChange={(e) => setNewPollSlug(e.target.value)}
+                    placeholder="delhi-assembly-civic-opinion-poll-2029"
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono shadow-2xs"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                  Poll Title (Hindi) *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={newPollTitleHi}
-                  onChange={(e) => setNewPollTitleHi(e.target.value)}
-                  placeholder="उदा. 2029 दिल्ली विधानसभा नागरिक जनमत सर्वेक्षण"
-                  className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
-                />
+              {/* SECTION: DESCRIPTIONS WITH BIDIRECTIONAL AUTO-TRANSLATION */}
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-3">
+                <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                  {language === 'hi' ? 'विवरण (स्वतः अनुवाद)' : 'Descriptions (Optional)'}
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-[var(--text-tertiary)] block">
+                      Description (English)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={newPollDescEn}
+                      onChange={(e) => handleDescEnChange(e.target.value)}
+                      placeholder="Cast your verified anonymous vote for the upcoming 2029 Delhi Assembly."
+                      className="w-full px-3 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-semibold text-[var(--text-tertiary)] block">
+                      विवरण (हिंदी में)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={newPollDescHi}
+                      onChange={(e) => handleDescHiChange(e.target.value)}
+                      placeholder="2029 दिल्ली विधानसभा के लिए अपना सत्यापित और गुमनाम मत दर्ज करें।"
+                      className="w-full px-3 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] resize-none"
+                    />
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-1">
-                <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                  URL Slug
-                </label>
-                <input
-                  type="text"
-                  value={newPollSlug}
-                  onChange={(e) => setNewPollSlug(e.target.value)}
-                  placeholder="e.g. delhi-assembly-poll-2029"
-                  className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
-                />
+              {/* SECTION: STATUS & RESULTS VISIBILITY */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)]">
+                <div className="space-y-1.5">
+                  <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                    {language === 'hi' ? 'पोल स्थिति (Status)' : 'Poll Status'}
+                  </label>
+                  <select
+                    value={newPollStatus}
+                    onChange={(e) => setNewPollStatus(e.target.value as Poll['status'])}
+                    className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-bold focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  >
+                    <option value="LIVE">LIVE (सक्रिय - मतदान खुला)</option>
+                    <option value="DRAFT">DRAFT (प्रारूप / आगामी)</option>
+                    <option value="SCHEDULED">SCHEDULED (अनुसूचित)</option>
+                    <option value="CLOSED">CLOSED (समाप्त / बंद)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                    {language === 'hi' ? 'परिणाम दृश्यता (Visibility)' : 'Results Visibility'}
+                  </label>
+                  <select
+                    value={newPollVisibility}
+                    onChange={(e) => setNewPollVisibility(e.target.value as Poll['results_visibility'])}
+                    className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-bold focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  >
+                    <option value="PUBLIC">PUBLIC (सार्वजनिक - सभी को दिखे)</option>
+                    <option value="ADMIN_ONLY">ADMIN_ONLY (केवल व्यवस्थापक)</option>
+                    <option value="AFTER_CLOSE">AFTER_CLOSE (समाप्ति के बाद)</option>
+                  </select>
+                </div>
               </div>
 
-              {/* Select Parties */}
-              <div className="space-y-1">
-                <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                  Include Recognized Parties
-                </label>
-                <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+              {/* SECTION: ADD CUSTOM PARTIES & LOGO UPLOAD */}
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5">
+                    <span className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1.5 uppercase tracking-wider">
+                      <Plus className="w-3.5 h-3.5 text-[var(--accent)]" />
+                      <span>{language === 'hi' ? 'कस्टम पार्टियां / उम्मीदवार जोड़ें' : 'Add Custom Parties / Choices'}</span>
+                    </span>
+                    <p className="text-[11px] text-[var(--text-secondary)]">
+                      {language === 'hi'
+                        ? 'कोई भी अन्य पार्टी नाम लिखें, लोगो अपलोड करें या इमेज URL दें'
+                        : 'Write any other party name and upload custom party logos'}
+                    </p>
+                  </div>
+                  {customParties.length > 0 && (
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)]">
+                      {customParties.length} {language === 'hi' ? 'कस्टम' : 'custom added'}
+                    </span>
+                  )}
+                </div>
+
+                {/* Form to add a new custom party */}
+                <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
+                        Party Name (English)
+                      </label>
+                      <input
+                        type="text"
+                        value={newPartyNameEn}
+                        onChange={(e) => handlePartyNameEnChange(e.target.value)}
+                        placeholder="e.g. Kalyana Rajya Pragathi Paksha"
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
+                        पार्टी का नाम (हिंदी)
+                      </label>
+                      <input
+                        type="text"
+                        value={newPartyNameHi}
+                        onChange={(e) => handlePartyNameHiChange(e.target.value)}
+                        placeholder="कल्याण राज्य प्रगति पक्ष"
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
+                        Short Code
+                      </label>
+                      <input
+                        type="text"
+                        value={newPartyShort}
+                        onChange={(e) => setNewPartyShort(e.target.value.toUpperCase())}
+                        placeholder="e.g. KRPP"
+                        className="w-full px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Logo Upload & Color Picker */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 items-center">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-semibold text-[var(--text-secondary)] flex items-center gap-1">
+                        <Upload className="w-3 h-3 text-[var(--accent)]" />
+                        <span>Upload Logo or Paste Image URL</span>
+                      </label>
+                      <div className="flex items-center gap-2">
+                        <label className="px-3 py-1.5 rounded-lg bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)]/80 text-[var(--accent)] font-bold text-xs cursor-pointer flex items-center gap-1.5 border border-[var(--accent)]/30 shrink-0 transition-colors">
+                          <Upload className="w-3.5 h-3.5" />
+                          <span>Choose Image</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleLogoFileUpload}
+                            className="hidden"
+                          />
+                        </label>
+                        <input
+                          type="text"
+                          value={newPartyLogo.startsWith('data:') ? 'Image selected from device' : newPartyLogo}
+                          onChange={(e) => setNewPartyLogo(e.target.value)}
+                          placeholder="or paste https://...logo.png"
+                          className="flex-1 px-2.5 py-1.5 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] truncate"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0">
+                      {/* Logo Preview */}
+                      {newPartyLogo ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-10 h-10 rounded-xl bg-white border border-[var(--border-glass)] p-1 flex items-center justify-center overflow-hidden shadow-xs shrink-0">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={newPartyLogo} alt="Party Logo" className="w-full h-full object-contain" />
+                          </div>
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Logo Ready</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-[11px] text-[var(--text-tertiary)]">
+                          <ImageIcon className="w-4 h-4" />
+                          <span>Optional (auto monogram if none)</span>
+                        </div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={handleAddCustomParty}
+                        className="py-1.5 px-3.5 rounded-xl bg-[var(--accent)] hover:opacity-90 text-white font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1.5 shrink-0 transition-all active:scale-95"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Add Party</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* List of currently added custom parties */}
+                {customParties.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    <span className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                      Added Custom Choices:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {customParties.map((cp) => (
+                        <div
+                          key={cp.id}
+                          className="p-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center justify-between gap-2 shadow-2xs"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className="w-8 h-8 rounded-lg bg-white border border-[var(--border-glass)] p-0.5 flex items-center justify-center shrink-0 overflow-hidden">
+                              {cp.logo_url ? (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img src={cp.logo_url} alt={cp.name_en} className="w-full h-full object-contain" />
+                              ) : (
+                                <span className="font-bold text-[10px] text-[var(--accent)]">{cp.short_name.slice(0, 3)}</span>
+                              )}
+                            </div>
+                            <div className="min-w-0">
+                              <span className="font-bold text-xs text-[var(--text-primary)] truncate block">
+                                {cp.name_en} ({cp.short_name})
+                              </span>
+                              <span className="text-[10px] text-[var(--text-secondary)] truncate block">
+                                {cp.name_hi}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveCustomParty(cp.id)}
+                            className="p-1 rounded-lg text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer shrink-0"
+                            title="Remove option"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* SECTION: SELECT RECOGNIZED PARTIES */}
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                    {language === 'hi' ? 'मान्यता प्राप्त दलों का चयन करें:' : 'Include Recognized Parties:'}
+                  </label>
+                  <span className="text-[11px] text-[var(--text-tertiary)] font-mono">
+                    {newPollPartyIds.length} selected
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-36 overflow-y-auto p-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
                   {OFFICIAL_PARTIES.map((party) => {
                     const isChecked = newPollPartyIds.includes(party.id);
                     return (
-                      <label key={party.id} className="flex items-center gap-2 cursor-pointer text-xs">
+                      <label key={party.id} className="flex items-center gap-2 cursor-pointer text-xs p-1 rounded-lg hover:bg-[var(--bg-primary)] transition-colors">
                         <input
                           type="checkbox"
                           checked={isChecked}
@@ -1511,28 +1925,30 @@ export function AdminClient() {
                               setNewPollPartyIds(newPollPartyIds.filter((id) => id !== party.id));
                             }
                           }}
-                          className="rounded text-[var(--accent)]"
+                          className="rounded text-[var(--accent)] focus:ring-[var(--accent)]"
                         />
-                        <span className="truncate">{party.short_name || party.name_en}</span>
+                        <span className="truncate font-medium">{party.short_name || party.name_en}</span>
                       </label>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-3 border-t border-[var(--border-glass)]">
+              {/* ACTION BUTTONS */}
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[var(--border-glass)]">
                 <button
                   type="button"
                   onClick={() => setIsCreatingPoll(false)}
-                  className="py-2 px-4 rounded-xl text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] cursor-pointer"
+                  className="py-2.5 px-4 rounded-xl text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] cursor-pointer transition-colors"
                 >
-                  Cancel
+                  {language === 'hi' ? 'रद्द करें' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
-                  className="py-2 px-4 rounded-xl bg-[var(--accent)] hover:opacity-90 text-white font-bold text-xs shadow-md transition-all cursor-pointer"
+                  className="py-2.5 px-6 rounded-xl bg-[var(--accent)] hover:opacity-90 text-white font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95 flex items-center gap-2"
                 >
-                  Create & Launch Poll
+                  <Vote className="w-4 h-4" />
+                  <span>{language === 'hi' ? 'जनमत सर्वेक्षण प्रकाशित करें' : 'Create & Launch Poll'}</span>
                 </button>
               </div>
             </form>

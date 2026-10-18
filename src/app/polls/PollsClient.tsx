@@ -50,20 +50,14 @@ export function PollsClient() {
 
         {/* Quick Nav Badges */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <Link href="/polls/national-opinion-poll-2029/results" className="inline-flex">
-            <GlassButton variant="primary" size="sm" className="gap-2 text-xs font-bold shadow-xs">
-              <BarChart3 className="w-3.5 h-3.5 shrink-0" />
-              <span className="leading-none">{language === 'hi' ? 'लाइव परिणाम देखें' : 'View Live Results'}</span>
-            </GlassButton>
-          </Link>
           <Link href="/pm" className="inline-flex">
-            <GlassButton variant="secondary" size="sm" className="gap-2 text-xs font-bold">
-              <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+            <GlassButton variant="primary" size="sm" className="gap-2 text-xs font-bold shadow-xs">
+              <Globe className="w-3.5 h-3.5 shrink-0" />
               <span className="leading-none">{language === 'hi' ? 'PM जनमत (संपूर्ण भारत)' : 'PM Poll (All India)'}</span>
             </GlassButton>
           </Link>
           <Link href="/cm" className="inline-flex">
-            <GlassButton variant="secondary" size="sm" className="gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400 border-emerald-500/30">
+            <GlassButton variant="secondary" size="sm" className="gap-2 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-500/30">
               <Building2 className="w-3.5 h-3.5 shrink-0" />
               <span className="leading-none">{language === 'hi' ? 'CM जनमत (राज्यवार)' : 'CM Poll (State-wise)'}</span>
             </GlassButton>
