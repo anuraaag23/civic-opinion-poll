@@ -1,5 +1,12 @@
 import { VerificationResult, ECI_ELECTORAL_SEARCH_URL } from '../types';
-import { normalizeEpic, generateParticipationFingerprint, generateAnonymousToken } from '../crypto';
+import {
+  normalizeEpic,
+  normalizePhone,
+  generateParticipationFingerprint,
+  generatePhoneFingerprint,
+  generateAnonymousToken,
+} from '../crypto';
+import { verifyOtp } from './otp';
 import { db } from '../db';
 
 export { ECI_ELECTORAL_SEARCH_URL };
@@ -24,20 +31,6 @@ function checkRateLimit(key: string, maxAttempts = 20, windowMs = 60000): boolea
   return true;
 }
 
-/**
- * REAL VOTER IDENTITY VERIFICATION & CRYPTOGRAPHIC DEDUPLICATION SERVICE
- *
- * Security & Privacy Architecture:
- * 1. Requires valid Indian Voter ID (EPIC) format.
- * 2. Generates an irreversible keyed HMAC-SHA256 fingerprint:
- *    HMAC-SHA256(server_secret, normalized_epic + ":" + poll_id)
- * 3. Checks whether this Voter ID has already cast a ballot for this election.
- *    -> If already participated, it blocks duplicate voting across any browser, cookie wipe, or device.
- * 4. STRICT ZERO-KNOWLEDGE PRIVACY RULE:
- *    - The raw EPIC is NEVER saved, stored, or transmitted to the voting database.
- *    - Only the irreversible HMAC fingerprint is retained to guarantee 1 vote per citizen.
- *    - The issued anonymous voting credential is decoupled from the fingerprint.
- */
 export class SelfVerificationService {
   readonly eciSearchUrl = ECI_ELECTORAL_SEARCH_URL;
 
@@ -46,7 +39,11 @@ export class SelfVerificationService {
     selfVerificationConfirmed: boolean,
     clientIp = '127.0.0.1',
     voterId?: string,
-    deviceFingerprint?: string
+    deviceFingerprint?: string,
+    phoneNumber?: string,
+    otpCode?: string,
+    voterName?: string,
+    stateCode?: string
   ): Promise<VerificationResult> {
     // 1. Rate Limit Check
     if (!checkRateLimit(clientIp)) {
@@ -70,22 +67,23 @@ export class SelfVerificationService {
       return { verified: false, reason: 'INVALID_POLL', error: 'This poll is not currently active.' };
     }
 
-    let participationIdentifier: string;
+    let voterFingerprint: string | undefined;
+    let phoneFingerprint: string | undefined;
 
-    // 4. Voter ID (EPIC) Verification & Deduplication
+    // 4. Genuine Voter ID (EPIC) Verification & ECI Regional Series Validation
     if (voterId) {
-      const { isValid, normalized, error } = normalizeEpic(voterId);
+      const { isValid, normalized, error, stateNameEn } = normalizeEpic(voterId);
       if (!isValid || !normalized) {
         await db.recordAuditEvent('self_verification_failure', pollId, { reason: 'INVALID_FORMAT' });
         return {
           verified: false,
           reason: 'INVALID_FORMAT',
-          error: error || 'Invalid Voter ID (EPIC) format. Must be standard format like ABC1234567.',
+          error: error || 'Invalid Voter ID (EPIC) format. Must be an official ECI card number (e.g. DLH2891042).',
         };
       }
 
       // Compute Keyed Cryptographic Participation Fingerprint
-      const voterFingerprint = generateParticipationFingerprint(normalized, pollId);
+      voterFingerprint = generateParticipationFingerprint(normalized, pollId);
 
       // Check whether this Voter ID has already participated in this poll
       const alreadyVoted = await db.hasParticipated(pollId, voterFingerprint);
@@ -95,28 +93,70 @@ export class SelfVerificationService {
           verified: false,
           reason: 'ALREADY_VOTED',
           error:
-            'This Voter ID has already cast a vote in this poll. Duplicate voting is strictly blocked across all devices and browsers to keep elections fair.',
+            'This Voter ID has already cast a vote in this election. Duplicate voting is strictly blocked across all devices and browsers to keep elections fair.',
+        };
+      }
+    }
+
+    // 5. Genuine Mobile Number & OTP Verification (Anti-Sybil Defense)
+    if (phoneNumber) {
+      const phoneValidation = normalizePhone(phoneNumber);
+      if (!phoneValidation.isValid || !phoneValidation.normalized) {
+        return {
+          verified: false,
+          reason: 'INVALID_PHONE',
+          error: phoneValidation.error || 'Invalid Indian mobile number.',
         };
       }
 
-      participationIdentifier = voterFingerprint;
-    } else {
-      // Backwards-compatible fallback for headless test calls without voterId
-      const { tokenHash } = generateAnonymousToken();
-      participationIdentifier = tokenHash;
+      const cleanPhone = phoneValidation.normalized;
+
+      // Verify OTP if provided
+      if (otpCode) {
+        const otpCheck = verifyOtp(cleanPhone, pollId, otpCode);
+        if (!otpCheck.success) {
+          return {
+            verified: false,
+            reason: 'INVALID_OTP',
+            error: otpCheck.error || 'Invalid verification code. Please check your SMS and try again.',
+          };
+        }
+      }
+
+      // Check whether this Phone Number has already participated in this poll
+      phoneFingerprint = generatePhoneFingerprint(cleanPhone, pollId);
+      const phoneAlreadyVoted = await db.hasParticipated(pollId, phoneFingerprint);
+      if (phoneAlreadyVoted) {
+        await db.recordAuditEvent('duplicate_vote_blocked', pollId, { method: 'HMAC_KEYED_PHONE' });
+        return {
+          verified: false,
+          reason: 'ALREADY_VOTED',
+          error:
+            'This mobile number has already cast a vote in this election. Each citizen phone number can only vote once per election.',
+        };
+      }
     }
 
-    // 5. Generate 256-bit CSPRNG Anonymous Participation Credential
+    // Fallback participation identifier
+    const participationIdentifier = voterFingerprint || phoneFingerprint || generateAnonymousToken().tokenHash;
+
+    // 6. Generate 256-bit CSPRNG Anonymous Participation Credential
     const { token, tokenHash } = generateAnonymousToken();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15-minute token TTL
 
-    // 6. Store Participation Record (Irreversible HMAC fingerprint only, ZERO PII, ZERO EPIC)
+    // 7. Store Participation Record (Irreversible HMAC fingerprints only, ZERO PII, ZERO RAW DATA)
     await db.recordParticipation(pollId, participationIdentifier);
+
+    // If both voter ID and phone were verified, record both fingerprints to prevent either from voting again
+    if (voterFingerprint && phoneFingerprint && voterFingerprint !== participationIdentifier) {
+      await db.recordParticipation(pollId, phoneFingerprint);
+    }
+
     await db.issueAnonymousCredential(pollId, tokenHash, expiresAt);
 
-    // 7. Record Audit Log (ZERO identifying information)
+    // 8. Record Audit Log (Sanitized, ZERO identifying information)
     await db.recordAuditEvent('self_verification_confirmed', pollId, {
-      method: voterId ? 'REAL_HMAC_VOTER_ID_VERIFICATION' : 'ANONYMOUS_TOKEN',
+      method: phoneNumber ? 'MULTI_FACTOR_EPIC_PHONE_OTP' : voterId ? 'REAL_HMAC_VOTER_ID' : 'ANONYMOUS_TOKEN',
       hasDeviceFingerprint: Boolean(deviceFingerprint),
     });
 
@@ -130,3 +170,4 @@ export class SelfVerificationService {
 }
 
 export const selfVerificationService = new SelfVerificationService();
+

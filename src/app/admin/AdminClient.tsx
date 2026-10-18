@@ -5,7 +5,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
-import { OFFICIAL_PARTIES, INDIAN_STATES, IndianState } from '@/lib/data/parties';
+import { OFFICIAL_PARTIES, INDIAN_STATES, IndianState, Party } from '@/lib/data/parties';
 import { Poll, OptionResult, SiteSettings, AuditEvent } from '@/lib/types';
 import { DbSupporter } from '@/lib/supabase';
 import {
@@ -41,6 +41,7 @@ import {
   Image as ImageIcon,
   Languages,
   Sparkles,
+  Search,
 } from 'lucide-react';
 import { translateEnToHi, translateHiToEn } from '@/lib/utils/translation';
 
@@ -97,7 +98,20 @@ export function AdminClient() {
   const [newPollDescHi, setNewPollDescHi] = useState('');
   const [newPollStatus, setNewPollStatus] = useState<Poll['status']>('LIVE');
   const [newPollVisibility, setNewPollVisibility] = useState<Poll['results_visibility']>('PUBLIC');
-  const [newPollPartyIds, setNewPollPartyIds] = useState<string[]>(['bjp', 'inc', 'aap', 'bsp', 'cpi-m']);
+  const [newPollVotingPolicy, setNewPollVotingPolicy] = useState<'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES'>('STRICT_SINGLE_VOTE');
+  const [newPollMaxVotes, setNewPollMaxVotes] = useState<number>(1);
+  const [newPollPartyIds, setNewPollPartyIds] = useState<string[]>(['party-bjp', 'party-inc', 'party-aap', 'party-sp']);
+
+  // Parties directory & dedicated party creation state
+  const [allParties, setAllParties] = useState<Party[]>(OFFICIAL_PARTIES);
+  const [partySearchQuery, setPartySearchQuery] = useState('');
+  const [isAddingPartyModal, setIsAddingPartyModal] = useState(false);
+  const [createPartyNameEn, setCreatePartyNameEn] = useState('');
+  const [createPartyNameHi, setCreatePartyNameHi] = useState('');
+  const [createPartyShort, setCreatePartyShort] = useState('');
+  const [createPartyColor, setCreatePartyColor] = useState('#3B82F6');
+  const [createPartyLogo, setCreatePartyLogo] = useState('');
+  const [isSavingParty, setIsSavingParty] = useState(false);
 
   // Custom Options & Party Logo Upload State
   interface CustomPartyDraft {
@@ -154,17 +168,25 @@ export function AdminClient() {
   const fetchAllData = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      const [statsRes, pollsRes, settingsRes, supportersRes, auditRes] = await Promise.all([
+      const [statsRes, pollsRes, settingsRes, supportersRes, auditRes, partiesRes] = await Promise.all([
         fetch('/api/admin/stats').catch(() => null),
         fetch('/api/admin/polls').catch(() => null),
         fetch('/api/admin/settings').catch(() => null),
         fetch('/api/admin/supporters').catch(() => null),
         fetch('/api/admin/audit?limit=40').catch(() => null),
+        fetch('/api/admin/parties').catch(() => null),
       ]);
 
       if (statsRes?.ok) {
         const d = await statsRes.json();
         if (d.success) setStats(d.data);
+      }
+
+      if (partiesRes?.ok) {
+        const d = await partiesRes.json();
+        if (d.success && Array.isArray(d.parties)) {
+          setAllParties(d.parties);
+        }
       }
 
       if (pollsRes?.ok) {
@@ -306,6 +328,8 @@ export function AdminClient() {
           status: editingPoll.status,
           end_at: editingPoll.end_at,
           results_visibility: editingPoll.results_visibility,
+          voting_policy: editingPoll.voting_policy,
+          max_votes_per_citizen: editingPoll.max_votes_per_citizen,
         }),
       });
       const data = await res.json();
@@ -508,6 +532,8 @@ export function AdminClient() {
           description_hi: newPollDescHi,
           status: newPollStatus,
           results_visibility: newPollVisibility,
+          voting_policy: newPollVotingPolicy,
+          max_votes_per_citizen: newPollMaxVotes,
           party_ids: newPollPartyIds,
           custom_options: customParties.map((p) => ({
             name_en: p.name_en,
@@ -529,6 +555,8 @@ export function AdminClient() {
         setNewPollDescHi('');
         setNewPollStatus('LIVE');
         setNewPollVisibility('PUBLIC');
+        setNewPollVotingPolicy('STRICT_SINGLE_VOTE');
+        setNewPollMaxVotes(1);
         setCustomParties([]);
         fetchAllData();
       } else {
@@ -552,6 +580,111 @@ export function AdminClient() {
       }
     } catch {
       showToast('Error deleting poll', true);
+    }
+  };
+
+  // Party Management Handlers
+  const handlePartyLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Image size should be under 2MB', true);
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setCreatePartyLogo(reader.result);
+        showToast(language === 'hi' ? 'लोगो चुना गया' : 'Logo uploaded successfully');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCreateParty = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!createPartyNameEn || !createPartyNameHi) {
+      showToast('English and Hindi names are required', true);
+      return;
+    }
+    setIsSavingParty(true);
+    try {
+      const res = await fetch('/api/admin/parties', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name_en: createPartyNameEn,
+          name_hi: createPartyNameHi,
+          short_name: createPartyShort,
+          color: createPartyColor,
+          logo_url: createPartyLogo,
+        }),
+      });
+      const d = await res.json();
+      if (d.success) {
+        showToast(language === 'hi' ? 'राजनीतिक दल सफलतापूर्वक जोड़ा गया' : 'Political party added and saved to database successfully');
+        setIsAddingPartyModal(false);
+        setCreatePartyNameEn('');
+        setCreatePartyNameHi('');
+        setCreatePartyShort('');
+        setCreatePartyLogo('');
+        fetchAllData();
+      } else {
+        showToast(d.error || 'Failed to create party', true);
+      }
+    } catch {
+      showToast('Error creating party', true);
+    } finally {
+      setIsSavingParty(false);
+    }
+  };
+
+  const handleDeleteParty = async (partyId: string) => {
+    if (!confirm('Are you sure you want to delete / deactivate this party?')) return;
+    try {
+      const res = await fetch(`/api/admin/parties?id=${partyId}`, { method: 'DELETE' });
+      const d = await res.json();
+      if (d.success) {
+        showToast('Party deleted');
+        fetchAllData();
+      } else {
+        showToast(d.error || 'Failed to delete party', true);
+      }
+    } catch {
+      showToast('Error deleting party', true);
+    }
+  };
+
+  const handleUpdatePollVotingPolicy = async (
+    pollId: string,
+    policy: 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES'
+  ) => {
+    try {
+      const res = await fetch('/api/admin/polls', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_details',
+          pollId,
+          voting_policy: policy,
+          max_votes_per_citizen: policy === 'ALLOW_ONE_REVOTE' ? 2 : policy === 'ALLOW_MULTIPLE_VOTES' ? 999999 : 1,
+        }),
+      });
+      const d = await res.json();
+      if (d.success) {
+        showToast(
+          policy === 'STRICT_SINGLE_VOTE'
+            ? 'Strict 1-Vote Policy Active (Users can NEVER vote again)'
+            : policy === 'ALLOW_ONE_REVOTE'
+            ? '1-Time Revote Allowed (Users can change vote only once)'
+            : 'Multiple Votes Allowed'
+        );
+        fetchAllData();
+      } else {
+        showToast(d.error || 'Failed to update voting policy', true);
+      }
+    } catch {
+      showToast('Error updating voting policy', true);
     }
   };
 
@@ -961,6 +1094,50 @@ export function AdminClient() {
                           Total: <strong className="text-[var(--text-primary)]">{poll.total_votes.toLocaleString()}</strong> votes
                         </span>
                       </div>
+
+                      {/* Voting Restriction Policy Controls */}
+                      <div className="flex items-center gap-2 flex-wrap pt-1">
+                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] shadow-2xs">
+                          <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+                          <span className="text-[11px] font-bold text-[var(--text-secondary)]">Voting Policy:</span>
+                          <select
+                            value={poll.voting_policy || 'STRICT_SINGLE_VOTE'}
+                            onChange={(e) =>
+                              handleUpdatePollVotingPolicy(
+                                poll.id,
+                                e.target.value as 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES'
+                              )
+                            }
+                            className="bg-transparent text-[11px] font-bold text-[var(--text-primary)] focus:outline-none cursor-pointer"
+                          >
+                            <option value="STRICT_SINGLE_VOTE">
+                              🛡️ Strict 1-Vote (User Never Votes Again)
+                            </option>
+                            <option value="ALLOW_ONE_REVOTE">
+                              🔄 Allow 1 Revote (Max 2 Votes)
+                            </option>
+                            <option value="ALLOW_MULTIPLE_VOTES">
+                              ♾️ Allow Multiple Votes
+                            </option>
+                          </select>
+                        </div>
+                        {poll.voting_policy === 'STRICT_SINGLE_VOTE' && (
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                            ✓ Permanent single-vote lock active
+                          </span>
+                        )}
+                        {poll.voting_policy === 'ALLOW_ONE_REVOTE' && (
+                          <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                            ✓ 1 vote change permitted
+                          </span>
+                        )}
+                        {poll.voting_policy === 'ALLOW_MULTIPLE_VOTES' && (
+                          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold">
+                            ✓ Continuous sentiment polling
+                          </span>
+                        )}
+                      </div>
+
                       <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
                         {language === 'hi' ? poll.title_hi : poll.title_en}
                       </h3>
@@ -1360,44 +1537,125 @@ export function AdminClient() {
       {/* TAB 5: OFFICIAL PARTIES DIRECTORY */}
       {activeTab === 'parties' && (
         <div className="space-y-6">
-          <div>
-            <h2 className="text-xl font-bold text-[var(--text-primary)]">
-              {language === 'hi' ? 'मान्यता प्राप्त राजनीतिक दल एवं प्रतीक' : 'Official Recognized Political Parties'}
-            </h2>
-            <p className="text-xs text-[var(--text-secondary)]">
-              ECI recognized national and state political parties directory with verified SVG symbols
-            </p>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-[var(--text-primary)]">
+                {language === 'hi' ? 'मान्यता प्राप्त राजनीतिक दल एवं प्रतीक' : 'Political Parties & Custom Candidates'}
+              </h2>
+              <p className="text-xs text-[var(--text-secondary)]">
+                ECI recognized parties directory and custom political parties with logos saved in the database
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsAddingPartyModal(true)}
+              className="py-2.5 px-4 rounded-xl bg-[var(--accent)] text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer active:scale-95 self-start sm:self-auto"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{language === 'hi' ? 'नई पार्टी / उम्मीदवार जोड़ें' : 'Add New Party / Choice'}</span>
+            </button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {OFFICIAL_PARTIES.map((party) => (
-              <div
-                key={party.id}
-                className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-3.5 shadow-sm"
-              >
-                <div
-                  className="w-12 h-12 rounded-xl p-2 bg-[var(--bg-primary)] border border-[var(--border-glass)] flex items-center justify-center shrink-0"
-                  dangerouslySetInnerHTML={{ __html: party.symbol_svg }}
-                />
-                <div className="min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-[var(--accent)] font-mono">
-                      {party.short_name || party.id.toUpperCase()}
-                    </span>
-                    {party.color && (
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: party.color }} />
-                    )}
-                  </div>
-                  <span className="text-xs font-bold text-[var(--text-primary)] truncate block">
-                    {language === 'hi' ? party.name_hi : party.name_en}
-                  </span>
-                  <span className="text-[11px] text-[var(--text-tertiary)] block truncate">
-                    {party.symbol_alt_en}
-                  </span>
-                </div>
-              </div>
-            ))}
+          {/* Search Filter Bar */}
+          <div className="relative max-w-md">
+            <Search className="w-4 h-4 text-[var(--text-tertiary)] absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={partySearchQuery}
+              onChange={(e) => setPartySearchQuery(e.target.value)}
+              placeholder="Search parties by name or short code (e.g. BJP, AAP, Congress)..."
+              className="w-full pl-9 pr-3 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)]"
+            />
           </div>
+
+          {/* Parties Grid */}
+          {(() => {
+            const partyMap = new Map<string, Party>();
+            OFFICIAL_PARTIES.forEach((p) => partyMap.set(p.id, p));
+            allParties.forEach((p) => partyMap.set(p.id, p));
+            const combined = Array.from(partyMap.values());
+            const filtered = combined.filter((p) => {
+              if (!partySearchQuery.trim()) return true;
+              const q = partySearchQuery.toLowerCase();
+              return (
+                p.name_en.toLowerCase().includes(q) ||
+                p.name_hi.toLowerCase().includes(q) ||
+                (p.short_name && p.short_name.toLowerCase().includes(q))
+              );
+            });
+
+            if (filtered.length === 0) {
+              return (
+                <div className="p-8 text-center text-xs text-[var(--text-tertiary)] rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+                  No parties found matching &quot;{partySearchQuery}&quot;. Click &apos;Add New Party&apos; to register one.
+                </div>
+              );
+            }
+
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {filtered.map((party) => {
+                  const isBuiltIn = OFFICIAL_PARTIES.some((op) => op.id === party.id);
+                  return (
+                    <div
+                      key={party.id}
+                      className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center justify-between gap-3 shadow-sm relative group"
+                    >
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <div className="w-12 h-12 rounded-xl p-1 bg-[var(--bg-primary)] border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden">
+                          {party.logo_url ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            <img src={party.logo_url} alt={party.name_en} className="w-full h-full object-contain" />
+                          ) : party.symbol_svg ? (
+                            <div
+                              className="w-full h-full flex items-center justify-center p-1"
+                              dangerouslySetInnerHTML={{ __html: party.symbol_svg }}
+                            />
+                          ) : (
+                            <span className="font-bold text-xs text-[var(--accent)] font-mono">
+                              {party.short_name?.slice(0, 3) || 'P'}
+                            </span>
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[10px] font-bold text-[var(--accent)] font-mono">
+                              {party.short_name || party.id.toUpperCase()}
+                            </span>
+                            {party.color && (
+                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: party.color }} />
+                            )}
+                            {!isBuiltIn && (
+                              <span className="text-[9px] px-1.5 py-0.2 rounded bg-[var(--accent-soft)] text-[var(--accent)] font-bold">
+                                Custom
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-xs font-bold text-[var(--text-primary)] truncate block">
+                            {language === 'hi' ? party.name_hi : party.name_en}
+                          </span>
+                          <span className="text-[11px] text-[var(--text-tertiary)] block truncate">
+                            {language === 'hi' ? party.name_en : party.name_hi}
+                          </span>
+                        </div>
+                      </div>
+
+                      {!isBuiltIn && (
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteParty(party.id)}
+                          className="opacity-70 group-hover:opacity-100 p-1.5 rounded-lg text-red-500 hover:bg-red-500/10 transition-all cursor-pointer shrink-0"
+                          title="Delete / Deactivate Party"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
 
           {/* State Scope Directory */}
           <GlassCard className="space-y-4">
@@ -1572,6 +1830,38 @@ export function AdminClient() {
                     <option value="PUBLIC">PUBLIC (सार्वजनिक)</option>
                     <option value="ADMIN_ONLY">ADMIN_ONLY (केवल एडमिन)</option>
                     <option value="AFTER_CLOSE">AFTER_CLOSE (समाप्ति के बाद)</option>
+                  </select>
+                </div>
+
+                <div className="space-y-1 sm:col-span-2">
+                  <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                    Voting Limit Policy (मतदान प्रतिबंध एवं सीमा)
+                  </label>
+                  <select
+                    value={editingPoll.voting_policy || 'STRICT_SINGLE_VOTE'}
+                    onChange={(e) =>
+                      setEditingPoll({
+                        ...editingPoll,
+                        voting_policy: e.target.value as 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES',
+                        max_votes_per_citizen:
+                          e.target.value === 'ALLOW_ONE_REVOTE'
+                            ? 2
+                            : e.target.value === 'ALLOW_MULTIPLE_VOTES'
+                            ? 999999
+                            : 1,
+                      })
+                    }
+                    className="w-full glass-select rounded-xl text-xs font-bold"
+                  >
+                    <option value="STRICT_SINGLE_VOTE">
+                      🛡️ Strict 1-Vote Limit (User can NEVER vote again in this poll)
+                    </option>
+                    <option value="ALLOW_ONE_REVOTE">
+                      🔄 Allow 1 Revote (User can change/re-cast vote once, max 2 votes)
+                    </option>
+                    <option value="ALLOW_MULTIPLE_VOTES">
+                      ♾️ Allow Multiple Votes (Multiple submissions permitted)
+                    </option>
                   </select>
                 </div>
               </div>
@@ -1800,6 +2090,120 @@ export function AdminClient() {
                 </div>
               </div>
 
+              {/* SECTION: VOTING RESTRICTION / LIMIT POLICY */}
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[var(--accent)] flex items-center gap-1.5 uppercase tracking-wider">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>{language === 'hi' ? 'मतदान सीमा एवं कड़े नियम' : 'Voting Limit & Prevention Policy'}</span>
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] font-bold">
+                    Anti-Fraud Engine
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <label
+                    className={`p-3 rounded-xl border text-xs cursor-pointer transition-all flex flex-col justify-between ${
+                      newPollVotingPolicy === 'STRICT_SINGLE_VOTE'
+                        ? 'bg-[var(--accent-soft)] border-[var(--accent)] ring-1 ring-[var(--accent)]'
+                        : 'bg-[var(--bg-surface)] border-[var(--border-glass)] hover:bg-[var(--bg-glass-elevated)]'
+                    }`}
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[var(--text-primary)]">Strict 1-Vote Only</span>
+                        <input
+                          type="radio"
+                          name="newPollVotingPolicy"
+                          value="STRICT_SINGLE_VOTE"
+                          checked={newPollVotingPolicy === 'STRICT_SINGLE_VOTE'}
+                          onChange={() => {
+                            setNewPollVotingPolicy('STRICT_SINGLE_VOTE');
+                            setNewPollMaxVotes(1);
+                          }}
+                          className="text-[var(--accent)]"
+                        />
+                      </div>
+                      <p className="text-[11px] text-[var(--text-secondary)] leading-tight">
+                        {language === 'hi'
+                          ? 'नागरिक इस पोल में दोबारा कभी वोट नहीं दे सकता (कुकीज हटाने या ब्राउज़र बदलने पर भी ब्लॉक)'
+                          : 'User can NEVER vote again in this poll (blocked across incognito, cookie clear & browser changes)'}
+                      </p>
+                    </div>
+                    <span className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
+                      🛡️ Recommended for Elections
+                    </span>
+                  </label>
+
+                  <label
+                    className={`p-3 rounded-xl border text-xs cursor-pointer transition-all flex flex-col justify-between ${
+                      newPollVotingPolicy === 'ALLOW_ONE_REVOTE'
+                        ? 'bg-[var(--accent-soft)] border-[var(--accent)] ring-1 ring-[var(--accent)]'
+                        : 'bg-[var(--bg-surface)] border-[var(--border-glass)] hover:bg-[var(--bg-glass-elevated)]'
+                    }`}
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[var(--text-primary)]">Allow 1 Revote</span>
+                        <input
+                          type="radio"
+                          name="newPollVotingPolicy"
+                          value="ALLOW_ONE_REVOTE"
+                          checked={newPollVotingPolicy === 'ALLOW_ONE_REVOTE'}
+                          onChange={() => {
+                            setNewPollVotingPolicy('ALLOW_ONE_REVOTE');
+                            setNewPollMaxVotes(2);
+                          }}
+                          className="text-[var(--accent)]"
+                        />
+                      </div>
+                      <p className="text-[11px] text-[var(--text-secondary)] leading-tight">
+                        {language === 'hi'
+                          ? 'नागरिक अपना वोट केवल 1 बार बदल सकता है (कुल अधिकतम 2 वोट)'
+                          : 'Voters can re-cast or change their vote exactly one time (total 2 submissions maximum)'}
+                      </p>
+                    </div>
+                    <span className="mt-2 text-[10px] font-bold text-blue-600 dark:text-blue-400">
+                      🔄 1 Vote-Change Allowed
+                    </span>
+                  </label>
+
+                  <label
+                    className={`p-3 rounded-xl border text-xs cursor-pointer transition-all flex flex-col justify-between ${
+                      newPollVotingPolicy === 'ALLOW_MULTIPLE_VOTES'
+                        ? 'bg-[var(--accent-soft)] border-[var(--accent)] ring-1 ring-[var(--accent)]'
+                        : 'bg-[var(--bg-surface)] border-[var(--border-glass)] hover:bg-[var(--bg-glass-elevated)]'
+                    }`}
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[var(--text-primary)]">Multiple Votes</span>
+                        <input
+                          type="radio"
+                          name="newPollVotingPolicy"
+                          value="ALLOW_MULTIPLE_VOTES"
+                          checked={newPollVotingPolicy === 'ALLOW_MULTIPLE_VOTES'}
+                          onChange={() => {
+                            setNewPollVotingPolicy('ALLOW_MULTIPLE_VOTES');
+                            setNewPollMaxVotes(999999);
+                          }}
+                          className="text-[var(--accent)]"
+                        />
+                      </div>
+                      <p className="text-[11px] text-[var(--text-secondary)] leading-tight">
+                        {language === 'hi'
+                          ? 'नागरिक जितनी बार चाहें मत दे सकते हैं (सामान्य जनमत सर्वेक्षण)'
+                          : 'Multiple votes permitted for continuous pulse and sentiment tracking'}
+                      </p>
+                    </div>
+                    <span className="mt-2 text-[10px] font-bold text-purple-600 dark:text-purple-400">
+                      ♾️ Continuous Polling
+                    </span>
+                  </label>
+                </div>
+              </div>
+
               {/* SECTION: ADD CUSTOM PARTIES & LOGO UPLOAD */}
               <div className="p-3.5 sm:p-4 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-3.5">
                 <div className="flex items-center justify-between">
@@ -1967,7 +2371,7 @@ export function AdminClient() {
               </div>
 
               {/* SECTION: SELECT RECOGNIZED PARTIES */}
-              <div className="p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-2">
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-2.5">
                 <div className="flex items-center justify-between">
                   <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
                     {language === 'hi' ? 'मान्यता प्राप्त दलों का चयन करें:' : 'Include Recognized Parties:'}
@@ -1976,28 +2380,98 @@ export function AdminClient() {
                     {newPollPartyIds.length} selected
                   </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-36 overflow-y-auto p-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
-                  {OFFICIAL_PARTIES.map((party) => {
-                    const isChecked = newPollPartyIds.includes(party.id);
+
+                {(() => {
+                  const partyMap = new Map<string, Party>();
+                  OFFICIAL_PARTIES.forEach((p) => partyMap.set(p.id, p));
+                  allParties.forEach((p) => partyMap.set(p.id, p));
+                  const combined = Array.from(partyMap.values());
+                  const filtered = combined.filter((p) => {
+                    if (!partySearchQuery.trim()) return true;
+                    const q = partySearchQuery.toLowerCase();
                     return (
-                      <label key={party.id} className="flex items-center gap-2 cursor-pointer text-xs p-1 rounded-lg hover:bg-[var(--bg-primary)] transition-colors">
-                        <input
-                          type="checkbox"
-                          checked={isChecked}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setNewPollPartyIds([...newPollPartyIds, party.id]);
+                      p.name_en.toLowerCase().includes(q) ||
+                      p.name_hi.toLowerCase().includes(q) ||
+                      (p.short_name && p.short_name.toLowerCase().includes(q))
+                    );
+                  });
+
+                  return (
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="relative flex-1">
+                          <Search className="w-3.5 h-3.5 text-[var(--text-tertiary)] absolute left-2.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            value={partySearchQuery}
+                            onChange={(e) => setPartySearchQuery(e.target.value)}
+                            placeholder="Filter parties by name or code..."
+                            className="w-full pl-8 pr-2.5 py-1.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (newPollPartyIds.length === combined.length) {
+                              setNewPollPartyIds([]);
                             } else {
-                              setNewPollPartyIds(newPollPartyIds.filter((id) => id !== party.id));
+                              setNewPollPartyIds(combined.map((p) => p.id));
                             }
                           }}
-                          className="rounded text-[var(--accent)] focus:ring-[var(--accent)]"
-                        />
-                        <span className="truncate font-medium">{party.short_name || party.name_en}</span>
-                      </label>
-                    );
-                  })}
-                </div>
+                          className="py-1 px-2.5 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-[11px] font-semibold text-[var(--accent)] hover:bg-[var(--accent-soft)] transition-colors shrink-0"
+                        >
+                          {newPollPartyIds.length === combined.length ? 'Deselect All' : 'Select All'}
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto p-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+                        {filtered.map((party) => {
+                          const isChecked = newPollPartyIds.includes(party.id);
+                          return (
+                            <label
+                              key={party.id}
+                              className={`flex items-center gap-2 cursor-pointer text-xs p-1.5 rounded-lg border transition-all ${
+                                isChecked
+                                  ? 'bg-[var(--accent-soft)] border-[var(--accent)]/40 text-[var(--text-primary)] font-bold'
+                                  : 'border-transparent hover:bg-[var(--bg-primary)] text-[var(--text-secondary)]'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setNewPollPartyIds([...newPollPartyIds, party.id]);
+                                  } else {
+                                    setNewPollPartyIds(newPollPartyIds.filter((id) => id !== party.id));
+                                  }
+                                }}
+                                className="rounded text-[var(--accent)] focus:ring-[var(--accent)] shrink-0"
+                              />
+                              <div className="w-5 h-5 rounded bg-white border border-[var(--border-glass)] p-0.5 flex items-center justify-center shrink-0 overflow-hidden">
+                                {party.logo_url ? (
+                                  /* eslint-disable-next-line @next/next/no-img-element */
+                                  <img src={party.logo_url} alt={party.name_en} className="w-full h-full object-contain" />
+                                ) : party.symbol_svg ? (
+                                  <div
+                                    className="w-full h-full flex items-center justify-center"
+                                    dangerouslySetInnerHTML={{ __html: party.symbol_svg }}
+                                  />
+                                ) : (
+                                  <span className="font-bold text-[9px] text-[var(--accent)]">{party.short_name?.slice(0, 2) || 'P'}</span>
+                                )}
+                              </div>
+                              <span className="truncate text-[11px]">
+                                {party.short_name ? `${party.short_name} - ` : ''}
+                                {language === 'hi' ? party.name_hi : party.name_en}
+                              </span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* ACTION BUTTONS */}
@@ -2015,6 +2489,190 @@ export function AdminClient() {
                 >
                   <Vote className="w-4 h-4" />
                   <span>{language === 'hi' ? 'जनमत सर्वेक्षण प्रकाशित करें' : 'Create & Launch Poll'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADD NEW PARTY MODAL */}
+      {isAddingPartyModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 backdrop-blur-md">
+          <div className="w-full max-w-lg rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-glass)] p-5 sm:p-6 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-[var(--border-glass)]">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] shrink-0">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
+                    {language === 'hi' ? 'नया राजनीतिक दल / उम्मीदवार पंजीकृत करें' : 'Register New Political Party / Choice'}
+                  </h3>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    {language === 'hi'
+                      ? 'डेटाबेस में सहेजें ताकि यह सभी जनमत सर्वेक्षणों में चयन हेतु उपलब्ध हो'
+                      : 'Saved into database and selectable across all current and future polls'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAddingPartyModal(false)}
+                className="p-1 rounded-lg hover:bg-[var(--bg-glass-elevated)] text-[var(--text-tertiary)] hover:text-[var(--text-primary)] cursor-pointer transition-colors"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateParty} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-bold text-[var(--text-secondary)] block">
+                    Party Name (English) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={createPartyNameEn}
+                    onChange={(e) => {
+                      setCreatePartyNameEn(e.target.value);
+                      if (autoTranslateEnabled) {
+                        setCreatePartyNameHi(translateEnToHi(e.target.value));
+                      }
+                      if (!createPartyShort) {
+                        const words = e.target.value.trim().split(/\s+/);
+                        const abbr = words.map((w) => w[0]).join('').toUpperCase().slice(0, 5);
+                        setCreatePartyShort(abbr);
+                      }
+                    }}
+                    placeholder="e.g. Rashtriya Lok Dal"
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-medium"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-[var(--text-secondary)] block">
+                    पार्टी का नाम (हिंदी में) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={createPartyNameHi}
+                    onChange={(e) => {
+                      setCreatePartyNameHi(e.target.value);
+                      if (autoTranslateEnabled && !createPartyNameEn) {
+                        setCreatePartyNameEn(translateHiToEn(e.target.value));
+                      }
+                    }}
+                    placeholder="उदा. राष्ट्रीय लोक दल"
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-medium"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="font-bold text-[var(--text-secondary)] block">
+                    Short Abbreviation / Code *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={createPartyShort}
+                    onChange={(e) => setCreatePartyShort(e.target.value.toUpperCase())}
+                    placeholder="e.g. RLD"
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono font-bold"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="font-bold text-[var(--text-secondary)] block">
+                    Brand Color
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="color"
+                      value={createPartyColor}
+                      onChange={(e) => setCreatePartyColor(e.target.value)}
+                      className="w-9 h-9 rounded-xl border border-[var(--border-glass)] cursor-pointer p-0.5 bg-[var(--bg-primary)]"
+                    />
+                    <input
+                      type="text"
+                      value={createPartyColor}
+                      onChange={(e) => setCreatePartyColor(e.target.value)}
+                      className="flex-1 px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-mono"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Logo Upload / URL */}
+              <div className="space-y-2 p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)]">
+                <label className="font-bold text-[var(--text-secondary)] flex items-center gap-1.5 uppercase tracking-wider block">
+                  <Upload className="w-3.5 h-3.5 text-[var(--accent)]" />
+                  <span>Upload Party Logo / Symbol</span>
+                </label>
+
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <label className="py-2 px-3 rounded-xl bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)]/80 text-[var(--accent)] font-bold text-xs cursor-pointer flex items-center justify-center gap-2 border border-[var(--accent)]/30 transition-colors shrink-0">
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Upload Logo File</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePartyLogoFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+                  <input
+                    type="text"
+                    value={createPartyLogo.startsWith('data:') ? 'Image selected from device' : createPartyLogo}
+                    onChange={(e) => setCreatePartyLogo(e.target.value)}
+                    placeholder="or paste image URL (https://...)"
+                    className="flex-1 px-3 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] truncate"
+                  />
+                </div>
+
+                {/* Logo Preview */}
+                <div className="flex items-center gap-3 pt-1">
+                  <div className="w-12 h-12 rounded-xl bg-white border border-[var(--border-glass)] p-1 flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+                    {createPartyLogo ? (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src={createPartyLogo} alt="Party Logo Preview" className="w-full h-full object-contain" />
+                    ) : (
+                      <span className="font-bold text-xs text-[var(--accent)] font-mono">
+                        {createPartyShort.slice(0, 3) || 'LOGO'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-[11px] text-[var(--text-secondary)]">
+                    {createPartyLogo ? (
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                        ✓ Logo ready to save
+                      </span>
+                    ) : (
+                      <span>Optional. If not provided, an official monogram badge will be generated.</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[var(--border-glass)]">
+                <button
+                  type="button"
+                  onClick={() => setIsAddingPartyModal(false)}
+                  className="py-2.5 px-4 rounded-xl text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-surface)] cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingParty}
+                  className="py-2.5 px-6 rounded-xl bg-[var(--accent)] hover:opacity-90 text-white font-bold text-xs shadow-md transition-all cursor-pointer active:scale-95 disabled:opacity-50 flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{isSavingParty ? 'Saving...' : 'Save Party to Database'}</span>
                 </button>
               </div>
             </form>

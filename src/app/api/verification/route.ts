@@ -4,7 +4,17 @@ import { selfVerificationService } from '@/lib/verification';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { pollId, selfVerificationConfirmed, voterId, deviceFingerprint, mathChallenge } = body;
+    const {
+      pollId,
+      selfVerificationConfirmed,
+      voterId,
+      deviceFingerprint,
+      mathChallenge,
+      phoneNumber,
+      otpCode,
+      voterName,
+      stateCode,
+    } = body;
 
     if (!pollId) {
       return NextResponse.json(
@@ -60,13 +70,17 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-real-ip') ||
       '127.0.0.1';
 
-    // Process real Voter ID cryptographic verification and deduplication
+    // Process real Voter ID & Multi-Factor cryptographic verification and deduplication
     const result = await selfVerificationService.processSelfVerification(
       pollId,
       selfVerificationConfirmed,
       ip,
       voterId,
-      deviceFingerprint
+      deviceFingerprint,
+      phoneNumber,
+      otpCode,
+      voterName,
+      stateCode
     );
 
     if (!result.verified) {

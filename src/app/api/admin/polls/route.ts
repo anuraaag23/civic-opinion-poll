@@ -39,6 +39,8 @@ export async function POST(request: Request) {
       party_ids,
       custom_options,
       results_visibility,
+      voting_policy,
+      max_votes_per_citizen,
     } = body;
 
     if (!title_en || !title_hi) {
@@ -60,6 +62,8 @@ export async function POST(request: Request) {
       party_ids,
       custom_options,
       results_visibility,
+      voting_policy,
+      max_votes_per_citizen,
     });
 
     return NextResponse.json({
@@ -136,7 +140,19 @@ export async function PATCH(request: Request) {
     }
 
     // Default: update general poll details
-    const { title_en, title_hi, description_en, description_hi, status, end_at, start_at, results_visibility } = body;
+    const {
+      title_en,
+      title_hi,
+      description_en,
+      description_hi,
+      status,
+      end_at,
+      start_at,
+      results_visibility,
+      voting_policy,
+      max_votes_per_citizen,
+    } = body;
+
     const updated = await db.updatePoll(pollId, {
       title_en,
       title_hi,
@@ -146,6 +162,8 @@ export async function PATCH(request: Request) {
       end_at,
       start_at,
       results_visibility,
+      voting_policy,
+      max_votes_per_citizen,
     });
 
     if (!updated) {

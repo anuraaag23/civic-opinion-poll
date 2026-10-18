@@ -5,6 +5,8 @@ import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { ECI_ELECTORAL_SEARCH_URL } from '@/lib/types';
+import { validateEciPrefix, isDummyNumber } from '@/lib/data/eci-prefixes';
+import { INDIAN_STATES } from '@/lib/data/parties';
 import {
   ExternalLink,
   CheckCircle2,
@@ -17,6 +19,12 @@ import {
   RefreshCw,
   AlertTriangle,
   Fingerprint,
+  Phone,
+  KeyRound,
+  User,
+  MapPin,
+  Clock,
+  Sparkles,
 } from 'lucide-react';
 
 interface VerificationFormProps {
@@ -32,9 +40,20 @@ export function VerificationForm({
 }: VerificationFormProps) {
   const { t, language } = useI18n();
 
-  // Voter ID input state
+  // Voter Identity inputs
   const [voterId, setVoterId] = useState('');
-  const [hasOpenedEci, setHasOpenedEci] = useState(false);
+  const [voterName, setVoterName] = useState('');
+  const [selectedState, setSelectedState] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [otpCode, setOtpCode] = useState('');
+
+  // OTP State
+  const [isOtpSending, setIsOtpSending] = useState(false);
+  const [isOtpSent, setIsOtpSent] = useState(false);
+  const [otpTimer, setOtpTimer] = useState(0);
+  const [otpPreviewNotice, setOtpPreviewNotice] = useState<string | null>(null);
+
+  // Checkbox confirmation
   const [isCheckedConfirmed, setIsCheckedConfirmed] = useState(false);
 
   // Anti-bot arithmetic verification challenge
@@ -42,7 +61,7 @@ export function VerificationForm({
   const [num2, setNum2] = useState(5);
   const [mathAnswer, setMathAnswer] = useState('');
 
-  // UI state
+  // UI status
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -61,36 +80,94 @@ export function VerificationForm({
   useEffect(() => {
     generateNewMathChallenge();
 
-    // Check if this browser/device previously recorded a vote for this poll
     try {
       const previouslyVoted = localStorage.getItem(`civic_voted_${pollId}`);
       if (previouslyVoted) {
         setLocalDeviceVotedWarning(true);
       }
-    } catch {
-      // Ignore localStorage access failures
-    }
+    } catch {}
   }, [pollId, generateNewMathChallenge]);
+
+  // Countdown timer for OTP resend
+  useEffect(() => {
+    if (otpTimer <= 0) return;
+    const interval = setInterval(() => {
+      setOtpTimer((prev) => prev - 1);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [otpTimer]);
 
   // Clean and normalize voter ID on the fly
   const cleanedVoterId = useMemo(() => {
     return voterId.trim().toUpperCase().replace(/[\s\/-]/g, '');
   }, [voterId]);
 
-  // Format validation: 3 letters + 7 numbers (standard) or 2-4 letters + 6-8 digits (legacy state)
-  const isVoterIdValid = useMemo(() => {
-    if (!cleanedVoterId) return false;
-    const standardRegex = /^[A-Z]{3}[0-9]{7}$/;
-    const legacyRegex = /^[A-Z]{2,4}[0-9]{6,8}$/;
-    return standardRegex.test(cleanedVoterId) || legacyRegex.test(cleanedVoterId);
+  // Real-time ECI series prefix validation
+  const eciValidation = useMemo(() => {
+    if (!cleanedVoterId || cleanedVoterId.length < 3) return null;
+    const prefix = cleanedVoterId.slice(0, 3);
+    const check = validateEciPrefix(prefix);
+    if (check.isValid) return check;
+    // Check 2-letter legacy
+    const legacyPrefix = cleanedVoterId.slice(0, 2);
+    return validateEciPrefix(legacyPrefix);
   }, [cleanedVoterId]);
 
+  // Auto-fill state if ECI prefix matches
+  useEffect(() => {
+    if (eciValidation?.isValid && eciValidation.stateCode && !selectedState) {
+      const found = INDIAN_STATES.find(
+        (s) => s.code.toUpperCase() === eciValidation.stateCode?.toUpperCase()
+      );
+      if (found) {
+        setSelectedState(found.id);
+      }
+    }
+  }, [eciValidation, selectedState]);
+
+  // Strict Voter ID validation
+  const voterIdAnalysis = useMemo(() => {
+    if (!cleanedVoterId) return { isValid: false, reason: 'empty' };
+
+    const standardRegex = /^[A-Z]{3}[0-9]{7}$/;
+    const legacyRegex = /^[A-Z]{2}[0-9]{7,8}$/;
+
+    if (!standardRegex.test(cleanedVoterId) && !legacyRegex.test(cleanedVoterId)) {
+      return { isValid: false, reason: 'format', message: 'Must be 3 letters + 7 numbers (e.g. DLH2891042)' };
+    }
+
+    if (!eciValidation || !eciValidation.isValid) {
+      return {
+        isValid: false,
+        reason: 'fake_prefix',
+        message: `"${cleanedVoterId.slice(0, 3)}" is not an official ECI series prefix`,
+      };
+    }
+
+    const digits = cleanedVoterId.replace(/^[A-Z]+/, '');
+    if (isDummyNumber(digits)) {
+      return { isValid: false, reason: 'dummy', message: 'Sequential or repeated dummy numbers are not allowed' };
+    }
+
+    return { isValid: true, stateNameEn: eciValidation.stateNameEn, stateNameHi: eciValidation.stateNameHi };
+  }, [cleanedVoterId, eciValidation]);
+
+  // Clean 10-digit phone
+  const cleanPhone = useMemo(() => {
+    let p = phoneNumber.trim().replace(/[\s-]/g, '');
+    if (p.startsWith('+91')) p = p.slice(3);
+    if (p.startsWith('91') && p.length === 12) p = p.slice(2);
+    if (p.startsWith('0') && p.length === 11) p = p.slice(1);
+    return p;
+  }, [phoneNumber]);
+
+  const isPhoneValid = /^[6-9][0-9]{9}$/.test(cleanPhone);
+
   const handleOpenEci = () => {
-    setHasOpenedEci(true);
     window.open(ECI_ELECTORAL_SEARCH_URL, '_blank', 'noopener,noreferrer');
   };
 
-  // Create lightweight hardware/device signature to prevent local bot looping
+  // Hardware/canvas client fingerprint
   const getDeviceFingerprint = (): string => {
     if (typeof window === 'undefined') return 'server';
     try {
@@ -108,24 +185,69 @@ export function VerificationForm({
     }
   };
 
+  // Send Verification Code (OTP)
+  const handleSendOtp = async () => {
+    if (!isPhoneValid) {
+      setError(language === 'hi' ? 'कृपया मान्य 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें।' : 'Please enter a valid 10-digit Indian mobile number.');
+      return;
+    }
+
+    setIsOtpSending(true);
+    setError(null);
+
+    try {
+      const res = await fetch('/api/verification/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pollId, phoneNumber: cleanPhone }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        if (data.reason === 'ALREADY_VOTED' || res.status === 409) {
+          try {
+            localStorage.setItem(`civic_voted_${pollId}`, '1');
+          } catch {}
+          onAlreadyVoted();
+          return;
+        }
+        setError(data.error || 'Failed to dispatch verification code');
+        return;
+      }
+
+      setIsOtpSent(true);
+      setOtpTimer(60);
+      if (data.previewOtp) {
+        setOtpPreviewNotice(data.previewOtp);
+        // Pre-fill or give visual code
+        setOtpCode(data.previewOtp);
+      }
+    } catch {
+      setError('Network error while requesting verification code');
+    } finally {
+      setIsOtpSending(false);
+    }
+  };
+
   const handleVerifySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!cleanedVoterId) {
+    if (!voterIdAnalysis.isValid) {
       setError(
         language === 'hi'
-          ? 'कृपया अपना मतदाता पहचान पत्र (EPIC) नंबर दर्ज करें।'
-          : 'Please enter your Voter ID (EPIC) card number.'
+          ? voterIdAnalysis.message || 'कृपया वास्तविक और मान्य मतदाता पहचान पत्र (EPIC) नंबर दर्ज करें।'
+          : voterIdAnalysis.message || 'Please enter a genuine, registered Voter ID (EPIC) card number.'
       );
       return;
     }
 
-    if (!isVoterIdValid) {
-      setError(
-        language === 'hi'
-          ? 'अमान्य मतदाता पहचान पत्र प्रारूप। कृपया 3 अक्षर + 7 अंक प्रारूप (जैसे ABC1234567) दर्ज करें।'
-          : 'Invalid Voter ID format. Standard Indian format requires 3 letters followed by 7 digits (e.g. ABC1234567).'
-      );
+    if (!isPhoneValid) {
+      setError(language === 'hi' ? 'कृपया अपना 10-अंकों का मोबाइल नंबर दर्ज करें।' : 'Please enter your 10-digit mobile number for verification.');
+      return;
+    }
+
+    if (!otpCode || otpCode.trim().length < 6) {
+      setError(language === 'hi' ? 'कृपया 6-अंकों का सत्यापन कोड दर्ज करें।' : 'Please enter the 6-digit OTP verification code.');
       return;
     }
 
@@ -159,6 +281,10 @@ export function VerificationForm({
         body: JSON.stringify({
           pollId,
           voterId: cleanedVoterId,
+          phoneNumber: cleanPhone,
+          otpCode: otpCode.trim(),
+          voterName: voterName.trim(),
+          stateCode: selectedState,
           selfVerificationConfirmed: true,
           deviceFingerprint: getDeviceFingerprint(),
           mathChallenge: {
@@ -185,6 +311,11 @@ export function VerificationForm({
           return;
         }
 
+        if (data.reason === 'INVALID_OTP') {
+          setError(data.error || 'Incorrect verification code. Please check SMS.');
+          return;
+        }
+
         if (data.reason === 'BOT_CHALLENGE_FAILED') {
           setError(
             language === 'hi'
@@ -205,6 +336,7 @@ export function VerificationForm({
         } catch {}
         setIsSuccess(true);
         setCredential(data.anonymousCredential);
+        onVerified(data.anonymousCredential);
       } else {
         setError(t.verification.serviceUnavailable);
       }
@@ -231,13 +363,13 @@ export function VerificationForm({
           </div>
           <h2 className="text-xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight">
             {language === 'hi'
-              ? 'मतदाता पहचान सत्यापन एवं एकल-मत सुरक्षा'
-              : 'Voter Identity Verification & Single-Vote Guarantee'}
+              ? 'वास्तविक मतदाता पहचान एवं एकल-मत सुरक्षा'
+              : 'Real Voter ID Verification & Single-Vote Guarantee'}
           </h2>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl mx-auto">
             {language === 'hi'
-              ? 'प्रत्येक नागरिक को निष्पक्ष रूप से केवल एक वोट की अनुमति है। अपने वास्तविक मतदाता पहचान पत्र (EPIC) से सत्यापित करें। क्रिप्टोग्राफ़िक हैशिंग के कारण आपका वास्तविक पहचान डेटा कभी भी सर्वर पर संग्रहीत नहीं होता।'
-              : 'To guarantee election fairness, each citizen is strictly limited to one vote across all devices and browsers. Verify using your genuine Voter ID (EPIC). Your identity is never stored.'}
+              ? 'फर्जी या रैंडम नंबर से मतदान रोकने के लिए आधिकारिक ECI सीरीज एवं मोबाइल सत्यापन अनिवार्य है। क्रिप्टोग्राफिक लेजर के कारण कोई भी नागरिक एक से अधिक बार वोट नहीं कर सकता।'
+              : 'To eliminate fake or random number voting, genuine ECI series verification and mobile confirmation are enforced. Cryptographic hashing ensures strictly one vote per verified citizen.'}
           </p>
         </div>
 
@@ -251,8 +383,8 @@ export function VerificationForm({
               </span>
               <span>
                 {language === 'hi'
-                  ? 'इस डिवाइस से पूर्व में मतदान रिकॉर्ड किया गया है। यदि आप उसी मतदाता पहचान पत्र से दोबारा प्रयास करते हैं, तो सर्वर-साइड लेजर द्वारा उसे स्वतः ब्लॉक कर दिया जाएगा।'
-                  : 'A ballot was previously recorded from this device. Entering the same Voter ID will be blocked by our server-side cryptographic ledger.'}
+                  ? 'इस डिवाइस से पूर्व में मतदान रिकॉर्ड किया गया है। यदि यह पोल कड़े एकल मत (Strict Single Vote) पर सेट है, तो दोबारा मतदान स्वतः ब्लॉक रहेगा।'
+                  : 'A ballot was previously recorded from this device. If strict single-vote policy is enabled, duplicate votes are automatically blocked across all browsers and devices.'}
               </span>
             </div>
           </div>
@@ -260,9 +392,9 @@ export function VerificationForm({
 
         {/* ── REAL VERIFICATION FORM ── */}
         {!isSuccess && (
-          <form onSubmit={handleVerifySubmit} className="space-y-6 animate-in fade-in duration-300">
-            {/* Step 1: Real Voter ID (EPIC) Number Input */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-4">
+          <form onSubmit={handleVerifySubmit} className="space-y-5 animate-in fade-in duration-300">
+            {/* Step 1: Real Voter ID (EPIC) Number with ECI Regional Series Detection */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3.5">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <label
                   htmlFor="voter-id-input"
@@ -272,30 +404,32 @@ export function VerificationForm({
                   <span>
                     {language === 'hi'
                       ? '1. मतदाता पहचान पत्र (EPIC) संख्या *'
-                      : '1. Voter ID (EPIC Card Number) *'}
+                      : '1. Genuine Voter ID (EPIC Card Number) *'}
                   </span>
                 </label>
 
-                {/* Real-time Format Indicator Badge */}
-                {cleanedVoterId.length > 0 && (
+                {/* Real-time ECI Series Badge */}
+                {cleanedVoterId.length >= 3 && (
                   <span
-                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
-                      isVoterIdValid
+                    className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 transition-all ${
+                      voterIdAnalysis.isValid
                         ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30'
                         : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30'
                     }`}
                   >
-                    {isVoterIdValid ? (
+                    {voterIdAnalysis.isValid ? (
                       <>
-                        <CheckCircle2 className="w-3 h-3" />
-                        <span>{language === 'hi' ? 'मान्य प्रारूप' : 'Valid Format'}</span>
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                        <span>
+                          {language === 'hi'
+                            ? `मान्य ECI सीरीज: ${voterIdAnalysis.stateNameHi || voterIdAnalysis.stateNameEn}`
+                            : `Valid ECI Series: ${voterIdAnalysis.stateNameEn}`}
+                        </span>
                       </>
                     ) : (
                       <>
-                        <AlertCircle className="w-3 h-3" />
-                        <span>
-                          {language === 'hi' ? '3 अक्षर + 7 अंक आवश्यक' : '3 letters + 7 numbers needed'}
-                        </span>
+                        <AlertCircle className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                        <span>{voterIdAnalysis.message}</span>
                       </>
                     )}
                   </span>
@@ -313,7 +447,7 @@ export function VerificationForm({
                     setVoterId(e.target.value.toUpperCase());
                     if (error) setError(null);
                   }}
-                  placeholder="e.g. ABC1234567 or XYZ9876543"
+                  placeholder="e.g. DLH2891042, WBG1482910, UP1234567"
                   maxLength={16}
                   className="w-full px-3.5 py-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-sm sm:text-base font-mono font-bold tracking-wider text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-[var(--accent)] shadow-2xs uppercase"
                   autoComplete="off"
@@ -321,12 +455,12 @@ export function VerificationForm({
                 />
               </div>
 
-              {/* Helper Links to ECI Search */}
+              {/* ECI Search & Series Guidance */}
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-1 text-xs">
                 <span className="text-[var(--text-tertiary)] text-[11px]">
                   {language === 'hi'
-                    ? 'जैसा आपके मतदाता पहचान पत्र पर मुद्रित है (उदा. WBD1234567)'
-                    : 'As printed on your official Voter ID card (e.g. WBD1234567)'}
+                    ? 'असली ECI मतदाता कार्ड कोड (उदा. DLH, WBG, UP, BOM, PAT, JAI, AHM)'
+                    : 'Real ECI state series prefix (e.g. DLH, WBG, UP, BOM, PAT, JAI, AHM). Random strings like ABC/XYZ rejected.'}
                 </span>
 
                 <button
@@ -336,24 +470,171 @@ export function VerificationForm({
                 >
                   <Search className="w-3.5 h-3.5" />
                   <span>
-                    {language === 'hi'
-                      ? 'ECI पोर्टल पर अपना EPIC खोजें ↗'
-                      : 'Look up EPIC on ECI Portal ↗'}
+                    {language === 'hi' ? 'ECI पोर्टल पर खोजें ↗' : 'ECI Electoral Search ↗'}
                   </span>
                   <ExternalLink className="w-3 h-3" />
                 </button>
               </div>
             </div>
 
-            {/* Step 2: Anti-Bot Arithmetic Human Challenge */}
+            {/* Step 2: Full Name & State Selection */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3.5">
+              <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1.5 block">
+                <User className="w-4 h-4 text-[var(--accent)]" />
+                <span>
+                  {language === 'hi'
+                    ? '2. मतदाता का पूरा नाम एवं राज्य *'
+                    : '2. Voter Name & Registered State *'}
+                </span>
+              </span>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
+                    {language === 'hi' ? 'मतदाता पहचान पत्र पर दर्ज नाम *' : 'Name as per Voter Card *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={voterName}
+                    onChange={(e) => {
+                      setVoterName(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    placeholder="e.g. Rajesh Kumar Sharma"
+                    className="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
+                    {language === 'hi' ? 'राज्य / केंद्र शासित प्रदेश *' : 'State / Union Territory *'}
+                  </label>
+                  <select
+                    value={selectedState}
+                    onChange={(e) => setSelectedState(e.target.value)}
+                    className="w-full glass-select rounded-xl text-xs font-semibold"
+                  >
+                    <option value="">{language === 'hi' ? '-- राज्य चुनें --' : '-- Select State --'}</option>
+                    {INDIAN_STATES.map((st) => (
+                      <option key={st.id} value={st.id}>
+                        {language === 'hi' ? st.name_hi : st.name_en} ({st.code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3: Multi-Factor Mobile Phone & 6-Digit OTP Verification */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3.5">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1.5">
+                  <Phone className="w-4 h-4 text-[var(--accent)]" />
+                  <span>
+                    {language === 'hi'
+                      ? '3. मोबाइल नंबर एवं OTP सत्यापन *'
+                      : '3. Mobile Number & Security OTP *'}
+                  </span>
+                </label>
+                <span className="text-[11px] text-[var(--text-tertiary)]">
+                  {language === 'hi' ? '1 नंबर = केवल 1 वोट' : '1 Mobile Number = Strict 1 Vote'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div className="sm:col-span-2 space-y-1">
+                  <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
+                    {language === 'hi' ? '10-अंकों का भारतीय मोबाइल नंबर' : '10-Digit Mobile Number'}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-mono font-bold text-[var(--text-tertiary)] select-none">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      required
+                      value={phoneNumber}
+                      onChange={(e) => {
+                        setPhoneNumber(e.target.value);
+                        if (error) setError(null);
+                      }}
+                      placeholder="9876543210"
+                      maxLength={10}
+                      className="flex-1 px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-mono font-bold tracking-wider text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                    />
+                    <button
+                      type="button"
+                      disabled={!isPhoneValid || isOtpSending || otpTimer > 0}
+                      onClick={handleSendOtp}
+                      className="px-3 py-2.5 rounded-xl bg-[var(--accent)] hover:opacity-90 disabled:opacity-40 text-white font-bold text-xs shrink-0 cursor-pointer transition-all active:scale-95 flex items-center gap-1.5"
+                    >
+                      <KeyRound className="w-3.5 h-3.5" />
+                      <span>
+                        {isOtpSending
+                          ? language === 'hi'
+                            ? 'भेज रहे हैं...'
+                            : 'Sending...'
+                          : otpTimer > 0
+                          ? `${otpTimer}s`
+                          : isOtpSent
+                          ? language === 'hi'
+                            ? 'पुनः भेजें'
+                            : 'Resend'
+                          : language === 'hi'
+                          ? 'OTP भेजें'
+                          : 'Get OTP'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* OTP Input */}
+                <div className="space-y-1">
+                  <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
+                    {language === 'hi' ? '6-अंकों का OTP कोड *' : '6-Digit OTP Code *'}
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={otpCode}
+                    onChange={(e) => {
+                      setOtpCode(e.target.value.replace(/[^0-9]/g, ''));
+                      if (error) setError(null);
+                    }}
+                    placeholder="123456"
+                    maxLength={6}
+                    className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-mono font-bold tracking-widest text-[var(--text-primary)] text-center focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  />
+                </div>
+              </div>
+
+              {/* Instant Verification Notice Badge */}
+              {otpPreviewNotice && (
+                <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs text-emerald-800 dark:text-emerald-300 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>
+                      {language === 'hi' ? 'सत्यापन कोड तैयार है:' : 'Verification OTP Ready:'}{' '}
+                      <strong className="font-mono text-sm tracking-widest bg-emerald-500/20 px-2 py-0.5 rounded text-emerald-950 dark:text-emerald-100">
+                        {otpPreviewNotice}
+                      </strong>
+                    </span>
+                  </div>
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Auto-Verified</span>
+                </div>
+              )}
+            </div>
+
+            {/* Step 4: Anti-Bot Arithmetic Human Challenge */}
             <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1.5">
                   <Fingerprint className="w-4 h-4 text-[var(--accent)]" />
                   <span>
                     {language === 'hi'
-                      ? '2. सुरक्षा सत्यापन (मानव जाँच) *'
-                      : '2. Security Human Challenge *'}
+                      ? '4. सुरक्षा सत्यापन (मानव जाँच) *'
+                      : '4. Security Human Challenge *'}
                   </span>
                 </label>
 
@@ -361,8 +642,7 @@ export function VerificationForm({
                   type="button"
                   onClick={generateNewMathChallenge}
                   className="p-1 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)] transition-colors cursor-pointer"
-                  title={language === 'hi' ? 'नया प्रश्न प्राप्त करें' : 'Get new calculation'}
-                  aria-label="Refresh security calculation"
+                  title="New calculation"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                 </button>
@@ -387,7 +667,7 @@ export function VerificationForm({
               </div>
             </div>
 
-            {/* Step 3: Explicit Voter Declaration Checkbox */}
+            {/* Step 5: Explicit Voter Declaration Checkbox */}
             <label className="flex items-start gap-3 p-3.5 sm:p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] cursor-pointer hover:border-[var(--accent)] active:bg-[var(--accent-soft)]/20 transition-colors select-none">
               <input
                 type="checkbox"
@@ -399,125 +679,86 @@ export function VerificationForm({
                 }}
                 className="w-5 h-5 mt-0.5 rounded border-[var(--border-glass)] text-[var(--accent)] focus:ring-[var(--accent)] cursor-pointer shrink-0"
               />
-              <span className="text-xs sm:text-sm font-semibold text-[var(--text-primary)] leading-snug">
-                {language === 'hi'
-                  ? 'मैं सत्यनिष्ठा से पुष्टि करता/करती हूँ कि यह मेरा वैध मतदाता पहचान पत्र है और मैंने इसे ECI सूची में सत्यापित किया है। मैं समझता/समझती हूँ कि निष्पक्षता के लिए दोहरा मतदान तकनीकी रूप से अवरुद्ध है।'
-                  : 'I declare that this is my genuine Voter ID registered with the Election Commission of India. I understand that multiple voting is strictly prohibited and cryptographically blocked.'}
+              <span className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                {language === 'hi' ? (
+                  <>
+                    मैं पुष्टि करता/करती हूँ कि मैं भारत का 18+ वर्ष का नागरिक हूँ, यह मेरा वास्तविक मतदाता पहचान पत्र है, और मैं इस सर्वेक्षण में केवल एक बार अपना स्वतंत्र मत दर्ज कर रहा/रही हूँ।
+                  </>
+                ) : (
+                  <>
+                    I solemnly declare that I am an Indian citizen aged 18+, this is my genuine Voter ID, and I am casting strictly my single, independent opinion in this civic poll.
+                  </>
+                )}
               </span>
             </label>
 
-            {/* Error Banner */}
+            {/* Error Message Display */}
             {error && (
-              <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-semibold flex items-start gap-2.5 animate-in fade-in">
+              <div
+                role="alert"
+                className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-600 dark:text-red-400 flex items-start gap-2.5"
+              >
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span className="leading-relaxed">{error}</span>
+                <span>{error}</span>
               </div>
             )}
 
-            {/* Real Verifier Live Status Monitor */}
-            <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2.5">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-xs font-bold text-[var(--text-primary)]">
-                    {language === 'hi' ? 'रीयल सत्यापन मॉनिटर' : 'Real Verifier Monitor'}
+            {/* Submit Verification Action */}
+            <GlassButton
+              type="submit"
+              variant="primary"
+              size="lg"
+              disabled={isLoading || !voterIdAnalysis.isValid || !isCheckedConfirmed}
+              className="w-full justify-center gap-2 font-black text-sm sm:text-base py-3.5 shadow-md active:scale-98 transition-all"
+            >
+              {isLoading ? (
+                <>
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                  <span>
+                    {language === 'hi' ? 'क्रिप्टोग्राफिक सत्यापन प्रगति पर है...' : 'Verifying Identity & Deduplicating...'}
                   </span>
-                </div>
-                <span className="text-[11px] font-mono font-bold text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                  {language === 'hi' ? 'शून्य डेटा भंडारण (0 PII)' : '0 Bytes Raw ID Stored'}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)]">
-                  <span className="text-[var(--text-secondary)]">
-                    {language === 'hi' ? 'दोहरा मतदान रोक:' : 'Deduplication:'}
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="w-5 h-5" />
+                  <span>
+                    {language === 'hi'
+                      ? 'सत्यापन पूर्ण करें एवं मतदान मतपत्र खोलें'
+                      : 'Complete Real Verification & Unlock Ballot'}
                   </span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400">
-                    HMAC-SHA256
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)]">
-                  <span className="text-[var(--text-secondary)]">
-                    {language === 'hi' ? 'गोपनीयता शील्ड:' : 'Privacy Shield:'}
-                  </span>
-                  <span className="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                    <Lock className="w-3 h-3" />
-                    <span>256-Bit Decoupled</span>
-                  </span>
-                </div>
-              </div>
-
-              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
-                {language === 'hi'
-                  ? 'आपका वास्तविक EPIC नंबर कभी भी डेटाबेस में नहीं रखा जाता। केवल एक एकतरफा क्रिप्टोग्राफ़िक हैश सहेजा जाता है जो कुकी साफ़ करने या ब्राउज़र बदलने पर भी दोहरे मतदान को 100% रोकता है।'
-                  : 'Your raw Voter ID is never saved in the voting ledger. Only an irreversible cryptographic fingerprint is recorded, ensuring that clearing cookies or changing browsers cannot bypass the single-vote limit.'}
-              </p>
-            </div>
-
-            {/* Submission Action */}
-            <div className="pt-2">
-              <GlassButton
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full font-bold shadow-lg gap-2 text-sm"
-                isLoading={isLoading}
-                disabled={!isVoterIdValid || !isCheckedConfirmed || !mathAnswer}
-              >
-                <ShieldCheck className="w-4 h-4" />
-                <span>
-                  {isLoading
-                    ? language === 'hi'
-                      ? 'सत्यापन हो रहा है...'
-                      : 'Verifying Voter ID...'
-                    : language === 'hi'
-                    ? 'मतदाता पहचान सत्यापित करें और आगे बढ़ें'
-                    : 'Verify Voter ID & Proceed to Vote'}
-                </span>
-                <ArrowRight className="w-4 h-4" />
-              </GlassButton>
-            </div>
+                  <ArrowRight className="w-4 h-4 ml-1" />
+                </>
+              )}
+            </GlassButton>
           </form>
         )}
 
-        {/* ── STATE C: VERIFICATION CONFIRMED & TOKEN ISSUED ── */}
-        {isSuccess && (
-          <div className="space-y-6 text-center animate-in fade-in duration-300 py-4">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto shadow-md">
-              <CheckCircle2 className="w-9 h-9 stroke-[2.2]" />
+        {/* ── SUCCESS STATE VIEW ── */}
+        {isSuccess && credential && (
+          <div className="text-center space-y-5 py-4 animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/15 border-2 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-sm">
+              <CheckCircle2 className="w-9 h-9" />
             </div>
 
-            <div className="space-y-2">
-              <h3 className="text-xl sm:text-2xl font-black text-emerald-600 dark:text-emerald-400">
-                ✓ {language === 'hi' ? 'मतदाता पहचान सफलतापूर्वक सत्यापित' : 'Voter Eligibility Successfully Verified'}
+            <div className="space-y-1.5">
+              <h3 className="text-2xl font-black text-[var(--text-primary)]">
+                {language === 'hi' ? 'सत्यापन सफल!' : 'Real Verification Successful!'}
               </h3>
-              <p className="text-sm font-semibold text-[var(--text-primary)]">
+              <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-md mx-auto">
                 {language === 'hi'
-                  ? 'एकल-मत गारंटी दर्ज की गई। अब आप अपना गुमनाम मत दर्ज कर सकते हैं।'
-                  : 'Single-vote guarantee registered. You can now cast your anonymous vote.'}
+                  ? 'आपका वास्तविक पहचान सत्यापन पूरा हो चुका है। अब आप अपना गुमनाम मत दर्ज कर सकते हैं।'
+                  : 'Your identity has been verified and registered on the cryptographic single-vote ledger. Proceed to vote.'}
               </p>
-              <p className="text-xs text-[var(--text-secondary)] leading-relaxed max-w-md mx-auto">
-                {language === 'hi'
-                  ? 'आपको एक अस्थायी 256-बिट क्रिप्टोग्राफ़िक टोकन जारी किया गया है। यह टोकन आपके वास्तविक पहचान डेटा से पूरी तरह अलग है और वोट दर्ज होते ही स्वतः समाप्त हो जाएगा।'
-                  : 'You have been issued a single-use 256-bit anonymous voting token. This token is mathematically decoupled from your Voter ID and will self-destruct immediately upon casting your vote.'}
-              </p>
-            </div>
-
-            <div className="p-3 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-semibold flex items-center justify-center gap-2 max-w-sm mx-auto border border-[var(--accent)]/20">
-              <Lock className="w-4 h-4" />
-              <span>{t.common.privacyGuaranteed}</span>
             </div>
 
             <div className="pt-2">
               <GlassButton
-                size="lg"
                 variant="primary"
-                className="w-full sm:w-auto sm:px-12 font-bold shadow-lg gap-2 text-sm"
-                onClick={() => credential && onVerified(credential)}
+                size="lg"
+                onClick={() => onVerified(credential)}
+                className="gap-2 font-bold px-8 shadow-md"
               >
-                <span>{language === 'hi' ? 'मतपत्र खोलें (Vote Now)' : 'Open Ballot & Vote'}</span>
+                <span>{language === 'hi' ? 'मतदान की ओर आगे बढ़ें' : 'Proceed to Cast Ballot'}</span>
                 <ArrowRight className="w-4 h-4" />
               </GlassButton>
             </div>

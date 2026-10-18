@@ -1,6 +1,6 @@
 import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings } from '../types';
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
-import { OFFICIAL_PARTIES } from '../data/parties';
+import { OFFICIAL_PARTIES, ALL_PARTIES } from '../data/parties';
 import { supabaseAdmin } from '../supabase';
 
 import fs from 'fs';
@@ -98,7 +98,128 @@ export const civicStore = globalForStore.civicStore ?? new StorageStore();
 if (process.env.NODE_ENV !== 'production') globalForStore.civicStore = civicStore;
 
 export const db = {
+  async getAllParties(): Promise<Party[]> {
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        const { data, error } = await supabaseAdmin
+          .from('parties')
+          .select('*')
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
+
+        if (data && data.length > 0) {
+          return data as Party[];
+        }
+      } catch {}
+    }
+    return ALL_PARTIES;
+  },
+
+  async saveParty(party: Party): Promise<void> {
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('parties').upsert({
+          id: party.id,
+          name_en: party.name_en,
+          name_hi: party.name_hi,
+          short_name: party.short_name || party.name_en,
+          symbol_svg: party.symbol_svg || '',
+          symbol_alt_en: party.symbol_alt_en || '',
+          symbol_alt_hi: party.symbol_alt_hi || '',
+          description_en: party.description_en || '',
+          description_hi: party.description_hi || '',
+          source_ref: party.source_ref || 'Admin Custom Party',
+          is_active: party.is_active !== false,
+          display_order: party.display_order || 99,
+        });
+      } catch (err) {
+        console.error('Failed to save party to Supabase:', err);
+      }
+    }
+
+    // Also add to in-memory ALL_PARTIES and OFFICIAL_PARTIES if not already present
+    const idx = ALL_PARTIES.findIndex((p) => p.id === party.id);
+    if (idx >= 0) {
+      ALL_PARTIES[idx] = party;
+    } else {
+      ALL_PARTIES.push(party);
+    }
+    const offIdx = OFFICIAL_PARTIES.findIndex((p) => p.id === party.id);
+    if (offIdx >= 0) {
+      OFFICIAL_PARTIES[offIdx] = party;
+    } else {
+      OFFICIAL_PARTIES.push(party);
+    }
+  },
+
+  async deleteParty(partyId: string): Promise<boolean> {
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('parties').update({ is_active: false }).eq('id', partyId);
+      } catch {}
+    }
+    const p = ALL_PARTIES.find((item) => item.id === partyId);
+    if (p) p.is_active = false;
+    return true;
+  },
+
   async getPolls(): Promise<Poll[]> {
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        const { data, error } = await supabaseAdmin
+          .from('polls')
+          .select('*, poll_options!poll_options_poll_id_fkey(*, parties(*))')
+          .order('created_at', { ascending: false });
+
+        if (data && data.length > 0) {
+          data.forEach((row: any) => {
+            const mappedOptions: PollOption[] = (row.poll_options || []).map((po: any) => ({
+              id: po.id,
+              poll_id: row.id,
+              party_id: po.party_id,
+              party: po.parties || {
+                id: po.party_id,
+                name_en: 'Option',
+                name_hi: 'विकल्प',
+                symbol_svg: '',
+                symbol_alt_en: '',
+                symbol_alt_hi: '',
+                description_en: '',
+                description_hi: '',
+                source_ref: '',
+                is_active: true,
+                display_order: po.display_order || 0,
+              },
+              display_order: po.display_order || 0,
+              is_active: po.is_active !== false,
+            }));
+
+            const pollItem: Poll = {
+              id: row.id,
+              slug: row.slug,
+              title_en: row.title_en,
+              title_hi: row.title_hi,
+              description_en: row.description_en || '',
+              description_hi: row.description_hi || '',
+              status: row.status,
+              start_at: row.start_at,
+              end_at: row.end_at,
+              results_visibility: row.results_visibility,
+              voting_policy: row.voting_policy || civicStore.polls.get(row.id)?.voting_policy || 'STRICT_SINGLE_VOTE',
+              max_votes_per_citizen: row.max_votes_per_citizen || civicStore.polls.get(row.id)?.max_votes_per_citizen || 1,
+              total_votes: civicStore.polls.get(row.id)?.total_votes || 0,
+              options: mappedOptions.length > 0 ? mappedOptions : civicStore.polls.get(row.id)?.options || [],
+              created_at: row.created_at,
+              updated_at: row.updated_at,
+            };
+
+            civicStore.polls.set(row.id, pollItem);
+          });
+        }
+      } catch (err) {
+        console.error('Failed to sync polls from Supabase:', err);
+      }
+    }
     return Array.from(civicStore.polls.values());
   },
 
@@ -111,19 +232,34 @@ export const db = {
       const cmPoll = civicStore.polls.get('poll-state-cm-2029');
       if (cmPoll) return { ...cmPoll };
     }
-    const poll = Array.from(civicStore.polls.values()).find((p) => p.slug === slug);
+
+    // Try finding in cache
+    let poll = Array.from(civicStore.polls.values()).find((p) => p.slug === slug);
+    if (!poll) {
+      await this.getPolls();
+      poll = Array.from(civicStore.polls.values()).find((p) => p.slug === slug);
+    }
     return poll ? { ...poll } : null;
   },
 
   async getPollById(id: string): Promise<Poll | null> {
     if (id === 'pm') return this.getPollById('poll-national-2029');
     if (id === 'cm') return this.getPollById('poll-state-cm-2029');
-    const poll = civicStore.polls.get(id);
+
+    let poll = civicStore.polls.get(id);
+    if (!poll) {
+      await this.getPolls();
+      poll = civicStore.polls.get(id);
+    }
     return poll ? { ...poll } : null;
   },
 
   async getPollResults(pollId: string): Promise<PollResults | null> {
-    const poll = civicStore.polls.get(pollId);
+    let poll = civicStore.polls.get(pollId);
+    if (!poll) {
+      await this.getPolls();
+      poll = civicStore.polls.get(pollId);
+    }
     if (!poll) return null;
 
     const countsMap = civicStore.voteCounts.get(pollId) || new Map<string, number>();
@@ -161,44 +297,55 @@ export const db = {
     };
   },
 
+  /**
+   * Evaluates citizen participation based on poll voting policy:
+   * 1. 'STRICT_SINGLE_VOTE': Strictly one vote per citizen forever. Cannot vote again.
+   * 2. 'ALLOW_ONE_REVOTE': Citizen can vote up to 2 times (initial vote + 1 revision).
+   * 3. 'ALLOW_MULTIPLE_VOTES': Multiple submissions permitted.
+   */
   async hasParticipated(pollId: string, anonymousParticipationId: string): Promise<boolean> {
+    const poll = await this.getPollById(pollId);
+    const policy = poll?.voting_policy || 'STRICT_SINGLE_VOTE';
+    const maxVotes = poll?.max_votes_per_citizen ?? (policy === 'ALLOW_ONE_REVOTE' ? 2 : policy === 'ALLOW_MULTIPLE_VOTES' ? 999999 : 1);
+
+    if (policy === 'ALLOW_MULTIPLE_VOTES') {
+      return false; // Permitted to vote multiple times
+    }
+
     const key = `${pollId}:${anonymousParticipationId}`;
-    if (civicStore.participation.has(key)) return true;
+    const local = civicStore.participation.get(key);
+    let voteCount = local?.vote_count ?? (local ? 1 : 0);
 
     if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
       try {
         const { data } = await supabaseAdmin
           .from('participation')
-          .select('id')
+          .select('id, status')
           .eq('poll_id', pollId)
           .eq('anonymous_participation_id', anonymousParticipationId)
           .maybeSingle();
         if (data) {
-          civicStore.participation.set(key, {
-            id: data.id,
-            poll_id: pollId,
-            anonymous_participation_id: anonymousParticipationId,
-            self_verification_confirmed: true,
-            status: 'VOTED',
-            created_at: new Date().toISOString(),
-            voted_at: new Date().toISOString(),
-          });
-          return true;
+          voteCount = Math.max(voteCount, 1);
         }
       } catch {}
     }
-    return false;
+
+    return voteCount >= maxVotes;
   },
 
   async recordParticipation(pollId: string, anonymousParticipationId: string): Promise<void> {
     const key = `${pollId}:${anonymousParticipationId}`;
+    const existing = civicStore.participation.get(key);
+    const newCount = (existing?.vote_count ?? 0) + 1;
+
     civicStore.participation.set(key, {
-      id: `part-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      id: existing?.id || `part-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       poll_id: pollId,
       anonymous_participation_id: anonymousParticipationId,
       self_verification_confirmed: true,
       status: 'SELF_VERIFICATION_CONFIRMED',
-      created_at: new Date().toISOString(),
+      vote_count: newCount,
+      created_at: existing?.created_at || new Date().toISOString(),
       voted_at: null,
     });
     civicStore.saveLedger();
@@ -428,6 +575,8 @@ export const db = {
       symbol_svg?: string;
     }>;
     results_visibility?: Poll['results_visibility'];
+    voting_policy?: 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES';
+    max_votes_per_citizen?: number;
   }): Promise<Poll> {
     const id = `poll-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
     const now = new Date().toISOString();
@@ -436,7 +585,8 @@ export const db = {
 
     // 1. Add selected recognized official parties
     if (pollData.party_ids && pollData.party_ids.length > 0) {
-      const selectedParties = OFFICIAL_PARTIES.filter((p) => pollData.party_ids!.includes(p.id));
+      const allPartiesList = await this.getAllParties();
+      const selectedParties = allPartiesList.filter((p) => pollData.party_ids!.includes(p.id));
       selectedParties.forEach((party, index) => {
         options.push({
           id: `opt-${id}-${party.id}`,
@@ -451,7 +601,8 @@ export const db = {
 
     // 2. Add custom parties / candidates / choices with uploaded logos
     if (pollData.custom_options && pollData.custom_options.length > 0) {
-      pollData.custom_options.forEach((cust, index) => {
+      for (let index = 0; index < pollData.custom_options.length; index++) {
+        const cust = pollData.custom_options[index];
         const customPartyId = `custom-party-${Date.now()}-${index}`;
         const shortName = cust.short_name || cust.name_en.slice(0, 4).toUpperCase();
         const primaryColor = cust.color || '#1D4ED8';
@@ -474,6 +625,9 @@ export const db = {
           display_order: options.length + 1,
         };
 
+        // Persist custom party
+        await this.saveParty(customParty);
+
         options.push({
           id: `opt-${id}-${customPartyId}`,
           poll_id: id,
@@ -482,12 +636,13 @@ export const db = {
           display_order: options.length + 1,
           is_active: true,
         });
-      });
+      }
     }
 
     // Fallback if no party or custom option was provided
     if (options.length === 0) {
-      OFFICIAL_PARTIES.slice(0, 6).forEach((party, index) => {
+      const allPartiesList = await this.getAllParties();
+      allPartiesList.slice(0, 6).forEach((party, index) => {
         options.push({
           id: `opt-${id}-${party.id}`,
           poll_id: id,
@@ -498,6 +653,9 @@ export const db = {
         });
       });
     }
+
+    const votingPolicy = pollData.voting_policy || 'STRICT_SINGLE_VOTE';
+    const maxVotes = pollData.max_votes_per_citizen ?? (votingPolicy === 'ALLOW_ONE_REVOTE' ? 2 : votingPolicy === 'ALLOW_MULTIPLE_VOTES' ? 999999 : 1);
 
     const newPoll: Poll = {
       id,
@@ -510,6 +668,8 @@ export const db = {
       start_at: pollData.start_at || now,
       end_at: pollData.end_at || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       results_visibility: pollData.results_visibility || 'PUBLIC',
+      voting_policy: votingPolicy,
+      max_votes_per_citizen: maxVotes,
       total_votes: 0,
       options,
       created_at: now,
@@ -520,6 +680,42 @@ export const db = {
     const countsMap = new Map<string, number>();
     options.forEach((opt) => countsMap.set(opt.id, 0));
     civicStore.voteCounts.set(id, countsMap);
+
+    // Sync to Supabase
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('polls').upsert({
+          id: newPoll.id,
+          slug: newPoll.slug,
+          title_en: newPoll.title_en,
+          title_hi: newPoll.title_hi,
+          description_en: newPoll.description_en,
+          description_hi: newPoll.description_hi,
+          status: newPoll.status,
+          start_at: newPoll.start_at,
+          end_at: newPoll.end_at,
+          results_visibility: newPoll.results_visibility,
+        });
+
+        for (const opt of options) {
+          await supabaseAdmin.from('poll_options').upsert({
+            id: opt.id,
+            poll_id: id,
+            party_id: opt.party_id,
+            display_order: opt.display_order,
+            is_active: opt.is_active,
+          });
+
+          await supabaseAdmin.from('vote_counts').upsert({
+            poll_id: id,
+            option_id: opt.id,
+            vote_count: 0,
+          });
+        }
+      } catch (err) {
+        console.error('Failed to persist poll to Supabase:', err);
+      }
+    }
 
     await this.recordAuditEvent('admin_poll_create', id, { slug: newPoll.slug, custom_count: pollData.custom_options?.length || 0 });
     return newPoll;
@@ -537,7 +733,27 @@ export const db = {
     if (updates.end_at !== undefined) poll.end_at = updates.end_at;
     if (updates.start_at !== undefined) poll.start_at = updates.start_at;
     if (updates.results_visibility !== undefined) poll.results_visibility = updates.results_visibility;
+    if (updates.voting_policy !== undefined) poll.voting_policy = updates.voting_policy;
+    if (updates.max_votes_per_citizen !== undefined) poll.max_votes_per_citizen = updates.max_votes_per_citizen;
     poll.updated_at = new Date().toISOString();
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('polls').update({
+          title_en: poll.title_en,
+          title_hi: poll.title_hi,
+          description_en: poll.description_en,
+          description_hi: poll.description_hi,
+          status: poll.status,
+          end_at: poll.end_at,
+          start_at: poll.start_at,
+          results_visibility: poll.results_visibility,
+          updated_at: poll.updated_at,
+        }).eq('id', id);
+      } catch (err) {
+        console.error('Failed to update poll in Supabase:', err);
+      }
+    }
 
     await this.recordAuditEvent('admin_poll_update', id, { updates });
     return { ...poll };
@@ -547,6 +763,15 @@ export const db = {
     if (!civicStore.polls.has(id)) return false;
     civicStore.polls.delete(id);
     civicStore.voteCounts.delete(id);
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('polls').delete().eq('id', id);
+      } catch (err) {
+        console.error('Failed to delete poll from Supabase:', err);
+      }
+    }
+
     await this.recordAuditEvent('admin_poll_delete', id);
     return true;
   },
@@ -561,7 +786,8 @@ export const db = {
       civicStore.voteCounts.set(pollId, countsMap);
     }
 
-    countsMap.set(optionId, Math.max(0, Number(newCount) || 0));
+    const sanitizedCount = Math.max(0, Number(newCount) || 0);
+    countsMap.set(optionId, sanitizedCount);
 
     let sum = 0;
     countsMap.forEach((v) => {
@@ -569,6 +795,17 @@ export const db = {
     });
     poll.total_votes = sum;
     poll.updated_at = new Date().toISOString();
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('vote_counts').upsert({
+          poll_id: pollId,
+          option_id: optionId,
+          vote_count: sanitizedCount,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'poll_id,option_id' });
+      } catch {}
+    }
 
     await this.recordAuditEvent('admin_poll_update', pollId, { optionId, newCount });
     return true;
@@ -599,6 +836,13 @@ export const db = {
         civicStore.tokens.delete(key);
       }
     });
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('vote_counts').update({ vote_count: 0 }).eq('poll_id', pollId);
+        await supabaseAdmin.from('participation').delete().eq('poll_id', pollId);
+      } catch {}
+    }
 
     await this.recordAuditEvent('admin_votes_reset', pollId);
     return true;

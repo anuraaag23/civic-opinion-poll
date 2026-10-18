@@ -1,40 +1,123 @@
 import crypto from 'crypto';
+import { validateEciPrefix, isDummyNumber } from '../data/eci-prefixes';
+
+export interface EpicValidationResult {
+  isValid: boolean;
+  normalized: string;
+  error?: string;
+  stateCode?: string;
+  stateNameEn?: string;
+  stateNameHi?: string;
+}
 
 /**
  * Validates and normalizes an Indian EPIC (Electors Photo Identity Card) number.
- * Standard format: 3 uppercase letters followed by 7 numeric digits (e.g., ABC1234567).
- * Legacy state formats: 2-4 uppercase letters followed by 6-8 digits (e.g., UP1234567 or DLH1234567).
+ * Standard format: 3 uppercase letters followed by 7 numeric digits (e.g., DLH1234567, WBG1482910).
+ * Rejects non-ECI series prefixes (e.g., ABC, XYZ, AAA) and dummy/sequential numbers.
  */
-export function normalizeEpic(raw: string): { isValid: boolean; normalized: string; error?: string } {
+export function normalizeEpic(raw: string): EpicValidationResult {
   if (!raw || typeof raw !== 'string') {
     return { isValid: false, normalized: '', error: 'Voter ID (EPIC) number is required' };
   }
 
   // Trim whitespace and remove common separators like spaces or dashes
-  const cleaned = raw.trim().toUpperCase().replace(/[\s-]/g, '');
+  const cleaned = raw.trim().toUpperCase().replace(/[\s\/-]/g, '');
 
-  // Exact standard Indian EPIC regex: 3 uppercase letters + 7 digits (e.g. ABC1234567)
+  // Exact standard Indian EPIC regex: 3 uppercase letters + 7 digits (e.g. DLH1234567)
   const standardEpicRegex = /^[A-Z]{3}[0-9]{7}$/;
+  // Legacy state 2-letter format (e.g. UP1234567, BR1234567)
+  const legacyEpicRegex = /^[A-Z]{2}[0-9]{7,8}$/;
 
-  if (!standardEpicRegex.test(cleaned)) {
+  if (!standardEpicRegex.test(cleaned) && !legacyEpicRegex.test(cleaned)) {
     return {
       isValid: false,
       normalized: cleaned,
-      error: 'Invalid Voter ID format. Must be standard format like ABC1234567 (3 letters followed by 7 digits).',
+      error: 'Invalid Voter ID format. Must be standard format like DLH2891042 (3 letters followed by 7 digits).',
     };
   }
 
-  // Prevent obvious dummy repetitive sequences
-  const digits = cleaned.slice(3);
-  if (/^(\d)\1+$/.test(digits)) {
+  // Extract prefix
+  const prefix = cleaned.slice(0, 3);
+  const prefixCheck = validateEciPrefix(prefix);
+
+  // If 3-letter didn't match, check 2-letter legacy (e.g. UP, BR, RJ, GJ)
+  const legacyPrefix = cleaned.slice(0, 2);
+  const legacyCheck = !prefixCheck.isValid ? validateEciPrefix(legacyPrefix) : null;
+
+  const validCheck = prefixCheck.isValid ? prefixCheck : legacyCheck;
+
+  if (!validCheck || !validCheck.isValid) {
     return {
       isValid: false,
       normalized: cleaned,
-      error: 'Invalid Voter ID. Repetitive number sequences (e.g. 0000000) are not permitted.',
+      error: `Invalid Voter ID. "${prefix}" is not a recognized Election Commission of India (ECI) regional series. Please enter your genuine Voter ID card number.`,
+    };
+  }
+
+  // Check for dummy or sequential numbers
+  const digits = cleaned.replace(/^[A-Z]+/, '');
+  if (isDummyNumber(digits)) {
+    return {
+      isValid: false,
+      normalized: cleaned,
+      error: 'Invalid Voter ID. Sequential, all-identical, or repetitive numbers are strictly blocked to protect poll integrity.',
+    };
+  }
+
+  return {
+    isValid: true,
+    normalized: cleaned,
+    stateCode: validCheck.stateCode,
+    stateNameEn: validCheck.stateNameEn,
+    stateNameHi: validCheck.stateNameHi,
+  };
+}
+
+/**
+ * Validates and normalizes an Indian 10-digit mobile phone number.
+ */
+export function normalizePhone(raw: string): { isValid: boolean; normalized: string; error?: string } {
+  if (!raw || typeof raw !== 'string') {
+    return { isValid: false, normalized: '', error: 'Mobile number is required for verification' };
+  }
+
+  // Remove spaces, hyphens, and leading +91 / 0
+  let cleaned = raw.trim().replace(/[\s-]/g, '');
+  if (cleaned.startsWith('+91')) {
+    cleaned = cleaned.slice(3);
+  } else if (cleaned.startsWith('91') && cleaned.length === 12) {
+    cleaned = cleaned.slice(2);
+  } else if (cleaned.startsWith('0') && cleaned.length === 11) {
+    cleaned = cleaned.slice(1);
+  }
+
+  // Indian mobile numbers must be 10 digits starting with 6, 7, 8, or 9
+  if (!/^[6-9][0-9]{9}$/.test(cleaned)) {
+    return {
+      isValid: false,
+      normalized: cleaned,
+      error: 'Invalid mobile number. Please enter a valid 10-digit Indian mobile number (e.g., 9876543210).',
     };
   }
 
   return { isValid: true, normalized: cleaned };
+}
+
+/**
+ * Keyed HMAC-SHA256 generation for phone number duplicate-participation prevention.
+ */
+export function generatePhoneFingerprint(
+  normalizedPhone: string,
+  pollId: string,
+  customSecret?: string
+): string {
+  const secret =
+    customSecret ||
+    process.env.VOTING_HMAC_SECRET ||
+    'civic_voter_hmac_secret_meravote_2026_ledger!';
+
+  const message = `phone:${normalizedPhone}:${pollId}`;
+  return crypto.createHmac('sha256', secret).update(message).digest('hex');
 }
 
 /**

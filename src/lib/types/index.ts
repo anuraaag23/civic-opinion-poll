@@ -40,6 +40,8 @@ export interface Poll {
   start_at: string;
   end_at: string;
   results_visibility: 'PUBLIC' | 'ADMIN_ONLY' | 'AFTER_CLOSE';
+  voting_policy?: 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES';
+  max_votes_per_citizen?: number;
   total_votes: number;
   options: PollOption[];
   created_at: string;
@@ -54,6 +56,7 @@ export interface ParticipationRecord {
   anonymous_participation_id: string; // Token hash or anonymous participation id
   self_verification_confirmed: boolean;
   status: 'SELF_VERIFICATION_CONFIRMED' | 'VOTED';
+  vote_count?: number;
   created_at: string;
   voted_at?: string | null;
 }
@@ -107,6 +110,8 @@ export interface VerificationResult {
     | 'UNCONFIRMED'
     | 'INVALID_POLL'
     | 'INVALID_FORMAT'
+    | 'INVALID_PHONE'
+    | 'INVALID_OTP'
     | 'BOT_CHALLENGE_FAILED';
   anonymous_token?: string;
   expires_at?: string;
@@ -119,6 +124,7 @@ export interface AuditEvent {
     | 'self_verification_attempt'
     | 'self_verification_confirmed'
     | 'self_verification_failure'
+    | 'verification_otp_dispatched'
     | 'vote_submission_success'
     | 'vote_submission_failure'
     | 'duplicate_vote_blocked'

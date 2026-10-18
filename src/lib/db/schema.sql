@@ -32,6 +32,8 @@ CREATE TABLE IF NOT EXISTS polls (
     start_at TIMESTAMPTZ NOT NULL,
     end_at TIMESTAMPTZ NOT NULL,
     results_visibility VARCHAR(30) NOT NULL DEFAULT 'PUBLIC' CHECK (results_visibility IN ('PUBLIC', 'ADMIN_ONLY', 'AFTER_CLOSE')),
+    voting_policy VARCHAR(50) NOT NULL DEFAULT 'STRICT_SINGLE_VOTE' CHECK (voting_policy IN ('STRICT_SINGLE_VOTE', 'ALLOW_ONE_REVOTE', 'ALLOW_MULTIPLE_VOTES')),
+    max_votes_per_citizen INT NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -42,9 +44,11 @@ CREATE TABLE IF NOT EXISTS parties (
     name_en VARCHAR(255) NOT NULL,
     name_hi VARCHAR(255) NOT NULL,
     short_name VARCHAR(50) NOT NULL,
-    symbol_svg TEXT NOT NULL,
-    symbol_alt_en VARCHAR(255) NOT NULL,
-    symbol_alt_hi VARCHAR(255) NOT NULL,
+    symbol_svg TEXT NOT NULL DEFAULT '',
+    logo_url TEXT,
+    color VARCHAR(30),
+    symbol_alt_en VARCHAR(255) NOT NULL DEFAULT '',
+    symbol_alt_hi VARCHAR(255) NOT NULL DEFAULT '',
     description_en TEXT NOT NULL DEFAULT '',
     description_hi TEXT NOT NULL DEFAULT '',
     source_ref VARCHAR(255) NOT NULL DEFAULT 'Official Recognized Parties Directory',
@@ -73,6 +77,7 @@ CREATE TABLE IF NOT EXISTS participation (
     anonymous_participation_id VARCHAR(64) UNIQUE NOT NULL, -- SHA-256(token)
     self_verification_confirmed BOOLEAN NOT NULL DEFAULT true,
     status VARCHAR(40) NOT NULL DEFAULT 'SELF_VERIFICATION_CONFIRMED' CHECK (status IN ('SELF_VERIFICATION_CONFIRMED', 'VOTED')),
+    vote_count INT NOT NULL DEFAULT 1,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     voted_at TIMESTAMPTZ,
     UNIQUE(poll_id, anonymous_participation_id)
@@ -270,4 +275,14 @@ CREATE POLICY "Public Read Verified Supporters" ON supporters FOR SELECT USING (
 
 DROP POLICY IF EXISTS "Public Read Site Settings" ON site_settings;
 CREATE POLICY "Public Read Site Settings" ON site_settings FOR SELECT USING (true);
+
+-- ====================================================================
+-- SAFE UPGRADE PATCH FOR EXISTING PRODUCTION INSTANCES
+-- ====================================================================
+ALTER TABLE polls ADD COLUMN IF NOT EXISTS voting_policy VARCHAR(50) NOT NULL DEFAULT 'STRICT_SINGLE_VOTE';
+ALTER TABLE polls ADD COLUMN IF NOT EXISTS max_votes_per_citizen INT NOT NULL DEFAULT 1;
+ALTER TABLE participation ADD COLUMN IF NOT EXISTS vote_count INT NOT NULL DEFAULT 1;
+ALTER TABLE parties ADD COLUMN IF NOT EXISTS logo_url TEXT;
+ALTER TABLE parties ADD COLUMN IF NOT EXISTS color VARCHAR(30);
+
 
