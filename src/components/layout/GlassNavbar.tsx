@@ -8,7 +8,6 @@ import { useI18n } from '@/lib/i18n/context';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { SupportButton } from '@/components/support/SupportButton';
-import { MeraVoteLogo } from '@/components/common/MeraVoteLogo';
 import { BarChart3, HelpCircle, HeartHandshake, Globe, Building2, Vote, Mail } from 'lucide-react';
 
 export function GlassNavbar() {
@@ -58,12 +57,19 @@ export function GlassNavbar() {
             className="flex items-center gap-2.5 sm:gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl min-w-0"
             aria-label="Mera Vote Home"
           >
-            {/* Official Mera Vote Civic Logo */}
-            <div className="transition-transform duration-200 group-hover:scale-105 shrink-0">
-              <MeraVoteLogo size={40} className="w-9 h-9 sm:w-10 sm:h-10 drop-shadow-xs" />
+            {/* Authentic Mera Vote 3D Glass Logo */}
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/90 dark:bg-white/10 border border-[var(--border-glass)] p-1 flex items-center justify-center shadow-xs transition-transform duration-200 group-hover:scale-105 shrink-0">
+              <Image
+                src="/meravote-logo.png"
+                alt="Mera Vote Logo"
+                width={40}
+                height={40}
+                className="w-full h-full object-contain"
+                priority
+              />
             </div>
 
-            {/* Brand Title and Subtitle - Balanced, Centered & Clean */}
+            {/* Brand Title and Subtitle - Clean & Vertically Centered */}
             <div className="flex flex-col justify-center min-w-0">
               <span className="text-base sm:text-xl font-black tracking-tight text-[var(--text-primary)] leading-tight">
                 {language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}

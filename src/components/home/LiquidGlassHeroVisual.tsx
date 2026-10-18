@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { MeraVoteLogo } from '@/components/common/MeraVoteLogo';
 import { ShieldCheck, Lock, Vote, CheckCircle2 } from 'lucide-react';
 
 export function LiquidGlassHeroVisual() {
@@ -25,9 +24,16 @@ export function LiquidGlassHeroVisual() {
             boxShadow: '0 12px 30px -6px rgba(0, 0, 0, 0.08), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
           }}
         >
-          {/* Central Mera Vote Civic Logo */}
-          <div className="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mb-1.5 sm:mb-2.5 transform transition-transform duration-300 hover:scale-110 drop-shadow-md">
-            <MeraVoteLogo size={72} className="w-16 h-16 sm:w-20 sm:h-20" />
+          {/* Central 3D Liquid Glass Mera Vote Logo */}
+          <div className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-gradient-to-tr from-white/20 via-white/10 to-transparent border border-white/40 p-1.5 sm:p-2 flex items-center justify-center shadow-xl mb-1.5 sm:mb-2.5 transform transition-transform duration-300 hover:scale-110 overflow-hidden backdrop-blur-md">
+            <Image
+              src="/meravote-logo.png"
+              alt="Mera Vote Logo"
+              width={80}
+              height={80}
+              className="w-full h-full object-contain drop-shadow-md"
+              priority
+            />
           </div>
           <span className="text-xs sm:text-base font-black tracking-tight text-[var(--text-primary)]">
             Mera Vote

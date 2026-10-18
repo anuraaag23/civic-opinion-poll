@@ -7,7 +7,6 @@ import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { BUYMEACHAI_CONFIG, CHAI_TIERS } from '@/lib/buymeachai/config';
 import { SupportButton } from '@/components/support/SupportButton';
-import { MeraVoteLogo } from '@/components/common/MeraVoteLogo';
 import {
   MapPin,
   Shield,
@@ -37,10 +36,16 @@ export function AboutCreatorSection() {
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <Link
                 href="/"
-                className="w-10 h-10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform"
+                className="w-10 h-10 rounded-xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform"
                 aria-label="Mera Vote Home"
               >
-                <MeraVoteLogo size={40} className="w-10 h-10 drop-shadow-xs" />
+                <Image
+                  src="/meravote-logo.png"
+                  alt="Mera Vote Logo"
+                  width={36}
+                  height={36}
+                  className="w-full h-full object-contain"
+                />
               </Link>
 
               <div className="min-w-0 flex-1">

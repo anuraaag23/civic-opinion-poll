@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { SupportButton } from '@/components/support/SupportButton';
-import { MeraVoteLogo } from '@/components/common/MeraVoteLogo';
 import { ShieldCheck, Lock, CheckCircle2, Mail, MapPin, User, HeartHandshake } from 'lucide-react';
 
 export function Footer() {
@@ -23,8 +22,14 @@ export function Footer() {
                 className="inline-flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] rounded-xl active:scale-95 transition-transform touch-manipulation cursor-pointer py-1"
                 aria-label="Mera Vote Home"
               >
-                <div className="transition-transform duration-200 group-hover:scale-105 shrink-0">
-                  <MeraVoteLogo size={40} className="w-10 h-10 drop-shadow-xs" />
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-white/10 to-white/5 border border-white/30 p-1 flex items-center justify-center shadow-md overflow-hidden backdrop-blur-md shrink-0 group-hover:scale-105 transition-transform">
+                  <Image
+                    src="/meravote-logo.png"
+                    alt="Mera Vote Logo"
+                    width={36}
+                    height={36}
+                    className="w-full h-full object-contain"
+                  />
                 </div>
                 <span className="text-lg font-black tracking-tight text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
                   {language === 'hi' ? 'मेरा वोट (Mera Vote)' : 'Mera Vote'}
