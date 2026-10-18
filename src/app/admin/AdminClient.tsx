@@ -89,6 +89,7 @@ export function AdminClient() {
 
   // New Poll Creation State
   const [isCreatingPoll, setIsCreatingPoll] = useState(false);
+  const [autoTranslateEnabled, setAutoTranslateEnabled] = useState(true);
   const [newPollTitleEn, setNewPollTitleEn] = useState('');
   const [newPollTitleHi, setNewPollTitleHi] = useState('');
   const [newPollSlug, setNewPollSlug] = useState('');
@@ -372,8 +373,10 @@ export function AdminClient() {
   // Bidirectional auto-translation handlers
   const handleTitleEnChange = (val: string) => {
     setNewPollTitleEn(val);
-    const hi = translateEnToHi(val);
-    setNewPollTitleHi(hi);
+    if (autoTranslateEnabled) {
+      const hi = translateEnToHi(val);
+      setNewPollTitleHi(hi);
+    }
     const generatedSlug = val
       .toLowerCase()
       .trim()
@@ -386,31 +389,39 @@ export function AdminClient() {
 
   const handleTitleHiChange = (val: string) => {
     setNewPollTitleHi(val);
-    const en = translateHiToEn(val);
-    setNewPollTitleEn(en);
-    const generatedSlug = en
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-    if (!newPollSlug || newPollSlug.startsWith('poll-')) {
-      setNewPollSlug(generatedSlug);
+    if (autoTranslateEnabled) {
+      const en = translateHiToEn(val);
+      setNewPollTitleEn(en);
+      const generatedSlug = en
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+      if (!newPollSlug || newPollSlug.startsWith('poll-')) {
+        setNewPollSlug(generatedSlug);
+      }
     }
   };
 
   const handleDescEnChange = (val: string) => {
     setNewPollDescEn(val);
-    setNewPollDescHi(translateEnToHi(val));
+    if (autoTranslateEnabled) {
+      setNewPollDescHi(translateEnToHi(val));
+    }
   };
 
   const handleDescHiChange = (val: string) => {
     setNewPollDescHi(val);
-    setNewPollDescEn(translateHiToEn(val));
+    if (autoTranslateEnabled) {
+      setNewPollDescEn(translateHiToEn(val));
+    }
   };
 
   const handlePartyNameEnChange = (val: string) => {
     setNewPartyNameEn(val);
-    setNewPartyNameHi(translateEnToHi(val));
+    if (autoTranslateEnabled) {
+      setNewPartyNameHi(translateEnToHi(val));
+    }
     if (!newPartyShort) {
       const words = val.trim().split(/\s+/);
       const abbr = words.map((w) => w[0]).join('').toUpperCase().slice(0, 5);
@@ -420,7 +431,9 @@ export function AdminClient() {
 
   const handlePartyNameHiChange = (val: string) => {
     setNewPartyNameHi(val);
-    setNewPartyNameEn(translateHiToEn(val));
+    if (autoTranslateEnabled) {
+      setNewPartyNameEn(translateHiToEn(val));
+    }
   };
 
   const handleLogoFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1533,12 +1546,12 @@ export function AdminClient() {
                   <select
                     value={editingPoll.status}
                     onChange={(e) => setEditingPoll({ ...editingPoll, status: e.target.value as Poll['status'] })}
-                    className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                    className="w-full glass-select rounded-xl text-xs font-bold"
                   >
-                    <option value="LIVE">LIVE</option>
-                    <option value="PAUSED">PAUSED</option>
-                    <option value="CLOSED">CLOSED</option>
-                    <option value="DRAFT">DRAFT</option>
+                    <option value="LIVE">LIVE (सक्रिय)</option>
+                    <option value="PAUSED">PAUSED (स्थगित)</option>
+                    <option value="CLOSED">CLOSED (बंद)</option>
+                    <option value="DRAFT">DRAFT (प्रारूप)</option>
                   </select>
                 </div>
 
@@ -1554,11 +1567,11 @@ export function AdminClient() {
                         results_visibility: e.target.value as Poll['results_visibility'],
                       })
                     }
-                    className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                    className="w-full glass-select rounded-xl text-xs font-bold"
                   >
-                    <option value="PUBLIC">PUBLIC</option>
-                    <option value="ADMIN_ONLY">ADMIN_ONLY</option>
-                    <option value="AFTER_CLOSE">AFTER_CLOSE</option>
+                    <option value="PUBLIC">PUBLIC (सार्वजनिक)</option>
+                    <option value="ADMIN_ONLY">ADMIN_ONLY (केवल एडमिन)</option>
+                    <option value="AFTER_CLOSE">AFTER_CLOSE (समाप्ति के बाद)</option>
                   </select>
                 </div>
               </div>
@@ -1619,16 +1632,53 @@ export function AdminClient() {
             <form onSubmit={handleCreateNewPoll} className="space-y-4 text-xs">
               {/* SECTION: TITLES WITH REAL-TIME BIDIRECTIONAL AUTO-TRANSLATION */}
               <div className="p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-3">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-xs font-bold text-[var(--accent)] flex items-center gap-1.5 uppercase tracking-wider">
                     <Languages className="w-3.5 h-3.5" />
-                    <span>{language === 'hi' ? 'द्विभाषी शीर्षक (स्वतः अनुवाद)' : 'Poll Titles (Bidirectional Sync)'}</span>
+                    <span>{language === 'hi' ? 'द्विभाषी शीर्षक' : 'Poll Titles'}</span>
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] font-semibold flex items-center gap-1">
-                    <Sparkles className="w-2.5 h-2.5" />
-                    <span>Auto EN ⮂ HI</span>
-                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setAutoTranslateEnabled(!autoTranslateEnabled)}
+                    className={`text-[11px] px-3 py-1 rounded-full font-bold flex items-center gap-1.5 border transition-all cursor-pointer shadow-xs active:scale-95 ${
+                      autoTranslateEnabled
+                        ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/25'
+                        : 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/40 hover:bg-amber-500/25'
+                    }`}
+                    title={
+                      autoTranslateEnabled
+                        ? 'Click to turn OFF auto-translation and write custom independent text in both boxes'
+                        : 'Click to turn ON automatic English ⇄ Hindi translation'
+                    }
+                  >
+                    <span
+                      className={`w-2 h-2 rounded-full ${
+                        autoTranslateEnabled ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'
+                      }`}
+                    />
+                    <Sparkles className="w-3 h-3 shrink-0" />
+                    <span>
+                      {autoTranslateEnabled
+                        ? language === 'hi'
+                          ? 'Auto EN ⮂ HI: चालू (बंद करें)'
+                          : 'Auto EN ⮂ HI: ON (Click to Off)'
+                        : language === 'hi'
+                        ? 'मैन्युअल मोड: अनुवाद बंद (चालू करें)'
+                        : 'Manual Mode: Auto Sync OFF (Click to On)'}
+                    </span>
+                  </button>
                 </div>
+
+                {!autoTranslateEnabled && (
+                  <div className="px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300 flex items-center gap-2">
+                    <span className="font-bold shrink-0">✓ {language === 'hi' ? 'मैन्युअल मोड सक्रिय:' : 'Manual Mode Active:'}</span>
+                    <span>
+                      {language === 'hi'
+                        ? 'अंग्रेजी और हिंदी बॉक्स पूरी तरह स्वतंत्र हैं। आप दोनों में अपनी पसंद का कोई भी अलग टेक्स्ट लिख सकते हैं।'
+                        : 'English and Hindi fields are completely independent. Enter whatever custom text you want in each box.'}
+                    </span>
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="space-y-1">
@@ -1678,7 +1728,13 @@ export function AdminClient() {
               {/* SECTION: DESCRIPTIONS WITH BIDIRECTIONAL AUTO-TRANSLATION */}
               <div className="p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-3">
                 <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                  {language === 'hi' ? 'विवरण (स्वतः अनुवाद)' : 'Descriptions (Optional)'}
+                  {language === 'hi'
+                    ? autoTranslateEnabled
+                      ? 'विवरण (स्वतः अनुवाद)'
+                      : 'विवरण (मैन्युअल मोड)'
+                    : autoTranslateEnabled
+                    ? 'Descriptions (Auto-Sync)'
+                    : 'Descriptions (Manual Mode)'}
                 </span>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1719,7 +1775,7 @@ export function AdminClient() {
                   <select
                     value={newPollStatus}
                     onChange={(e) => setNewPollStatus(e.target.value as Poll['status'])}
-                    className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-bold focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                    className="w-full glass-select rounded-xl text-xs font-bold"
                   >
                     <option value="LIVE">LIVE (सक्रिय - मतदान खुला)</option>
                     <option value="DRAFT">DRAFT (प्रारूप / आगामी)</option>
@@ -1735,7 +1791,7 @@ export function AdminClient() {
                   <select
                     value={newPollVisibility}
                     onChange={(e) => setNewPollVisibility(e.target.value as Poll['results_visibility'])}
-                    className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-bold focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                    className="w-full glass-select rounded-xl text-xs font-bold"
                   >
                     <option value="PUBLIC">PUBLIC (सार्वजनिक - सभी को दिखे)</option>
                     <option value="ADMIN_ONLY">ADMIN_ONLY (केवल व्यवस्थापक)</option>

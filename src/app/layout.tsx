@@ -8,6 +8,7 @@ import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { SiteAnnouncementBanner } from '@/components/layout/SiteAnnouncementBanner';
 import { Footer } from '@/components/layout/Footer';
 import { FloatingSupportWidget } from '@/components/support/FloatingSupportWidget';
+import { OfflineDetector } from '@/components/common/OfflineDetector';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -122,8 +123,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {/* Footer */}
             <Footer />
 
-            {/* Persistent Floating Support Widget */}
+            {/* Persistent Floating Support Widget (homepage only) */}
             <FloatingSupportWidget />
+
+            {/* Global Real-Time Offline / No Internet Window & Detector */}
+            <OfflineDetector />
 
             {/* Accessible Dedicated Custom Portal Root for Modals & Dialogs */}
             <div id="modal-root" />

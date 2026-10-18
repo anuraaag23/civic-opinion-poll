@@ -1,15 +1,19 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { Coffee } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
 import { BUYMEACHAI_CONFIG, getStoredSupportStats, SupportStats } from '@/lib/buymeachai/config';
 
 export function FloatingSupportWidget() {
+  const pathname = usePathname();
   const { language } = useI18n();
   const [stats, setStats] = useState<SupportStats>(() => getStoredSupportStats());
 
   useEffect(() => {
+    if (pathname !== '/') return;
+
     // Fetch live stats from server
     fetch('/api/support')
       .then((res) => res.json())
@@ -28,7 +32,12 @@ export function FloatingSupportWidget() {
 
     window.addEventListener('meravote_support_updated', handleUpdate);
     return () => window.removeEventListener('meravote_support_updated', handleUpdate);
-  }, []);
+  }, [pathname]);
+
+  // Hide the floating support button on all other pages and especially on /admin
+  if (pathname !== '/') {
+    return null;
+  }
 
   const titleText =
     language === 'hi'
