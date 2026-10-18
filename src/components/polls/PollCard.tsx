@@ -7,7 +7,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ArrowRight, BarChart3, Calendar, Users, Globe, Building2, Vote } from 'lucide-react';
+import { ArrowRight, Calendar, Users, Globe, Building2, Vote } from 'lucide-react';
 
 interface PollCardProps {
   poll: Poll;
@@ -24,11 +24,6 @@ export function PollCard({ poll }: PollCardProps) {
   const isCM = poll.id === 'poll-state-cm-2029' || poll.slug.includes('cm') || poll.slug.includes('state');
 
   const targetLink = isPM ? '/pm' : isCM ? '/cm' : `/polls/${poll.slug}`;
-  const resultsLink = isPM
-    ? '/polls/national-opinion-poll-2029/results'
-    : isCM
-    ? '/polls/national-opinion-poll-2029/results?state=uttar-pradesh'
-    : `/polls/${poll.slug}/results`;
 
   const statusVariant = isLive ? 'success' : poll.status === 'CLOSED' ? 'neutral' : 'warning';
   const statusLabel =

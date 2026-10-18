@@ -5,7 +5,6 @@ import { useI18n } from '@/lib/i18n/context';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
-import { GlassButton } from '@/components/ui/GlassButton';
 import { OFFICIAL_PARTIES, INDIAN_STATES, IndianState } from '@/lib/data/parties';
 import { Poll, OptionResult, SiteSettings, AuditEvent } from '@/lib/types';
 import { DbSupporter } from '@/lib/supabase';
@@ -23,9 +22,7 @@ import {
   Plus,
   Trash2,
   Edit3,
-  CheckCircle2,
   XCircle,
-  Eye,
   Sliders,
   Bell,
   Radio,
@@ -129,10 +126,17 @@ export function AdminClient() {
 
   // Check existing session
   useEffect(() => {
-    const savedSession = sessionStorage.getItem('meravote_admin_auth');
-    if (savedSession === 'true') {
-      setIsAuthenticated(true);
-    }
+    let isMounted = true;
+    Promise.resolve().then(() => {
+      if (!isMounted) return;
+      const savedSession = sessionStorage.getItem('meravote_admin_auth');
+      if (savedSession === 'true') {
+        setIsAuthenticated(true);
+      }
+    });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const showToast = (msg: string, isError = false) => {
@@ -209,9 +213,15 @@ export function AdminClient() {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
     if (isAuthenticated) {
-      fetchAllData();
+      Promise.resolve().then(() => {
+        if (isMounted) fetchAllData();
+      });
     }
+    return () => {
+      isMounted = false;
+    };
   }, [isAuthenticated, fetchAllData]);
 
   // Handle Passcode Unlock
@@ -994,7 +1004,7 @@ export function AdminClient() {
                           Party Breakdown & Vote Count Adjuster
                         </span>
                         <span className="text-xs text-[var(--text-secondary)]">
-                          Enter custom value & click 'Update' to adjust individual counts
+                          Enter custom value &amp; click &apos;Update&apos; to adjust individual counts
                         </span>
                       </div>
 

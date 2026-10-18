@@ -7,7 +7,7 @@ import { PollCard } from '@/components/polls/PollCard';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ShieldCheck, Vote, Loader2, Globe, Building2, ArrowRight, BarChart3 } from 'lucide-react';
+import { ShieldCheck, Vote, Loader2, Globe, Building2 } from 'lucide-react';
 import Link from 'next/link';
 
 export function PollsClient() {

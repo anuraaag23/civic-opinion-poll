@@ -47,7 +47,8 @@ export function SupportButton({
           <Coffee className="w-3.5 h-3.5 text-white animate-cup-tilt" />
         </span>
         <span className={`text-white drop-shadow-2xs ${showLabelOnMobile ? 'inline' : 'hidden sm:inline'}`}>
-          {label}
+          <span className="sm:hidden">{shortLabel}</span>
+          <span className="hidden sm:inline">{label}</span>
         </span>
       </a>
     );

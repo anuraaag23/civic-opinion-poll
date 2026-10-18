@@ -7,17 +7,12 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import {
   ShieldCheck,
-  Lock,
   CheckCircle2,
-  AlertTriangle,
-  Server,
   KeyRound,
   EyeOff,
   Cpu,
   ArrowRight,
-  ExternalLink,
 } from 'lucide-react';
-import { ECI_ELECTORAL_SEARCH_URL } from '@/lib/types';
 
 export function SafetyClient() {
   const { language } = useI18n();

@@ -87,7 +87,16 @@ export function HomeTopPollLiveResult() {
           const total = data.totalResponses || 128420;
           setTotalVotes(total);
           // Take top 5
-          const mapped: LeaderboardItem[] = data.results.slice(0, 5).map((r: any) => ({
+          const mapped: LeaderboardItem[] = data.results.slice(0, 5).map((r: {
+            party_id: string;
+            party_short_name?: string;
+            party_name_en: string;
+            party_name_hi: string;
+            logo_url?: string;
+            color?: string;
+            count: number;
+            percentage: number;
+          }) => ({
             partyId: r.party_id,
             shortName: r.party_short_name || r.party_id.replace('party-', '').toUpperCase(),
             nameEn: r.party_name_en,

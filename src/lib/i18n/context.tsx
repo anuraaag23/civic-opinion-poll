@@ -16,16 +16,23 @@ export function I18nProvider({ children }: { children: React.ReactNode }) {
   const [language, setLanguageState] = useState<Language>('en');
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('civic_poll_lang') as Language;
-      if (stored === 'en' || stored === 'hi') {
-        setLanguageState(stored);
-      } else if (typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('hi')) {
-        setLanguageState('hi');
+    let isMounted = true;
+    Promise.resolve().then(() => {
+      if (!isMounted) return;
+      try {
+        const stored = localStorage.getItem('civic_poll_lang') as Language;
+        if (stored === 'en' || stored === 'hi') {
+          setLanguageState(stored);
+        } else if (typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('hi')) {
+          setLanguageState('hi');
+        }
+      } catch {
+        // Fallback
       }
-    } catch {
-      // Fallback
-    }
+    });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   useEffect(() => {

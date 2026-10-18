@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, ReactNode } from 'react';
+import { useSyncExternalStore, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 interface PortalProps {
@@ -8,18 +8,20 @@ interface PortalProps {
   containerId?: string;
 }
 
+const emptySubscribe = () => () => {};
+
 /**
  * Custom Portal component that renders modal dialogs into a dedicated portal root
  * (#modal-root), preventing any z-index or stacking context clipping issues.
  */
 export function Portal({ children, containerId = 'modal-root' }: PortalProps) {
-  const [mounted, setMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted || typeof document === 'undefined') {
+  if (!isMounted || typeof document === 'undefined') {
     return null;
   }
 

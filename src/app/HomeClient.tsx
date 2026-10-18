@@ -9,7 +9,6 @@ import { KeyGuaranteesSection } from '@/components/home/KeyGuaranteesSection';
 import { AboutCreatorSection } from '@/components/home/AboutCreatorSection';
 import { HomeTopPollLiveResult } from '@/components/home/HomeTopPollLiveResult';
 import { VoterAssuranceCard } from '@/components/verification/VoterAssuranceCard';
-import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { StateSelector } from '@/components/common/StateSelector';
 import { NATIONAL_PARTIES, getPartiesForState, getStateById } from '@/lib/data/parties';
 import { GlassCard } from '@/components/ui/GlassCard';

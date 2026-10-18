@@ -8,7 +8,7 @@ import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import Link from 'next/link';
-import { Globe, Building2, ArrowRight, Mail, MapPin, User, ShieldCheck } from 'lucide-react';
+import { Globe, Building2, ArrowRight, Mail, MapPin } from 'lucide-react';
 
 export function AboutClient() {
   const { language } = useI18n();

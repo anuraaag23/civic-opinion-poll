@@ -12,12 +12,10 @@ import {
   Shield,
   User,
   Coffee,
-  ArrowRight,
   Mail,
   ChevronDown,
   ChevronUp,
   ShieldCheck,
-  HeartHandshake,
 } from 'lucide-react';
 
 export function AboutCreatorSection() {
@@ -65,8 +63,7 @@ export function AboutCreatorSection() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0 flex-wrap">
-              <SupportButton variant="compact" />
+            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
               <button
                 type="button"
                 onClick={() => setIsExpanded(!isExpanded)}

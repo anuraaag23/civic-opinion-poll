@@ -9,15 +9,9 @@ import { GlassButton } from '@/components/ui/GlassButton';
 import {
   Globe,
   Building2,
-  ShieldCheck,
-  Vote,
   BarChart3,
   ExternalLink,
-  ArrowRight,
   HelpCircle,
-  Lock,
-  CheckCircle2,
-  AlertTriangle,
 } from 'lucide-react';
 import { ECI_ELECTORAL_SEARCH_URL } from '@/lib/types';
 

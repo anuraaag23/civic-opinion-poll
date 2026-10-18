@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { SupportButton } from '@/components/support/SupportButton';
-import { ShieldCheck, Lock, CheckCircle2, Mail, MapPin, User, HeartHandshake } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, MapPin, User } from 'lucide-react';
 
 export function Footer() {
   const { t, language } = useI18n();
