@@ -33,49 +33,73 @@ export function HowItWorksClient() {
       {/* 4-Step Process Section */}
       <HowItWorksSection />
 
-      {/* Deep-Dive Technical Blueprint */}
+      {/* Identity Separation Architecture (Clean, code-free overview) */}
       <section className="max-w-4xl mx-auto space-y-6">
         <div className="text-center space-y-2 mb-8">
           <h2 className="text-2xl font-bold text-[var(--text-primary)]">
-            {language === 'hi' ? 'पहचान पृथक्करण का तकनीकी प्रवाह' : 'The Identity Separation Flow'}
+            {language === 'hi' ? 'पहचान एवं गोपनीयता सुरक्षा का सिद्धांत' : 'The Four Pillars of Voter Protection'}
           </h2>
           <p className="text-sm text-[var(--text-secondary)]">
             {language === 'hi'
-              ? 'सत्यापन प्रणाली पात्रता की पुष्टि करती है, जबकि वोटिंग प्रणाली पूर्णतः गुमनाम रहती है।'
-              : 'The verification system handles eligibility, while the voting database stores only aggregate tallies.'}
+              ? 'पात्रता सत्यापन और मत गणना के बीच पूर्ण तकनीकी अलगाव रहता है।'
+              : 'Complete structural decoupling between eligibility verification and anonymous vote tallies.'}
           </p>
         </div>
 
-        <GlassCard elevated className="space-y-6 font-mono text-xs sm:text-sm">
-          <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2">
-            <span className="text-[var(--accent)] font-bold block">1. In-Memory Eligibility Check</span>
-            <p className="text-[var(--text-secondary)] font-sans">
-              Participant checks eligibility directly on the official ECI search portal in an isolated browser tab. No voter names, addresses, or electoral roll records ever touch our database.
+        <GlassCard elevated className="space-y-4">
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 shadow-xs">
+            <span className="text-xs font-bold text-[var(--accent)] uppercase tracking-wider block">
+              {language === 'hi' ? '1. स्वतंत्र मतदाता सत्यापन' : '1. Independent Voter Check'}
+            </span>
+            <h3 className="text-base font-bold text-[var(--text-primary)]">
+              {language === 'hi' ? 'आधिकारिक पोर्टल पर सीधा स्व-सत्यापन' : 'Direct Verification on Official ECI Portal'}
+            </h3>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+              {language === 'hi'
+                ? 'नागरिक आधिकारिक चुनाव आयोग पोर्टल पर सीधे अपना पंजीकरण जांचते हैं। कोई भी व्यक्तिगत पहचान, नाम या पता हमारे सर्वर पर कभी दर्ज नहीं होता।'
+                : 'Participants confirm registration directly on the official electoral portal. Zero personal records, voter names, or addresses ever reach our databases.'}
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2">
-            <span className="text-[var(--accent)] font-bold block">2. Keyed Participation Fingerprinting</span>
-            <p className="text-[var(--text-secondary)] font-sans">
-              To prevent duplicate participation without saving plain hashes, the system derives:
-              <code className="block mt-1 p-2 rounded bg-[var(--bg-primary)] text-[var(--text-primary)]">
-                HMAC-SHA256(server_secret, normalized_epic + &quot;:&quot; + poll_id)
-              </code>
-              The server secret never enters the database, protecting constrained alphanumeric strings from rainbow table guessing.
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 shadow-xs">
+            <span className="text-xs font-bold text-[var(--accent)] uppercase tracking-wider block">
+              {language === 'hi' ? '2. दोहरा मतदान निषेध' : '2. Single Response Guarantee'}
+            </span>
+            <h3 className="text-base font-bold text-[var(--text-primary)]">
+              {language === 'hi' ? 'एक नागरिक, एक मत का सुरक्षित तंत्र' : 'One Citizen, One Voice Safeguard'}
+            </h3>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+              {language === 'hi'
+                ? 'बिना किसी व्यक्तिगत जानकारी को संग्रहीत किए, मंच यह सुनिश्चित करता है कि प्रत्येक नागरिक केवल एक ही बार मत दर्ज कर सके।'
+                : 'To prevent duplicate entries without storing personal information, the system uses one-way mathematical tokens that cannot be reversed or read by anyone.'}
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2">
-            <span className="text-[var(--accent)] font-bold block">3. Ephemeral Anonymous Token Issuance</span>
-            <p className="text-[var(--text-secondary)] font-sans">
-              A 256-bit CSPRNG token is issued exclusively to the participant&apos;s browser. The voting database receives only a SHA-256 hash of this token with a 15-minute expiration time.
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 shadow-xs">
+            <span className="text-xs font-bold text-[var(--accent)] uppercase tracking-wider block">
+              {language === 'hi' ? '3. क्षणिक गुमनाम सत्र' : '3. Ephemeral Anonymous Session'}
+            </span>
+            <h3 className="text-base font-bold text-[var(--text-primary)]">
+              {language === 'hi' ? 'पहचान-मुक्त अल्पकालिक मतदान टोकन' : 'Unlinkable Short-Lived Voting Pass'}
+            </h3>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+              {language === 'hi'
+                ? 'सत्यापन के बाद केवल एक बार इस्तेमाल होने वाला अल्पकालिक सत्र टोकन जारी होता है, जिसका आपके पहचान से कोई संबंध नहीं होता।'
+                : 'Upon self-verification, an anonymous session token is generated with a 15-minute lifespan. It contains zero identifying details and dissolves once used.'}
             </p>
           </div>
 
-          <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2">
-            <span className="text-[var(--success)] font-bold block">4. Atomic Vote Submission</span>
-            <p className="text-[var(--text-secondary)] font-sans">
-              When the participant submits their choice, the database executes an atomic transaction: marks the anonymous token as consumed and increments the aggregate vote counter by 1. No identity link exists.
+          <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 shadow-xs">
+            <span className="text-xs font-bold text-[var(--success)] uppercase tracking-wider block">
+              {language === 'hi' ? '4. सुरक्षित गणना' : '4. Tamper-Proof Tallying'}
+            </span>
+            <h3 className="text-base font-bold text-[var(--text-primary)]">
+              {language === 'hi' ? 'अखंड सार्वजनिक मतगणना' : 'Instant Aggregate-Only Increment'}
+            </h3>
+            <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
+              {language === 'hi'
+                ? 'आपका वोट केवल संबंधित दल के कुल योग को 1 से बढ़ाता है। डेटाबेस में कभी यह रिकॉर्ड नहीं होता कि किस व्यक्ति ने किस दल को चुना।'
+                : 'Submissions instantly advance the total count for the selected choice. The database maintains only cumulative totals, making it physically impossible to associate any ballot with a participant.'}
             </p>
           </div>
         </GlassCard>

@@ -2,19 +2,58 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashToken, isValidTokenFormat } from '@/lib/crypto';
 
+// Rate limiting for vote submissions: max 30 per 60 seconds per IP
+const voteSubmissions = new Map<string, { count: number; resetAt: number }>();
+
+function checkVoteRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = voteSubmissions.get(ip);
+
+  if (!entry || now > entry.resetAt) {
+    voteSubmissions.set(ip, { count: 1, resetAt: now + 60000 });
+    return true;
+  }
+
+  if (entry.count >= 30) {
+    return false;
+  }
+
+  entry.count += 1;
+  return true;
+}
+
 export async function POST(request: NextRequest) {
   try {
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      '127.0.0.1';
+
+    if (!checkVoteRateLimit(ip)) {
+      return NextResponse.json(
+        { success: false, error: 'Rate limit exceeded. Please wait a moment.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { pollId, optionId, anonymousToken, idempotencyKey } = body;
 
-    if (!pollId || !optionId || !anonymousToken) {
+    if (!pollId || typeof pollId !== 'string' || pollId.length > 80) {
       return NextResponse.json(
-        { success: false, error: 'Missing required parameters' },
+        { success: false, error: 'Invalid or missing poll identifier' },
         { status: 400 }
       );
     }
 
-    if (!isValidTokenFormat(anonymousToken)) {
+    if (!optionId || typeof optionId !== 'string' || optionId.length > 80) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid or missing option identifier' },
+        { status: 400 }
+      );
+    }
+
+    if (!anonymousToken || !isValidTokenFormat(anonymousToken)) {
       return NextResponse.json(
         { success: false, error: 'Invalid anonymous credential token format' },
         { status: 400 }
@@ -44,7 +83,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Vote recorded anonymously',
-      idempotencyKey: idempotencyKey || undefined,
+      idempotencyKey: typeof idempotencyKey === 'string' ? idempotencyKey.slice(0, 64) : undefined,
     });
   } catch {
     return NextResponse.json(

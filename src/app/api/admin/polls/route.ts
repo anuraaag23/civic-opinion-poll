@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAdminRequest } from '@/lib/auth/admin';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
+    }
     const detailedPolls = await db.getDetailedPolls();
     return NextResponse.json({
       success: true,
@@ -19,6 +23,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
+    }
     const body = await request.json();
     const { slug, title_en, title_hi, description_en, description_hi, status, start_at, end_at, party_ids } = body;
 
@@ -56,6 +63,9 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
+    }
     const body = await request.json();
     const { action, pollId } = body;
 
@@ -143,6 +153,9 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const pollId = searchParams.get('id');
 

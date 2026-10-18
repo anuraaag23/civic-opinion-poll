@@ -1,8 +1,12 @@
 import { NextResponse } from 'next/server';
 import { fetchAllSupporters, updateSupporter, deleteSupporter, submitSupporter } from '@/lib/supabase';
+import { verifyAdminRequest } from '@/lib/auth/admin';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
+    }
     const list = await fetchAllSupporters();
     return NextResponse.json({
       success: true,
@@ -19,6 +23,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
+    }
     const body = await request.json();
     const { name, amount, cups, rating, message, verified } = body;
 
@@ -43,6 +50,9 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
+    }
     const body = await request.json();
     const { id, ...updates } = body;
 
@@ -66,6 +76,9 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
+    }
     const { searchParams } = new URL(request.url);
     const id = searchParams.get('id');
 

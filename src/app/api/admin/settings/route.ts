@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAdminRequest } from '@/lib/auth/admin';
 
 export async function GET() {
   try {
@@ -19,6 +20,9 @@ export async function GET() {
 
 export async function PATCH(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json({ success: false, error: 'Unauthorized: Admin authentication required' }, { status: 401 });
+    }
     const body = await request.json();
     const updated = await db.updateSiteSettings(body);
     return NextResponse.json({

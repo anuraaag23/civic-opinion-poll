@@ -1,8 +1,16 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { verifyAdminRequest } from '@/lib/auth/admin';
 
 export async function GET(request: Request) {
   try {
+    if (!verifyAdminRequest(request)) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized: Admin authentication required' },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const format = searchParams.get('format') || 'json';
 
@@ -12,6 +20,7 @@ export async function GET(request: Request) {
         headers: {
           'Content-Type': 'text/csv; charset=utf-8',
           'Content-Disposition': `attachment; filename="meravote-polls-export-${Date.now()}.csv"`,
+          'Cache-Control': 'no-store, max-age=0',
         },
       });
     }
@@ -21,6 +30,7 @@ export async function GET(request: Request) {
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
         'Content-Disposition': `attachment; filename="meravote-full-backup-${Date.now()}.json"`,
+        'Cache-Control': 'no-store, max-age=0',
       },
     });
   } catch (err) {

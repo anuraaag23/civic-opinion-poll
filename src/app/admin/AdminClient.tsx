@@ -206,14 +206,18 @@ export function AdminClient() {
       const data = await res.json();
 
       if (data.success) {
+        if (data.token) {
+          sessionStorage.setItem('meravote_admin_token', data.token);
+        }
         sessionStorage.setItem('meravote_admin_auth', 'true');
         setIsAuthenticated(true);
         showToast(language === 'hi' ? 'व्यवस्थापक पैनल अनलॉक हो गया' : 'Admin Panel Unlocked');
       } else {
         setAuthError(
-          language === 'hi'
-            ? 'अमान्य पासकोड। डिफ़ॉल्ट पासकोड: meravote2026'
-            : 'Invalid passcode. Default passcode is: meravote2026'
+          data.error ||
+          (language === 'hi'
+            ? 'अमान्य व्यवस्थापक पासकोड। पहुंच अस्वीकृत।'
+            : 'Invalid administrative passcode. Access denied.')
         );
       }
     } catch {
@@ -481,8 +485,9 @@ export function AdminClient() {
                   autoFocus
                 />
               </div>
-              <p className="text-[11px] text-[var(--text-tertiary)]">
-                Default: <code className="font-mono text-[var(--accent)] font-bold">meravote2026</code>
+              <p className="text-[11px] text-[var(--text-tertiary)] flex items-center gap-1.5">
+                <Lock className="w-3 h-3 text-[var(--accent)] shrink-0" />
+                <span>{language === 'hi' ? 'सुरक्षित सत्र • केवल अधिकृत पहुंच' : 'Encrypted session • Authorized personnel only'}</span>
               </p>
             </div>
 
@@ -1545,7 +1550,7 @@ export function AdminClient() {
             <div className="text-center space-y-1">
               <h3 className="text-lg font-bold text-[var(--text-primary)]">Reset All Votes to Zero?</h3>
               <p className="text-xs text-[var(--text-secondary)]">
-                This will set all party tallies in poll <code className="font-mono text-red-500">{resetModalPollId}</code> to 0 and clear existing voter participation tokens. This action is irreversible.
+                This will set all party tallies in poll <strong className="text-red-500 font-bold">{resetModalPollId}</strong> to 0 and clear existing voter participation tokens. This action is irreversible.
               </p>
             </div>
             <div className="flex items-center justify-center gap-3 pt-2">

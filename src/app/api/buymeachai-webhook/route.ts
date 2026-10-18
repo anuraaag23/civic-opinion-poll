@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { NextResponse } from 'next/server';
 import { supabase, sanitizeText } from '@/lib/supabase';
 
@@ -6,6 +7,13 @@ const EXPECTED_TOKEN =
   process.env.BUYMEACHAI_VERIFICATION_TOKEN ||
   process.env.KOFI_VERIFICATION_TOKEN ||
   'c7bf8b09-4bbf-4789-a823-f1ad63ff1df8';
+
+function timingSafeCompare(a: string, b: string): boolean {
+  if (!a || !b) return false;
+  const hashA = crypto.createHash('sha256').update(a).digest();
+  const hashB = crypto.createHash('sha256').update(b).digest();
+  return crypto.timingSafeEqual(hashA, hashB);
+}
 
 interface ChaiPayload {
   verification_token?: string;
@@ -57,10 +65,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing or empty payload' }, { status: 400 });
     }
 
-    // Cryptographic Security: Validate Verification Token if present
-    if (payload.verification_token) {
-      if (payload.verification_token !== EXPECTED_TOKEN) {
-        console.warn('Unauthorized webhook attempt with invalid verification token:', payload.verification_token);
+    // Cryptographic Security: Validate Verification Token in constant time
+    const token = payload.verification_token || request.headers.get('x-verification-token');
+    if (token) {
+      if (!timingSafeCompare(token, EXPECTED_TOKEN)) {
+        console.warn('Unauthorized webhook attempt with invalid verification token');
         return NextResponse.json({ error: 'Unauthorized: Invalid verification token' }, { status: 401 });
       }
     }
