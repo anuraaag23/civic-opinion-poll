@@ -19,7 +19,7 @@ export function DisclaimerBanner({ compact = false, className = '' }: Disclaimer
         role="note"
       >
         <ShieldAlert className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
-        <span>{t.common.shortDisclaimer}</span>
+        <span suppressHydrationWarning>{t.common.shortDisclaimer}</span>
       </div>
     );
   }

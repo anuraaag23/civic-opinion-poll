@@ -13,22 +13,20 @@ interface I18nContextType {
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 export function I18nProvider({ children }: { children: React.ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem('civic_poll_lang') as Language;
-        if (stored === 'en' || stored === 'hi') {
-          return stored;
-        }
-        if (navigator.language.startsWith('hi')) {
-          return 'hi';
-        }
-      } catch {
-        // Fallback
+  const [language, setLanguageState] = useState<Language>('en');
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('civic_poll_lang') as Language;
+      if (stored === 'en' || stored === 'hi') {
+        setLanguageState(stored);
+      } else if (typeof navigator !== 'undefined' && navigator.language && navigator.language.startsWith('hi')) {
+        setLanguageState('hi');
       }
+    } catch {
+      // Fallback
     }
-    return 'en';
-  });
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = language;
