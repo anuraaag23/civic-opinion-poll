@@ -47,7 +47,8 @@ class StorageStore {
       this.voteCounts.set(pollId, countsMap);
     });
 
-    // Load persistent ledger records if available on disk
+    // Load persistent ledger records if available on disk (skip in test environment)
+    if (process.env.NODE_ENV === 'test') return;
     try {
       if (fs.existsSync(LEDGER_PATH)) {
         const raw = fs.readFileSync(LEDGER_PATH, 'utf-8');
@@ -70,6 +71,7 @@ class StorageStore {
   }
 
   saveLedger() {
+    if (process.env.NODE_ENV === 'test') return;
     try {
       const dir = path.dirname(LEDGER_PATH);
       if (!fs.existsSync(dir)) {
