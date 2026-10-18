@@ -2,11 +2,15 @@ import { createClient } from '@supabase/supabase-js';
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  'https://nrowfnerohslghecjetf.supabase.co';
+  'https://itdcuecexchibhntdswi.supabase.co';
 
 const SUPABASE_ANON_KEY =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5yb3dmbmVyb2hzbGdoZWNqZXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2NjUzODksImV4cCI6MjEwNjI0MTM4OX0.yLgr4IyFlYB_qR6yl5HRMW3lyxPFB-pR7BqnrwJUg0g';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZGN1ZWNleGNoaWJobnRkc3dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzMzgzOTgsImV4cCI6MjEwNzkxNDM5OH0.vqCmVnxxCNdN1i8Q0sQ01y7oJAyounYdfcBoCU1C05Y';
+
+const SUPABASE_SERVICE_ROLE =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ||
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZGN1ZWNleGNoaWJobnRkc3dpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MjMzODM5OCwiZXhwIjoyMTA3OTE0Mzk4fQ.vTbsqEnkYzd8UVNh8BG25oryk6JK7suCYXObmcxQp6g';
 
 export const isSupabaseConfigured = (): boolean => {
   return Boolean(SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_URL.includes('placeholder'));
@@ -14,6 +18,15 @@ export const isSupabaseConfigured = (): boolean => {
 
 export const supabase = isSupabaseConfigured()
   ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false,
+      },
+    })
+  : null;
+
+export const supabaseAdmin = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE)
+  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
       auth: {
         persistSession: false,
         autoRefreshToken: false,
@@ -126,7 +139,8 @@ export async function updateSupporter(
   id: string,
   updates: Partial<DbSupporter>
 ): Promise<boolean> {
-  if (supabase && id) {
+  const client = supabaseAdmin || supabase;
+  if (client && id) {
     try {
       const payload: Record<string, unknown> = {};
       if (updates.name !== undefined) payload.name = sanitizeText(updates.name, 80);
@@ -134,7 +148,7 @@ export async function updateSupporter(
       if (updates.message !== undefined) payload.message = sanitizeText(updates.message || '', 350) || null;
       if (updates.verified !== undefined) payload.verified = updates.verified;
 
-      const { error } = await supabase.from('supporters').update(payload).eq('id', id);
+      const { error } = await client.from('supporters').update(payload).eq('id', id);
       if (!error) return true;
       console.error('Supabase update supporter error:', error);
     } catch (err) {
@@ -161,9 +175,10 @@ export async function submitSupporter(supporter: {
   const cleanPaymentId = supporter.paymentId ? sanitizeText(supporter.paymentId, 80) : null;
   const isVerified = supporter.verified === true;
 
-  if (supabase) {
+  const client = supabaseAdmin || supabase;
+  if (client) {
     try {
-      const { error } = await supabase.from('supporters').insert([
+      const { error } = await client.from('supporters').insert([
         {
           name: cleanName,
           amount: supporter.amount,
@@ -188,9 +203,10 @@ export async function submitSupporter(supporter: {
  * Fetch verified supporters from Supabase.
  */
 export async function fetchSupporters(): Promise<DbSupporter[]> {
-  if (supabase) {
+  const client = supabase || supabaseAdmin;
+  if (client) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('supporters')
         .select('*')
         .eq('verified', true)
@@ -209,9 +225,10 @@ export async function fetchSupporters(): Promise<DbSupporter[]> {
  * Fetch all supporters (both verified and pending moderation) for admin panel.
  */
 export async function fetchAllSupporters(): Promise<DbSupporter[]> {
-  if (supabase) {
+  const client = supabaseAdmin || supabase;
+  if (client) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from('supporters')
         .select('*')
         .order('created_at', { ascending: false })
@@ -229,9 +246,10 @@ export async function fetchAllSupporters(): Promise<DbSupporter[]> {
  * Delete a supporter review by ID (admin moderation).
  */
 export async function deleteSupporter(id: string): Promise<boolean> {
-  if (supabase && id) {
+  const client = supabaseAdmin || supabase;
+  if (client && id) {
     try {
-      const { error } = await supabase.from('supporters').delete().eq('id', id);
+      const { error } = await client.from('supporters').delete().eq('id', id);
       if (!error) return true;
       console.error('Error deleting supporter:', error);
     } catch (err) {

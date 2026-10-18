@@ -1,6 +1,7 @@
 import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings } from '../types';
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
 import { OFFICIAL_PARTIES } from '../data/parties';
+import { supabaseAdmin } from '../supabase';
 
 import fs from 'fs';
 import path from 'path';
@@ -162,7 +163,31 @@ export const db = {
 
   async hasParticipated(pollId: string, anonymousParticipationId: string): Promise<boolean> {
     const key = `${pollId}:${anonymousParticipationId}`;
-    return civicStore.participation.has(key);
+    if (civicStore.participation.has(key)) return true;
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        const { data } = await supabaseAdmin
+          .from('participation')
+          .select('id')
+          .eq('poll_id', pollId)
+          .eq('anonymous_participation_id', anonymousParticipationId)
+          .maybeSingle();
+        if (data) {
+          civicStore.participation.set(key, {
+            id: data.id,
+            poll_id: pollId,
+            anonymous_participation_id: anonymousParticipationId,
+            self_verification_confirmed: true,
+            status: 'VOTED',
+            created_at: new Date().toISOString(),
+            voted_at: new Date().toISOString(),
+          });
+          return true;
+        }
+      } catch {}
+    }
+    return false;
   },
 
   async recordParticipation(pollId: string, anonymousParticipationId: string): Promise<void> {
@@ -177,6 +202,17 @@ export const db = {
       voted_at: null,
     });
     civicStore.saveLedger();
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('participation').upsert({
+          poll_id: pollId,
+          anonymous_participation_id: anonymousParticipationId,
+          self_verification_confirmed: true,
+          status: 'SELF_VERIFICATION_CONFIRMED',
+        }, { onConflict: 'poll_id,anonymous_participation_id' });
+      } catch {}
+    }
   },
 
   async issueAnonymousCredential(
@@ -188,6 +224,16 @@ export const db = {
       pollId,
       expiresAt,
     });
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('anonymous_tokens').insert({
+          poll_id: pollId,
+          token_hash: tokenHash,
+          expires_at: expiresAt,
+        });
+      } catch {}
+    }
   },
 
   /**
@@ -249,6 +295,19 @@ export const db = {
 
     civicStore.saveLedger();
 
+    // Sync to Supabase asynchronously
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('anonymous_tokens').update({ used_at: new Date().toISOString() }).eq('token_hash', tokenHash);
+        await supabaseAdmin.from('vote_counts').upsert({
+          poll_id: pollId,
+          option_id: optionId,
+          vote_count: current + 1,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'poll_id,option_id' });
+      } catch {}
+    }
+
     // Record audit event
     this.recordAuditEvent('vote_submission_success', pollId, { option_id: optionId });
 
@@ -290,6 +349,23 @@ export const db = {
   },
 
   async getSiteSettings(): Promise<SiteSettings> {
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        const { data } = await supabaseAdmin.from('site_settings').select('*').eq('id', 'global').maybeSingle();
+        if (data) {
+          civicStore.siteSettings = {
+            maintenanceMode: data.maintenance_mode,
+            emergencyBannerEnabled: data.emergency_banner_enabled,
+            emergencyBannerTextEn: data.emergency_banner_text_en || '',
+            emergencyBannerTextHi: data.emergency_banner_text_hi || '',
+            emergencyBannerType: (data.emergency_banner_type as any) || 'info',
+            allowVoting: data.allow_voting,
+            rateLimitPerHour: data.rate_limit_per_hour || 60,
+            lastUpdated: data.last_updated || new Date().toISOString(),
+          };
+        }
+      } catch {}
+    }
     return { ...civicStore.siteSettings };
   },
 
@@ -299,6 +375,21 @@ export const db = {
       ...updates,
       lastUpdated: new Date().toISOString(),
     };
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('site_settings').upsert({
+          id: 'global',
+          maintenance_mode: civicStore.siteSettings.maintenanceMode,
+          emergency_banner_enabled: civicStore.siteSettings.emergencyBannerEnabled,
+          emergency_banner_text_en: civicStore.siteSettings.emergencyBannerTextEn,
+          emergency_banner_text_hi: civicStore.siteSettings.emergencyBannerTextHi,
+          emergency_banner_type: civicStore.siteSettings.emergencyBannerType,
+          allow_voting: civicStore.siteSettings.allowVoting,
+          rate_limit_per_hour: civicStore.siteSettings.rateLimitPerHour,
+          last_updated: civicStore.siteSettings.lastUpdated,
+        });
+      } catch {}
+    }
     await this.recordAuditEvent('admin_settings_update', undefined, { updates });
     return { ...civicStore.siteSettings };
   },

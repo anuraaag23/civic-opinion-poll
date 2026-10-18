@@ -9,9 +9,20 @@
 -- Enable pgcrypto for UUIDs and secure cryptographic functions
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
+-- Clean recreation if upgrading column types:
+DROP FUNCTION IF EXISTS submit_anonymous_vote(UUID, UUID, VARCHAR);
+DROP FUNCTION IF EXISTS submit_anonymous_vote(VARCHAR, VARCHAR, VARCHAR);
+DROP TABLE IF EXISTS vote_counts CASCADE;
+DROP TABLE IF EXISTS anonymous_tokens CASCADE;
+DROP TABLE IF EXISTS participation CASCADE;
+DROP TABLE IF EXISTS poll_options CASCADE;
+DROP TABLE IF EXISTS parties CASCADE;
+DROP TABLE IF EXISTS polls CASCADE;
+DROP TABLE IF EXISTS audit_events CASCADE;
+
 -- 1. POLLS TABLE
 CREATE TABLE IF NOT EXISTS polls (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id VARCHAR(100) PRIMARY KEY,
     slug VARCHAR(120) UNIQUE NOT NULL,
     title_en VARCHAR(255) NOT NULL,
     title_hi VARCHAR(255) NOT NULL,
@@ -27,7 +38,7 @@ CREATE TABLE IF NOT EXISTS polls (
 
 -- 2. PARTIES TABLE (Managed Directory)
 CREATE TABLE IF NOT EXISTS parties (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id VARCHAR(100) PRIMARY KEY,
     name_en VARCHAR(255) NOT NULL,
     name_hi VARCHAR(255) NOT NULL,
     short_name VARCHAR(50) NOT NULL,
@@ -44,9 +55,9 @@ CREATE TABLE IF NOT EXISTS parties (
 
 -- 3. POLL OPTIONS TABLE (Options linked to each poll)
 CREATE TABLE IF NOT EXISTS poll_options (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    poll_id UUID NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
-    party_id UUID NOT NULL REFERENCES parties(id) ON DELETE RESTRICT,
+    id VARCHAR(100) PRIMARY KEY,
+    poll_id VARCHAR(100) NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
+    party_id VARCHAR(100) NOT NULL REFERENCES parties(id) ON DELETE RESTRICT,
     display_order INT NOT NULL DEFAULT 0,
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -57,8 +68,8 @@ CREATE TABLE IF NOT EXISTS poll_options (
 -- STORES ONLY THE ANONYMOUS PARTICIPATION IDENTIFIER / TOKEN HASH.
 -- STRICT MODE A RULE: NO RAW EPIC, NO EPIC HASH, NO VOTER NAME, NO ADDRESS, NO EMAIL, NO PHONE.
 CREATE TABLE IF NOT EXISTS participation (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    poll_id UUID NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
+    id VARCHAR(100) PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    poll_id VARCHAR(100) NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
     anonymous_participation_id VARCHAR(64) UNIQUE NOT NULL, -- SHA-256(token)
     self_verification_confirmed BOOLEAN NOT NULL DEFAULT true,
     status VARCHAR(40) NOT NULL DEFAULT 'SELF_VERIFICATION_CONFIRMED' CHECK (status IN ('SELF_VERIFICATION_CONFIRMED', 'VOTED')),
@@ -73,8 +84,8 @@ ON participation(poll_id, anonymous_participation_id);
 
 -- 5. ANONYMOUS VOTE TOKENS (Ephemerally issued, decoupled from participation fingerprint)
 CREATE TABLE IF NOT EXISTS anonymous_tokens (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    poll_id UUID NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
+    id VARCHAR(100) PRIMARY KEY DEFAULT gen_random_uuid()::text,
+    poll_id VARCHAR(100) NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
     token_hash VARCHAR(64) UNIQUE NOT NULL, -- SHA-256(token)
     expires_at TIMESTAMPTZ NOT NULL,
     used_at TIMESTAMPTZ,
@@ -87,8 +98,8 @@ ON anonymous_tokens(token_hash, poll_id, used_at);
 -- 6. VOTE COUNTS (Atomic Aggregate Counter)
 -- Contains ONLY aggregate counters. NO voter identity, NO token hash link.
 CREATE TABLE IF NOT EXISTS vote_counts (
-    poll_id UUID NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
-    option_id UUID NOT NULL REFERENCES poll_options(id) ON DELETE CASCADE,
+    poll_id VARCHAR(100) NOT NULL REFERENCES polls(id) ON DELETE CASCADE,
+    option_id VARCHAR(100) NOT NULL REFERENCES poll_options(id) ON DELETE CASCADE,
     vote_count BIGINT NOT NULL DEFAULT 0 CHECK (vote_count >= 0),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     PRIMARY KEY(poll_id, option_id)
@@ -97,9 +108,9 @@ CREATE TABLE IF NOT EXISTS vote_counts (
 -- 7. AUDIT LOGS (Security and Integrity Monitoring)
 -- STRICT RULE: NEVER LOG RAW EPIC OR CORRELATION OF IDENTITY TO VOTE CHOICE
 CREATE TABLE IF NOT EXISTS audit_events (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id VARCHAR(100) PRIMARY KEY DEFAULT gen_random_uuid()::text,
     event_type VARCHAR(60) NOT NULL,
-    poll_id UUID REFERENCES polls(id) ON DELETE SET NULL,
+    poll_id VARCHAR(100) REFERENCES polls(id) ON DELETE SET NULL,
     metadata_sanitized JSONB NOT NULL DEFAULT '{}'::jsonb,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -113,8 +124,8 @@ ON audit_events(poll_id, created_at);
 -- and increments vote_counts. Guarantees no race conditions.
 -- ====================================================================
 CREATE OR REPLACE FUNCTION submit_anonymous_vote(
-    p_poll_id UUID,
-    p_option_id UUID,
+    p_poll_id VARCHAR(100),
+    p_option_id VARCHAR(100),
     p_token_hash VARCHAR(64)
 )
 RETURNS JSONB
@@ -123,7 +134,7 @@ SECURITY DEFINER
 AS $$
 DECLARE
     v_poll_status VARCHAR(30);
-    v_token_id UUID;
+    v_token_id VARCHAR(100);
     v_token_used_at TIMESTAMPTZ;
     v_token_expires_at TIMESTAMPTZ;
     v_option_exists BOOLEAN;
