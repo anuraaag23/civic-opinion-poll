@@ -145,11 +145,14 @@ export class SelfVerificationService {
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15-minute token TTL
 
     // 7. Store Participation Record (Irreversible HMAC fingerprints only, ZERO PII, ZERO RAW DATA)
-    await db.recordParticipation(pollId, participationIdentifier);
-
-    // If both voter ID and phone were verified, record both fingerprints to prevent either from voting again
-    if (voterFingerprint && phoneFingerprint && voterFingerprint !== participationIdentifier) {
+    if (voterFingerprint) {
+      await db.recordParticipation(pollId, voterFingerprint);
+    }
+    if (phoneFingerprint) {
       await db.recordParticipation(pollId, phoneFingerprint);
+    }
+    if (!voterFingerprint && !phoneFingerprint) {
+      await db.recordParticipation(pollId, participationIdentifier);
     }
 
     await db.issueAnonymousCredential(pollId, tokenHash, expiresAt);

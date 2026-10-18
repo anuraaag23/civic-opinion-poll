@@ -348,7 +348,9 @@ export const db = {
       created_at: existing?.created_at || new Date().toISOString(),
       voted_at: null,
     });
-    civicStore.saveLedger();
+    if (typeof (civicStore as any).saveLedger === 'function') {
+      (civicStore as any).saveLedger();
+    }
 
     if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
       try {
