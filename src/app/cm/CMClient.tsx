@@ -55,8 +55,8 @@ export function CMClient() {
   const stateTailoredPoll = useMemo<Poll | null>(() => {
     if (!rawPoll) return null;
 
-    const stateTitleEn = `Chief Minister (CM) Civic Opinion Poll — ${currentState.name_en}`;
-    const stateTitleHi = `मुख्यमंत्री (CM) नागरिक जनमत सर्वेक्षण — ${currentState.name_hi}`;
+    const stateTitleEn = `Chief Minister (CM) Poll — ${currentState.name_en}`;
+    const stateTitleHi = `मुख्यमंत्री (CM) जनमत सर्वेक्षण — ${currentState.name_hi}`;
 
     const options: PollOption[] = stateParties.map((party, index) => ({
       id: `opt-cm-${party.id}`,
@@ -90,8 +90,8 @@ export function CMClient() {
 
         <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[var(--text-primary)]">
           {language === 'hi'
-            ? 'मुख्यमंत्री (CM) नागरिक जनमत सर्वेक्षण'
-            : 'Chief Minister (CM) Civic Opinion Poll'}
+            ? 'मुख्यमंत्री (CM) जनमत सर्वेक्षण'
+            : 'Chief Minister (CM) Opinion Poll'}
         </h1>
 
         <p className="text-base sm:text-lg text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed">

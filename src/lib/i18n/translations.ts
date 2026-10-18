@@ -2,9 +2,9 @@ export const translations = {
   en: {
     common: {
       siteName: 'Mera Vote',
-      tagline: 'Independent Civic Opinion Polls',
+      tagline: 'Independent Opinion Polls',
       officialDisclaimer:
-        'Independent civic opinion-poll platform. Not operated by, affiliated with, or endorsed by the Election Commission of India (ECI) or the Government of India. Participation does not constitute an official election vote.',
+        'Independent opinion-poll platform. Not operated by, affiliated with, or endorsed by the Election Commission of India (ECI) or the Government of India. Participation does not constitute an official election vote.',
       shortDisclaimer:
         'Independent platform. Not affiliated with the Election Commission of India or the Government of India.',
       language: 'Language',
@@ -35,7 +35,7 @@ export const translations = {
       admin: 'Admin',
     },
     hero: {
-      title: 'Independent Civic Opinion Polls',
+      title: 'Mera Vote',
       subtitle:
         'Participate in independent public opinion polls with privacy-focused verification and cryptographically anonymous responses.',
       primaryCta: 'View Active Poll',
@@ -156,20 +156,20 @@ export const translations = {
         'Participation fingerprints are retained only for the lifecycle of the active poll to prevent ballot stuffing, and scheduled for cryptographic purge after poll closure.',
     },
     footer: {
-      independentBadge: 'Independent Civic Tech Platform',
-      copyright: 'Mera Vote — Independent Civic Opinion Poll Platform. Free & Open Civic Technology.',
+      independentBadge: 'Mera Vote',
+      copyright: 'Mera Vote — Independent Public Opinion Platform. Free & Open Civic Technology.',
       disclaimer:
         'Not affiliated with, operated by, or authorized by the Election Commission of India (ECI) or the Government of India. This application is an independent public opinion polling instrument and does not conduct legal, official, or binding elections.',
       persistentStatement:
-        'Independent civic opinion poll. Not an official election and not affiliated with the Election Commission of India.',
+        'Mera Vote — Independent public opinion poll. Not an official election and not affiliated with the Election Commission of India.',
     },
   },
   hi: {
     common: {
       siteName: 'मेरा वोट (Mera Vote)',
-      tagline: 'स्वतंत्र नागरिक जनमत सर्वेक्षण',
+      tagline: 'स्वतंत्र जनमत सर्वेक्षण',
       officialDisclaimer:
-        'स्वतंत्र नागरिक जनमत सर्वेक्षण मंच। यह भारत निर्वाचन आयोग (ECI) या भारत सरकार द्वारा संचालित, उससे संबद्ध या समर्थित नहीं है। इसमें भागीदारी आधिकारिक चुनावी मतदान नहीं है।',
+        'स्वतंत्र जनमत सर्वेक्षण मंच। यह भारत निर्वाचन आयोग (ECI) या भारत सरकार द्वारा संचालित, उससे संबद्ध या समर्थित नहीं है। इसमें भागीदारी आधिकारिक चुनावी मतदान नहीं है।',
       shortDisclaimer:
         'स्वतंत्र मंच। भारत निर्वाचन आयोग या भारत सरकार से संबद्ध नहीं है।',
       language: 'भाषा',
@@ -200,7 +200,7 @@ export const translations = {
       admin: 'व्यवस्थापक',
     },
     hero: {
-      title: 'स्वतंत्र नागरिक जनमत सर्वेक्षण',
+      title: 'मेरा वोट',
       subtitle:
         'गोपनीयता-केंद्रित सत्यापन और क्रिप्टोग्राफिक रूप से गुमनाम प्रतिक्रियाओं के साथ स्वतंत्र सार्वजनिक जनमत सर्वेक्षणों में भाग लें।',
       primaryCta: 'सक्रिय सर्वेक्षण देखें',
@@ -321,12 +321,12 @@ export const translations = {
         'भागीदारी फिंगरप्रिंट केवल सक्रिय सर्वेक्षण की अवधि के लिए रखे जाते हैं ताकि निष्पक्षता बनी रहे, और सर्वेक्षण समाप्त होने के बाद उन्हें हटा दिया जाता है।',
     },
     footer: {
-      independentBadge: 'स्वतंत्र नागरिक तकनीक मंच',
-      copyright: 'मेरा वोट — स्वतंत्र नागरिक जनमत सर्वेक्षण मंच। निःशुल्क एवं खुला नागरिक मंच।',
+      independentBadge: 'मेरा वोट',
+      copyright: 'मेरा वोट — स्वतंत्र जनमत सर्वेक्षण मंच। निःशुल्क एवं खुला नागरिक मंच।',
       disclaimer:
         'भारत निर्वाचन आयोग (ECI) या भारत सरकार द्वारा संचालित, अधिकृत या उससे संबद्ध नहीं है। यह एप्लिकेशन एक स्वतंत्र जनमत सर्वेक्षण उपकरण है और कोई कानूनी या आधिकारिक चुनाव आयोजित नहीं करता है।',
       persistentStatement:
-        'स्वतंत्र नागरिक जनमत सर्वेक्षण। यह आधिकारिक चुनाव नहीं है और भारत निर्वाचन आयोग से संबद्ध नहीं है।',
+        'मेरा वोट — स्वतंत्र जनमत सर्वेक्षण। यह आधिकारिक चुनाव नहीं है और भारत निर्वाचन आयोग से संबद्ध नहीं है।',
     },
   },
 } as const;

@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import { PollsClient } from './PollsClient';
 
 export const metadata: Metadata = {
-  title: 'Active Civic Opinion Polls',
+  title: 'All Polls — Mera Vote',
   description:
-    'Explore active independent civic inquiries on national and state electoral governance across India. Fully decoupled, verified, and 100% anonymous.',
+    'Explore active independent opinion polls on national and state electoral governance across India on Mera Vote. Fully decoupled, verified, and 100% anonymous.',
   keywords: [
-    'Civic Opinion Polls India',
+    'Mera Vote Polls',
     'Independent Public Opinion',
     'Lok Sabha Poll',
     'Assembly Election Poll',

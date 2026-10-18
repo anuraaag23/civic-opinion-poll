@@ -1,4 +1,4 @@
-# Independent India Civic Opinion Poll Platform
+# Mera Vote
 **Bilingual, Privacy-Preserving Civic Technology for Public Opinion Polling**
 
 > **IMPORTANT LEGAL NOTICE & NON-AFFILIATION DISCLAIMER**  

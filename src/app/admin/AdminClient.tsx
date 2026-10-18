@@ -1690,7 +1690,7 @@ export function AdminClient() {
                       required
                       value={newPollTitleEn}
                       onChange={(e) => handleTitleEnChange(e.target.value)}
-                      placeholder="e.g. 2029 Delhi Assembly Civic Opinion Poll"
+                      placeholder="e.g. 2029 Delhi Assembly Opinion Poll"
                       className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] shadow-2xs font-medium"
                     />
                   </div>
@@ -1704,7 +1704,7 @@ export function AdminClient() {
                       required
                       value={newPollTitleHi}
                       onChange={(e) => handleTitleHiChange(e.target.value)}
-                      placeholder="उदा. 2029 दिल्ली विधानसभा नागरिक जनमत सर्वेक्षण"
+                      placeholder="उदा. 2029 दिल्ली विधानसभा जनमत सर्वेक्षण"
                       className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] shadow-2xs font-medium"
                     />
                   </div>
@@ -1719,7 +1719,7 @@ export function AdminClient() {
                     type="text"
                     value={newPollSlug}
                     onChange={(e) => setNewPollSlug(e.target.value)}
-                    placeholder="delhi-assembly-civic-opinion-poll-2029"
+                    placeholder="delhi-assembly-opinion-poll-2029"
                     className="w-full px-3 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono shadow-2xs"
                   />
                 </div>

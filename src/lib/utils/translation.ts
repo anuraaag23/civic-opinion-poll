@@ -6,6 +6,7 @@
 // Phrase & Word level dictionaries
 const PHRASE_PAIRS: [RegExp, string, RegExp, string][] = [
   // [English regex, Hindi replacement, Hindi regex, English replacement]
+  [/\bMera Vote\b/gi, 'मेरा वोट', /मेरा वोट/g, 'Mera Vote'],
   [/\bChief Minister\b/gi, 'मुख्यमंत्री', /मुख्यमंत्री/g, 'Chief Minister'],
   [/\bPrime Minister\b/gi, 'प्रधानमंत्री', /प्रधानमंत्री/g, 'Prime Minister'],
   [/\bCivic Opinion Poll\b/gi, 'नागरिक जनमत सर्वेक्षण', /नागरिक जनमत सर्वेक्षण/g, 'Civic Opinion Poll'],

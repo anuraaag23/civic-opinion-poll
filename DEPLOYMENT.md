@@ -1,6 +1,6 @@
 # 🚀 Mera Vote — Complete Vercel & Supabase Production Deployment Guide
 
-This document provides a step-by-step walkthrough to deploy the **Mera Vote (Independent India Civic Opinion Poll Platform)** to **Vercel** with a **Supabase PostgreSQL** cloud database.
+This document provides a step-by-step walkthrough to deploy **Mera Vote** to **Vercel** with a **Supabase PostgreSQL** cloud database.
 
 ---
 

@@ -183,7 +183,7 @@ export function Footer() {
             </p>
           </div>
           <div className="mt-4 flex flex-col sm:flex-row items-center justify-between text-xs text-[var(--text-tertiary)] gap-2">
-            <span>© 2026 Mera Vote. All rights reserved. Independent Civic Opinion Poll Platform.</span>
+            <span>© 2026 Mera Vote. All rights reserved.</span>
             <span>{language === 'hi' ? 'गोपनीयता-प्रथम संरचना • WCAG 2.2 AA' : 'Privacy-First Architecture • WCAG 2.2 AA'}</span>
           </div>
         </div>

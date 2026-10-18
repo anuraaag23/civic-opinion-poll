@@ -1,5 +1,5 @@
 # Data Retention & Minimization Policy
-**Independent India Civic Opinion Poll Platform**
+**Mera Vote Platform**
 
 ## 1. The Minimum Data Principle
 The platform is designed strictly as an opinion research tool, not an electoral-roll database. Under no circumstances does the platform retain:

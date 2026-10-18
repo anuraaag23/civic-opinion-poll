@@ -52,8 +52,8 @@ export function PMClient() {
 
         <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-[var(--text-primary)]">
           {language === 'hi'
-            ? 'प्रधानमंत्री (PM) नागरिक जनमत सर्वेक्षण'
-            : 'Prime Minister (PM) Civic Opinion Poll'}
+            ? 'प्रधानमंत्री (PM) जनमत सर्वेक्षण'
+            : 'Prime Minister (PM) Opinion Poll'}
         </h1>
 
         <p className="text-base sm:text-lg text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed">

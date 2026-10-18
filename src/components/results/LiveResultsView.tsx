@@ -160,7 +160,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({
           title: `Mera Vote — ${pollTitle}`,
-          text: `Check out live civic opinion poll results on Mera Vote!`,
+          text: `Check out live results on Mera Vote!`,
           url: window.location.href,
         });
       } else if (typeof navigator !== 'undefined' && navigator.clipboard) {

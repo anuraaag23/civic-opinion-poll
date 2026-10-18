@@ -1,5 +1,5 @@
 # Security Architecture & Cryptographic Threat Model
-**Independent India Civic Opinion Poll Platform**
+**Mera Vote Platform**
 
 ## 1. Core Threat Model & Cryptographic Defenses
 

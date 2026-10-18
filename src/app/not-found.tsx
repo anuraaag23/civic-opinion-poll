@@ -110,8 +110,8 @@ export default function NotFound() {
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
           <span>
             {language === 'hi'
-              ? 'मेरा वोट — 100% स्वतंत्र नागरिक जनमत मंच'
-              : 'Mera Vote — Independent Civic Opinion Poll Platform'}
+              ? 'मेरा वोट — 100% स्वतंत्र जनमत मंच'
+              : 'Mera Vote — Independent Opinion Poll Platform'}
           </span>
         </div>
       </GlassCard>

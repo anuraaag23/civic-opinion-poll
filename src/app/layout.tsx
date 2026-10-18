@@ -24,19 +24,19 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL('https://meravote.in'),
   title: {
-    default: 'Mera Vote | Independent Civic Opinion Poll Platform',
+    default: 'Mera Vote',
     template: '%s | Mera Vote',
   },
   description:
-    'Mera Vote (मेरा वोट) — Independent civic opinion poll platform for India. Participate with privacy-preserving self-verification and cryptographically anonymous responses. Zero ID storage. Not affiliated with the Election Commission of India.',
+    'Mera Vote (मेरा वोट) — Independent public opinion poll platform for India. Participate with privacy-preserving self-verification and cryptographically anonymous responses. Zero ID storage. Not affiliated with the Election Commission of India.',
   keywords: [
     'Mera Vote',
     'मेरा वोट',
-    'Independent Civic Opinion Polls',
-    'India Public Opinion',
+    'Mera Vote India',
+    'Public Opinion Polls',
     'Civic Technology',
     'Anonymous Opinion Poll',
-    'स्वतंत्र नागरिक जनमत सर्वेक्षण',
+    'स्वतंत्र जनमत सर्वेक्षण',
     'Prime Minister Opinion Poll 2029',
     'Chief Minister Opinion Poll',
     'Lok Sabha Polls',
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     follow: true,
   },
   openGraph: {
-    title: 'Mera Vote | Independent Civic Opinion Polls',
+    title: 'Mera Vote',
     description:
       'Mera Vote (मेरा वोट) — Participate in independent public opinion polls with verified eligibility and cryptographically anonymous responses.',
     type: 'website',

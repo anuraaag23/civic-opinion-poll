@@ -1,5 +1,5 @@
 -- ====================================================================
--- INDEPENDENT INDIA CIVIC OPINION POLL PLATFORM
+-- MERA VOTE PLATFORM
 -- Production PostgreSQL / Supabase Database Schema
 --
 -- CORE GUARANTEE: ABSOLUTE SEPARATION OF IDENTITY AND VOTE STORAGE.

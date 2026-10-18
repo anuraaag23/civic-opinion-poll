@@ -35,8 +35,8 @@ export function HowToUseClient() {
         </h1>
         <p className="text-base text-[var(--text-secondary)] leading-relaxed max-w-2xl">
           {language === 'hi'
-            ? 'केवल 4 आसान और पारदर्शी चरणों में स्वतंत्र नागरिक जनमत में भाग लें। 100% सुरक्षित, कोई डेटा रिकॉर्ड नहीं।'
-            : 'Participate in independent civic opinion polls in 4 clear, transparent steps with 100% privacy and zero personal data stored.'}
+            ? 'केवल 4 आसान और पारदर्शी चरणों में "मेरा वोट" जनमत सर्वेक्षण में भाग लें। 100% सुरक्षित, कोई डेटा रिकॉर्ड नहीं।'
+            : 'Participate in Mera Vote public opinion polls in 4 clear, transparent steps with 100% privacy and zero personal data stored.'}
         </p>
       </div>
 
@@ -210,8 +210,8 @@ export function HowToUseClient() {
             </strong>
             <p className="text-[var(--text-secondary)] leading-relaxed">
               {language === 'hi'
-                ? 'नहीं। "मेरा वोट" एक पूर्णतः स्वतंत्र नागरिक जनमत सर्वेक्षण मंच है। इसका किसी राजनीतिक दल या चुनाव आयोग से कोई औपचारिक संबंध नहीं है।'
-                : 'No. Mera Vote is an independent civic opinion poll platform. It is not affiliated with the Election Commission of India (ECI) or any political party.'}
+                ? 'नहीं। "मेरा वोट" एक पूर्णतः स्वतंत्र जनमत सर्वेक्षण मंच है। इसका किसी राजनीतिक दल या चुनाव आयोग से कोई औपचारिक संबंध नहीं है।'
+                : 'No. Mera Vote is an independent public opinion poll platform. It is not affiliated with the Election Commission of India (ECI) or any political party.'}
             </p>
           </div>
         </div>

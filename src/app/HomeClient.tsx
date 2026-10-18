@@ -51,8 +51,8 @@ export function HomeClient() {
               <span className="text-[var(--accent)]">{language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}</span>
               <span className="block text-2xl sm:text-4xl lg:text-5xl mt-1 text-[var(--text-primary)]">
                 {language === 'hi'
-                  ? 'स्वतंत्र नागरिक जनमत सर्वेक्षण'
-                  : 'Independent India Civic Opinion Polls'}
+                  ? 'जनमत सर्वेक्षण मंच'
+                  : 'Opinion Poll Platform'}
               </span>
             </h1>
 

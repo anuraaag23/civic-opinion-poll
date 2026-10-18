@@ -522,7 +522,7 @@ export const db = {
     return {
       version: '1.0.0',
       exportedAt: new Date().toISOString(),
-      platform: 'Mera Vote - Independent Civic Opinion Poll',
+      platform: 'Mera Vote',
       siteSettings: civicStore.siteSettings,
       auditStats: await this.getAuditStats(),
       polls: pollsDetailed,

@@ -5,8 +5,8 @@ export const INITIAL_POLLS: Poll[] = [
   {
     id: 'poll-national-2029',
     slug: 'pm-election-poll-2029',
-    title_en: 'Prime Minister (PM) Civic Opinion Poll — All India (Lok Sabha)',
-    title_hi: 'प्रधानमंत्री (PM) नागरिक जनमत सर्वेक्षण — संपूर्ण भारत (लोकसभा)',
+    title_en: 'Prime Minister (PM) Poll — All India (Lok Sabha)',
+    title_hi: 'प्रधानमंत्री (PM) जनमत सर्वेक्षण — संपूर्ण भारत (लोकसभा)',
     description_en:
       'All-India national opinion poll examining voter sentiment across the country for the Prime Minister election. Features national political parties contesting across India.',
     description_hi:
@@ -30,8 +30,8 @@ export const INITIAL_POLLS: Poll[] = [
   {
     id: 'poll-state-cm-2029',
     slug: 'cm-state-assembly-poll',
-    title_en: 'Chief Minister (CM) Civic Opinion Poll — State Assemblies (Vidhan Sabha)',
-    title_hi: 'मुख्यमंत्री (CM) नागरिक जनमत सर्वेक्षण — राज्य विधानसभाएं',
+    title_en: 'Chief Minister (CM) Poll — State Assemblies (Vidhan Sabha)',
+    title_hi: 'मुख्यमंत्री (CM) जनमत सर्वेक्षण — राज्य विधानसभाएं',
     description_en:
       'State-specific legislative assembly poll examining citizen preferences for the Chief Minister election based on your selected Indian state and its active regional parties.',
     description_hi:

@@ -32,7 +32,7 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
     try {
       if (typeof navigator !== 'undefined' && navigator.share) {
         await navigator.share({
-          title: 'Mera Vote — Independent Civic Opinion Poll',
+          title: 'Mera Vote',
           text: 'I just participated anonymously in Mera Vote opinion poll! Check out live results:',
           url,
         });
