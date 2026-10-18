@@ -207,25 +207,6 @@ $$;
 -- Prevent public access to participation fingerprints and token hashes
 -- ====================================================================
 
-ALTER TABLE polls ENABLE ROW LEVEL SECURITY;
-ALTER TABLE parties ENABLE ROW LEVEL SECURITY;
-ALTER TABLE poll_options ENABLE ROW LEVEL SECURITY;
-ALTER TABLE participation ENABLE ROW LEVEL SECURITY;
-ALTER TABLE anonymous_tokens ENABLE ROW LEVEL SECURITY;
-ALTER TABLE vote_counts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE audit_events ENABLE ROW LEVEL SECURITY;
-
--- Public can read active polls, parties, options, and vote counts
-CREATE POLICY "Public Read Polls" ON polls FOR SELECT USING (status IN ('LIVE', 'CLOSED', 'SCHEDULED'));
-CREATE POLICY "Public Read Parties" ON parties FOR SELECT USING (is_active = true);
-CREATE POLICY "Public Read Poll Options" ON poll_options FOR SELECT USING (is_active = true);
-CREATE POLICY "Public Read Vote Counts" ON vote_counts FOR SELECT USING (true);
-
--- Deny public direct access to sensitive participation records and tokens
-CREATE POLICY "Deny Public Participation" ON participation FOR ALL USING (false);
-CREATE POLICY "Deny Public Anon Tokens" ON anonymous_tokens FOR ALL USING (false);
-CREATE POLICY "Deny Public Direct Audit" ON audit_events FOR ALL USING (false);
-
 -- 8. SUPPORTERS TABLE (For Chai Support & Donor Recognition)
 CREATE TABLE IF NOT EXISTS supporters (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -252,9 +233,41 @@ CREATE TABLE IF NOT EXISTS site_settings (
     last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE polls ENABLE ROW LEVEL SECURITY;
+ALTER TABLE parties ENABLE ROW LEVEL SECURITY;
+ALTER TABLE poll_options ENABLE ROW LEVEL SECURITY;
+ALTER TABLE participation ENABLE ROW LEVEL SECURITY;
+ALTER TABLE anonymous_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE vote_counts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE audit_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE supporters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
 
+-- Idempotent Policies: Drop old policy if exists before recreating
+DROP POLICY IF EXISTS "Public Read Polls" ON polls;
+CREATE POLICY "Public Read Polls" ON polls FOR SELECT USING (status IN ('LIVE', 'CLOSED', 'SCHEDULED'));
+
+DROP POLICY IF EXISTS "Public Read Parties" ON parties;
+CREATE POLICY "Public Read Parties" ON parties FOR SELECT USING (is_active = true);
+
+DROP POLICY IF EXISTS "Public Read Poll Options" ON poll_options;
+CREATE POLICY "Public Read Poll Options" ON poll_options FOR SELECT USING (is_active = true);
+
+DROP POLICY IF EXISTS "Public Read Vote Counts" ON vote_counts;
+CREATE POLICY "Public Read Vote Counts" ON vote_counts FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Deny Public Participation" ON participation;
+CREATE POLICY "Deny Public Participation" ON participation FOR ALL USING (false);
+
+DROP POLICY IF EXISTS "Deny Public Anon Tokens" ON anonymous_tokens;
+CREATE POLICY "Deny Public Anon Tokens" ON anonymous_tokens FOR ALL USING (false);
+
+DROP POLICY IF EXISTS "Deny Public Direct Audit" ON audit_events;
+CREATE POLICY "Deny Public Direct Audit" ON audit_events FOR ALL USING (false);
+
+DROP POLICY IF EXISTS "Public Read Verified Supporters" ON supporters;
 CREATE POLICY "Public Read Verified Supporters" ON supporters FOR SELECT USING (verified = true);
+
+DROP POLICY IF EXISTS "Public Read Site Settings" ON site_settings;
 CREATE POLICY "Public Read Site Settings" ON site_settings FOR SELECT USING (true);
 
