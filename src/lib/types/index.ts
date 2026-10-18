@@ -99,10 +99,18 @@ export interface PollResults {
 
 export interface VerificationResult {
   verified: boolean;
-  status?: 'SELF_VERIFICATION_CONFIRMED';
-  reason?: 'ALREADY_VOTED' | 'RATE_LIMITED' | 'SERVICE_UNAVAILABLE' | 'UNCONFIRMED' | 'INVALID_POLL';
+  status?: 'SELF_VERIFICATION_CONFIRMED' | 'VERIFICATION_SUCCESS';
+  reason?:
+    | 'ALREADY_VOTED'
+    | 'RATE_LIMITED'
+    | 'SERVICE_UNAVAILABLE'
+    | 'UNCONFIRMED'
+    | 'INVALID_POLL'
+    | 'INVALID_FORMAT'
+    | 'BOT_CHALLENGE_FAILED';
   anonymous_token?: string;
   expires_at?: string;
+  error?: string;
 }
 
 export interface AuditEvent {

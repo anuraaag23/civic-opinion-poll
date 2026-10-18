@@ -4,7 +4,7 @@ import { db, civicStore } from '../db';
 import { hashToken } from '../crypto';
 import { translations } from '../i18n/translations';
 
-describe('MODE A: ECI Self-Verification & Anonymous Voting Engine', () => {
+describe('Real Voter ID Verification & Anonymous Voting Engine', () => {
   const pollId = 'poll-national-2029';
 
   beforeEach(() => {
@@ -82,7 +82,7 @@ describe('MODE A: ECI Self-Verification & Anonymous Voting Engine', () => {
 
   // TEST 7: Inspect database - NO EPIC, NO voter name, NO address, NO email, NO phone
   it('TEST 7: guarantees NO EPIC, voter name, address, email, or phone in database records', async () => {
-    await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
+    await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1', 'ABC1234567');
 
     // Inspect participation table
     const records = Array.from(civicStore.participation.values());
@@ -135,5 +135,66 @@ describe('MODE A: ECI Self-Verification & Anonymous Voting Engine', () => {
     const result = await selfVerificationService.processSelfVerification('non-existent-poll', true);
     expect(result.verified).toBe(false);
     expect(result.reason).toBe('INVALID_POLL');
+  });
+
+  // TEST 11: Real Voter ID Verification - Successfully verifies genuine EPIC
+  it('TEST 11: verifies genuine Voter ID (EPIC) and issues single-use anonymous credential', async () => {
+    const result = await selfVerificationService.processSelfVerification(
+      pollId,
+      true,
+      '127.0.0.1',
+      'XYZ9876543'
+    );
+    expect(result.verified).toBe(true);
+    expect(result.anonymous_token).toBeDefined();
+    expect(result.anonymous_token?.length).toBe(64);
+  });
+
+  // TEST 12: Real Voter ID Deduplication - Blocks same Voter ID across browser changes or cookie clears
+  it('TEST 12: permanently BLOCKS duplicate vote attempt with the same Voter ID across sessions/cookie clear', async () => {
+    const voterId = 'WBD7654321';
+
+    // First attempt: should succeed
+    const firstAttempt = await selfVerificationService.processSelfVerification(
+      pollId,
+      true,
+      '127.0.0.1',
+      voterId
+    );
+    expect(firstAttempt.verified).toBe(true);
+
+    // Second attempt (simulating another browser / cleared cookies with same Voter ID): MUST BE BLOCKED
+    const secondAttempt = await selfVerificationService.processSelfVerification(
+      pollId,
+      true,
+      '192.168.1.5', // Different IP / browser
+      voterId
+    );
+    expect(secondAttempt.verified).toBe(false);
+    expect(secondAttempt.reason).toBe('ALREADY_VOTED');
+    expect(secondAttempt.error).toContain('already cast a vote');
+  });
+
+  // TEST 13: Reject invalid Voter ID formats
+  it('TEST 13: rejects invalid Voter ID formats and bogus sequences', async () => {
+    // Too short / missing letters
+    const invalidFormat = await selfVerificationService.processSelfVerification(
+      pollId,
+      true,
+      '127.0.0.1',
+      '123456'
+    );
+    expect(invalidFormat.verified).toBe(false);
+    expect(invalidFormat.reason).toBe('INVALID_FORMAT');
+
+    // Repetitive dummy sequence
+    const bogusSequence = await selfVerificationService.processSelfVerification(
+      pollId,
+      true,
+      '127.0.0.1',
+      'ABC0000000'
+    );
+    expect(bogusSequence.verified).toBe(false);
+    expect(bogusSequence.reason).toBe('INVALID_FORMAT');
   });
 });

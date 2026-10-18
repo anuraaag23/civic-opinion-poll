@@ -2,7 +2,12 @@ import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, Partici
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
 import { OFFICIAL_PARTIES } from '../data/parties';
 
-// In-Memory Storage Cache (Guarantees local zero-config operation and unit testing)
+import fs from 'fs';
+import path from 'path';
+
+const LEDGER_PATH = path.join(process.cwd(), '.data', 'civic_ledger.json');
+
+// In-Memory & Persistent Storage Cache (Guarantees local zero-config operation and unit testing)
 class StorageStore {
   polls: Map<string, Poll> = new Map();
   // pollId -> optionId -> count
@@ -41,6 +46,46 @@ class StorageStore {
       });
       this.voteCounts.set(pollId, countsMap);
     });
+
+    // Load persistent ledger records if available on disk
+    try {
+      if (fs.existsSync(LEDGER_PATH)) {
+        const raw = fs.readFileSync(LEDGER_PATH, 'utf-8');
+        const data = JSON.parse(raw);
+        if (Array.isArray(data.participation)) {
+          data.participation.forEach(([k, v]: [string, ParticipationRecord]) => {
+            this.participation.set(k, v);
+          });
+        }
+        if (Array.isArray(data.voteCounts)) {
+          data.voteCounts.forEach(([pId, opts]: [string, [string, number][]]) => {
+            const m = new Map<string, number>(opts);
+            this.voteCounts.set(pId, m);
+          });
+        }
+      }
+    } catch {
+      // Fallback cleanly if read fails
+    }
+  }
+
+  saveLedger() {
+    try {
+      const dir = path.dirname(LEDGER_PATH);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      const data = {
+        participation: Array.from(this.participation.entries()),
+        voteCounts: Array.from(this.voteCounts.entries()).map(([k, v]) => [
+          k,
+          Array.from(v.entries()),
+        ]),
+      };
+      fs.writeFileSync(LEDGER_PATH, JSON.stringify(data), 'utf-8');
+    } catch {
+      // Non-blocking in read-only environment
+    }
   }
 }
 
@@ -129,6 +174,7 @@ export const db = {
       created_at: new Date().toISOString(),
       voted_at: null,
     });
+    civicStore.saveLedger();
   },
 
   async issueAnonymousCredential(
@@ -198,6 +244,8 @@ export const db = {
     // Update poll total
     poll.total_votes += 1;
     poll.updated_at = new Date().toISOString();
+
+    civicStore.saveLedger();
 
     // Record audit event
     this.recordAuditEvent('vote_submission_success', pollId, { option_id: optionId });

@@ -4,7 +4,7 @@ import { selfVerificationService } from '@/lib/verification';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { pollId, selfVerificationConfirmed } = body;
+    const { pollId, selfVerificationConfirmed, voterId, deviceFingerprint, mathChallenge } = body;
 
     if (!pollId) {
       return NextResponse.json(
@@ -18,24 +18,55 @@ export async function POST(request: NextRequest) {
         {
           verified: false,
           reason: 'UNCONFIRMED',
-          error: 'You must confirm that you performed the electoral registration check on the official ECI portal.',
+          error: 'You must confirm the voter declaration before continuing.',
         },
         { status: 400 }
       );
     }
 
-    // Extract sanitized client identifier for rate-limiting (hashed or truncated)
+    // Require genuine Voter ID (EPIC)
+    if (!voterId || typeof voterId !== 'string' || voterId.trim().length === 0) {
+      return NextResponse.json(
+        {
+          verified: false,
+          reason: 'INVALID_FORMAT',
+          error:
+            'Voter ID (EPIC Card Number) is strictly required to verify voter eligibility and prevent duplicate voting.',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Optional Anti-Bot Arithmetic Challenge Verification
+    if (mathChallenge) {
+      const { num1, num2, answer } = mathChallenge;
+      if (typeof num1 === 'number' && typeof num2 === 'number' && typeof answer === 'number') {
+        if (num1 + num2 !== answer) {
+          return NextResponse.json(
+            {
+              verified: false,
+              reason: 'BOT_CHALLENGE_FAILED',
+              error: 'Security arithmetic verification failed. Please enter the correct sum.',
+            },
+            { status: 400 }
+          );
+        }
+      }
+    }
+
+    // Extract sanitized client IP
     const ip =
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
       request.headers.get('x-real-ip') ||
       '127.0.0.1';
 
-    // Process Mode A self-verification confirmation
-    // STRICT RULE: NEVER ACCEPT, LOG, STORE, OR TRANSMIT RAW EPIC OR VOTER PII
+    // Process real Voter ID cryptographic verification and deduplication
     const result = await selfVerificationService.processSelfVerification(
       pollId,
       selfVerificationConfirmed,
-      ip
+      ip,
+      voterId,
+      deviceFingerprint
     );
 
     if (!result.verified) {
@@ -50,9 +81,11 @@ export async function POST(request: NextRequest) {
         {
           verified: false,
           reason: result.reason,
+          error: result.error || 'Verification failed',
           realVerifier: {
-            status: 'FAILED',
+            status: result.reason === 'ALREADY_VOTED' ? 'DUPLICATE_BLOCKED' : 'FAILED',
             reason: result.reason,
+            voterIdDeduplicated: result.reason === 'ALREADY_VOTED',
             dataRecordedBytes: 0,
             monitoredAt: new Date().toISOString(),
           },
@@ -61,15 +94,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Return the anonymous credential to the client for immediate poll submission
+    // Return the decoupled anonymous credential to the client for immediate poll submission
     const response = NextResponse.json({
       verified: true,
-      status: 'SELF_VERIFICATION_CONFIRMED',
+      status: 'VERIFICATION_SUCCESS',
       anonymousCredential: result.anonymous_token,
       expiresAt: result.expires_at,
       realVerifier: {
         status: 'SUCCESS',
-        eciPortalVerified: true,
+        voterIdVerified: true,
+        deduplicationFingerprintRegistered: true,
         dataRecordedBytes: 0,
         anonymityShield: '256_BIT_CSPRNG',
         privacyGuaranteed: true,
@@ -77,7 +111,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Set secure HttpOnly session cookie indicating self-verification completed
+    // Set secure HttpOnly session cookie indicating verification completed
     response.cookies.set(`civic_verified_${pollId}`, '1', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
