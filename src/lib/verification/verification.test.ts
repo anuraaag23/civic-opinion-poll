@@ -38,7 +38,7 @@ describe('Real Voter ID Verification & Anonymous Voting Engine', () => {
 
   // TEST 4: User checks confirmation - anonymous credential created
   it('TEST 4: generates anonymous participation credential when self-verification is confirmed', async () => {
-    const result = await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
+    const result = await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1', 'KRL1234567');
     expect(result.verified).toBe(true);
     expect(result.status).toBe('SELF_VERIFICATION_CONFIRMED');
     expect(result.anonymous_token).toBeDefined();
@@ -48,7 +48,7 @@ describe('Real Voter ID Verification & Anonymous Voting Engine', () => {
 
   // TEST 5: User votes - one successful vote recorded
   it('TEST 5: records exactly one successful vote and increments aggregate tally', async () => {
-    const verifyRes = await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
+    const verifyRes = await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1', 'UPX9876543');
     expect(verifyRes.verified).toBe(true);
     const token = verifyRes.anonymous_token!;
     const tokenHash = hashToken(token);
@@ -68,7 +68,7 @@ describe('Real Voter ID Verification & Anonymous Voting Engine', () => {
 
   // TEST 6: User tries to vote again with same token - blocked
   it('TEST 6: blocks duplicate voting attempt using the same credential', async () => {
-    const verifyRes = await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
+    const verifyRes = await selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1', 'MHA5551234');
     const token = verifyRes.anonymous_token!;
     const tokenHash = hashToken(token);
 
@@ -109,7 +109,7 @@ describe('Real Voter ID Verification & Anonymous Voting Engine', () => {
 
   // TEST 8: Inspect token decoupled from vote choice
   it('TEST 8: ensures anonymous token contains zero embedded vote or personal metadata', () => {
-    const verifyRes = selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1');
+    const verifyRes = selfVerificationService.processSelfVerification(pollId, true, '127.0.0.1', 'DEL9998888');
     return verifyRes.then((res) => {
       const token = res.anonymous_token!;
       expect(token).toMatch(/^[0-9a-f]{64}$/); // Pure cryptographic hex entropy

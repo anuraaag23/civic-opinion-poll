@@ -152,3 +152,14 @@ export interface SiteSettings {
   lastUpdated: string;
 }
 
+export interface DbSupporter {
+  id?: string;
+  name: string;
+  amount: number;
+  cups: number;
+  rating: number;
+  message?: string | null;
+  payment_id?: string | null;
+  verified?: boolean;
+  created_at?: string;
+}

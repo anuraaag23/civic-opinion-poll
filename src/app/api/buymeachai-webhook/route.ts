@@ -1,12 +1,12 @@
 import crypto from 'crypto';
 import { NextResponse } from 'next/server';
-import { supabase, sanitizeText } from '@/lib/supabase';
+import { supabase, supabaseAdmin, sanitizeText } from '@/lib/supabase';
 
-// Verification Token configured for @ryper
+// Verification Token configured in environment variables
 const EXPECTED_TOKEN =
   process.env.BUYMEACHAI_VERIFICATION_TOKEN ||
   process.env.KOFI_VERIFICATION_TOKEN ||
-  'c7bf8b09-4bbf-4789-a823-f1ad63ff1df8';
+  '';
 
 function timingSafeCompare(a: string, b: string): boolean {
   if (!a || !b) return false;
@@ -66,12 +66,14 @@ export async function POST(request: Request) {
     }
 
     // Cryptographic Security: Validate Verification Token in constant time
-    const token = payload.verification_token || request.headers.get('x-verification-token');
-    if (token) {
-      if (!timingSafeCompare(token, EXPECTED_TOKEN)) {
-        console.warn('Unauthorized webhook attempt with invalid verification token');
+    const token = payload.verification_token || request.headers.get('x-verification-token') || '';
+    if (EXPECTED_TOKEN) {
+      if (!token || !timingSafeCompare(token, EXPECTED_TOKEN)) {
+        console.warn('Unauthorized webhook attempt with invalid or missing verification token');
         return NextResponse.json({ error: 'Unauthorized: Invalid verification token' }, { status: 401 });
       }
+    } else if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ error: 'Webhook secret not configured on server' }, { status: 403 });
     }
 
     const fromName = sanitizeText(payload.from_name || 'Anonymous Supporter', 80);
@@ -86,16 +88,17 @@ export async function POST(request: Request) {
     console.log(`[Buy Me a Chai Webhook] Verified donation received: ₹${numAmount} from "${fromName}" (ID: ${transactionId})`);
 
     // Synchronize to Supabase supporters ledger
-    if (supabase) {
+    const client = supabaseAdmin || supabase;
+    if (client) {
       try {
-        const { data: existing } = await supabase
+        const { data: existing } = await client
           .from('supporters')
           .select('id, name')
           .eq('payment_id', transactionId)
           .limit(1);
 
         if (existing && existing.length > 0) {
-          await supabase
+          await client
             .from('supporters')
             .update({
               verified: true,
@@ -106,7 +109,7 @@ export async function POST(request: Request) {
             .eq('id', existing[0].id);
         } else {
           const tenMinutesAgo = new Date(Date.now() - 600000).toISOString();
-          const { data: pendingMatch } = await supabase
+          const { data: pendingMatch } = await client
             .from('supporters')
             .select('id, rating, message')
             .eq('verified', false)
@@ -115,7 +118,7 @@ export async function POST(request: Request) {
             .limit(1);
 
           if (pendingMatch && pendingMatch.length > 0) {
-            await supabase
+            await client
               .from('supporters')
               .update({
                 verified: true,
@@ -125,7 +128,7 @@ export async function POST(request: Request) {
               })
               .eq('id', pendingMatch[0].id);
           } else {
-            await supabase.from('supporters').insert([
+            await client.from('supporters').insert([
               {
                 name: fromName,
                 amount: numAmount,

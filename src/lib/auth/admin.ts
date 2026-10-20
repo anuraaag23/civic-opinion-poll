@@ -81,8 +81,18 @@ export function verifyAdminPasscode(provided: string): boolean {
   if (!provided || typeof provided !== 'string') return false;
 
   const providedHash = crypto.createHash('sha256').update(provided.trim()).digest();
-  const expectedHash = crypto.createHash('sha256').update(ADMIN_PASSCODE).digest();
 
+  // If pre-hashed passcode is configured in environment (ADMIN_PASSCODE_HASH)
+  if (process.env.ADMIN_PASSCODE_HASH) {
+    try {
+      const configuredBuffer = Buffer.from(process.env.ADMIN_PASSCODE_HASH.trim(), 'hex');
+      if (configuredBuffer.length === providedHash.length) {
+        return crypto.timingSafeEqual(providedHash, configuredBuffer);
+      }
+    } catch {}
+  }
+
+  const expectedHash = crypto.createHash('sha256').update(ADMIN_PASSCODE).digest();
   return crypto.timingSafeEqual(providedHash, expectedHash);
 }
 

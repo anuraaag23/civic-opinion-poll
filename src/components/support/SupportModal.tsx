@@ -21,14 +21,19 @@ import {
 import confetti from 'canvas-confetti';
 import { useI18n } from '@/lib/i18n/context';
 import { BUYMEACHAI_CONFIG, CHAI_TIERS, addSupporter } from '@/lib/buymeachai/config';
-import {
-  containsLink,
-  sanitizeText,
-  checkForAutoVerifiedPayment,
-  updateSupporter,
-  submitSupporter,
-  DbSupporter,
-} from '@/lib/supabase';
+import { containsLink, sanitizeText } from '@/lib/utils/sanitize';
+
+interface DbSupporter {
+  id?: string;
+  name: string;
+  amount: number;
+  cups: number;
+  rating: number;
+  message?: string | null;
+  payment_id?: string | null;
+  verified?: boolean;
+  created_at?: string;
+}
 
 interface SupportModalProps {
   isOpen: boolean;
@@ -143,18 +148,7 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
             verified = true;
             supporterData = data.supporter;
           }
-        } catch {
-          // Direct Supabase fallback
-          const directRes = await checkForAutoVerifiedPayment(
-            paymentInitiatedAt,
-            supporterName,
-            currentAmount
-          );
-          if (directRes.verified && directRes.supporter) {
-            verified = true;
-            supporterData = directRes.supporter;
-          }
-        }
+        } catch {}
 
         if (verified && supporterData) {
           clearTimers();
@@ -162,11 +156,16 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
           // Update supporter record with user's rating and message if provided
           if (supporterData.id) {
             const cleanMsg = message.trim() ? sanitizeText(message.trim(), 350) : undefined;
-            await updateSupporter(supporterData.id, {
-              rating: starRating,
-              message: cleanMsg,
-              name: supporterName.trim() ? sanitizeText(supporterName.trim(), 80) : supporterData.name,
-            });
+            await fetch('/api/support', {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                id: supporterData.id,
+                rating: starRating,
+                message: cleanMsg,
+                name: supporterName.trim() ? sanitizeText(supporterName.trim(), 80) : supporterData.name,
+              }),
+            }).catch(() => null);
           }
 
           // Also update local storage and broadcast to update floating widget
@@ -262,28 +261,23 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
           verified = true;
           supporterData = data.supporter;
         }
-      } catch {
-        const directRes = await checkForAutoVerifiedPayment(
-          paymentInitiatedAt || Date.now() - 60000,
-          supporterName,
-          currentAmount
-        );
-        if (directRes.verified && directRes.supporter) {
-          verified = true;
-          supporterData = directRes.supporter;
-        }
-      }
+      } catch {}
 
       if (verified && supporterData) {
         clearTimers();
 
         if (supporterData.id) {
           const cleanMsg = message.trim() ? sanitizeText(message.trim(), 350) : undefined;
-          await updateSupporter(supporterData.id, {
-            rating: starRating,
-            message: cleanMsg,
-            name: supporterName.trim() ? sanitizeText(supporterName.trim(), 80) : supporterData.name,
-          });
+          await fetch('/api/support', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: supporterData.id,
+              rating: starRating,
+              message: cleanMsg,
+              name: supporterName.trim() ? sanitizeText(supporterName.trim(), 80) : supporterData.name,
+            }),
+          }).catch(() => null);
         }
 
         addSupporter(
@@ -334,15 +328,19 @@ export function SupportModal({ isOpen, onClose, defaultAmount = 20 }: SupportMod
       const finalName = sanitizeText(supporterName.trim(), 80) || 'Anonymous Citizen';
       const cleanMessage = message.trim() ? sanitizeText(message.trim(), 350) : undefined;
 
-      await submitSupporter({
-        name: finalName,
-        amount: currentAmount > 0 ? currentAmount : 50,
-        cups: estimatedCups,
-        rating: starRating,
-        message: cleanMessage,
-        paymentId: `chai-pending-${Date.now()}`,
-        verified: false,
-      });
+      await fetch('/api/support', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: finalName,
+          amount: currentAmount > 0 ? currentAmount : 50,
+          cups: estimatedCups,
+          rating: starRating,
+          message: cleanMessage,
+          paymentRef: `chai-pending-${Date.now()}`,
+          verified: false,
+        }),
+      }).catch(() => null);
 
       addSupporter(
         finalName,

@@ -18,9 +18,12 @@ export async function POST(request: NextRequest) {
       eciRecordFound,
     } = body;
 
-    if (!pollId) {
+    const cleanPollId = typeof pollId === 'string' ? pollId.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64) : '';
+    const cleanVoterId = typeof voterId === 'string' ? voterId.trim().toUpperCase().replace(/[\s\/-]/g, '').slice(0, 16) : '';
+
+    if (!cleanPollId) {
       return NextResponse.json(
-        { verified: false, reason: 'INVALID_POLL', error: 'Missing poll identifier' },
+        { verified: false, reason: 'INVALID_POLL', error: 'Missing or invalid poll identifier' },
         { status: 400 }
       );
     }
@@ -37,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Require genuine Voter ID (EPIC)
-    if (!voterId || typeof voterId !== 'string' || voterId.trim().length === 0) {
+    if (!cleanVoterId || cleanVoterId.length === 0) {
       return NextResponse.json(
         {
           verified: false,
@@ -74,10 +77,10 @@ export async function POST(request: NextRequest) {
 
     // Process real Voter ID & ECI Electoral Search verification and deduplication
     const result = await selfVerificationService.processSelfVerification(
-      pollId,
+      cleanPollId,
       selfVerificationConfirmed,
       ip,
-      voterId,
+      cleanVoterId,
       deviceFingerprint,
       voterName,
       stateCode,

@@ -1,21 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
+import { containsLink, sanitizeText } from '../utils/sanitize';
+export { containsLink, sanitizeText };
 
-const SUPABASE_URL =
-  process.env.NEXT_PUBLIC_SUPABASE_URL ||
-  'https://itdcuecexchibhntdswi.supabase.co';
-
-const SUPABASE_ANON_KEY =
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZGN1ZWNleGNoaWJobnRkc3dpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIzMzgzOTgsImV4cCI6MjEwNzkxNDM5OH0.vqCmVnxxCNdN1i8Q0sQ01y7oJAyounYdfcBoCU1C05Y';
-
-const SUPABASE_SERVICE_ROLE =
-  process.env.SUPABASE_SERVICE_ROLE_KEY ||
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml0ZGN1ZWNleGNoaWJobnRkc3dpIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc5MjMzODM5OCwiZXhwIjoyMTA3OTE0Mzk4fQ.vTbsqEnkYzd8UVNh8BG25oryk6JK7suCYXObmcxQp6g';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 
 export const isSupabaseConfigured = (): boolean => {
   return Boolean(SUPABASE_URL && SUPABASE_ANON_KEY && !SUPABASE_URL.includes('placeholder'));
 };
 
+// Client-safe Supabase client (only anon key, never service role)
 export const supabase = isSupabaseConfigured()
   ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: {
@@ -25,14 +20,16 @@ export const supabase = isSupabaseConfigured()
     })
   : null;
 
-export const supabaseAdmin = Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE)
-  ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    })
-  : null;
+// Server-only admin client (strictly guarded: never evaluated or accessible in browser client)
+export const supabaseAdmin =
+  typeof window === 'undefined' && Boolean(SUPABASE_URL && SUPABASE_SERVICE_ROLE)
+    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
+        auth: {
+          persistSession: false,
+          autoRefreshToken: false,
+        },
+      })
+    : null;
 
 export interface DbSupporter {
   id?: string;
@@ -50,22 +47,6 @@ export interface AutoVerifyResult {
   verified: boolean;
   supporter?: DbSupporter;
 }
-
-const LINK_REGEX =
-  /(?:https?:\/\/|ftp:\/\/|www\.)[^\s/$.?#].[^\s]*|\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|org|net|edu|gov|mil|io|co|in|ai|me|xyz|app|dev|gg|link|info|biz|site|online|tech|store|cc|to|is|ru|cn|tv|top)\b(?:\/[^\s]*)?/gi;
-
-export const containsLink = (text: string): boolean => {
-  if (!text) return false;
-  return LINK_REGEX.test(text);
-};
-
-export const sanitizeText = (text: string, maxLen = 350): string => {
-  if (!text) return '';
-  let cleaned = text.replace(/<[^>]*>/g, '').replace(/[<>"'`]/g, '');
-  cleaned = cleaned.replace(LINK_REGEX, '');
-  cleaned = cleaned.replace(/\s+/g, ' ').trim();
-  return cleaned.slice(0, maxLen);
-};
 
 /**
  * Checks Supabase for a newly verified payment received around or after the payment initiation timestamp.

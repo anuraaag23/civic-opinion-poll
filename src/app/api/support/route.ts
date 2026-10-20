@@ -77,3 +77,26 @@ export async function POST(request: Request) {
     );
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const body = await request.json();
+    const { id, rating, message, name } = body;
+
+    if (!id || typeof id !== 'string') {
+      return NextResponse.json({ success: false, error: 'Supporter ID is required' }, { status: 400 });
+    }
+
+    const { updateSupporter } = await import('@/lib/supabase');
+    const success = await updateSupporter(id, {
+      rating: rating !== undefined ? Math.min(5, Math.max(1, Number(rating))) : undefined,
+      message: message !== undefined ? sanitizeText(String(message), 350) : undefined,
+      name: name !== undefined ? sanitizeText(String(name), 80) : undefined,
+    });
+
+    return NextResponse.json({ success });
+  } catch (err) {
+    console.error('Support PATCH error:', err);
+    return NextResponse.json({ success: false, error: 'Failed to update supporter' }, { status: 500 });
+  }
+}

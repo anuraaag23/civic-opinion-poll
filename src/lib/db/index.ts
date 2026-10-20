@@ -559,7 +559,7 @@ export const db = {
   },
 
   async createPoll(pollData: {
-    slug: string;
+    slug?: string;
     title_en: string;
     title_hi: string;
     description_en?: string;

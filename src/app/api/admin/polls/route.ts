@@ -50,12 +50,20 @@ export async function POST(request: Request) {
       );
     }
 
+    const { sanitizeText, sanitizeId } = await import('@/lib/utils/sanitize');
+
+    const cleanTitleEn = sanitizeText(title_en, 150);
+    const cleanTitleHi = sanitizeText(title_hi, 150);
+    const cleanDescEn = description_en ? sanitizeText(description_en, 500) : '';
+    const cleanDescHi = description_hi ? sanitizeText(description_hi, 500) : '';
+    const cleanSlug = slug ? sanitizeId(slug, 80) : undefined;
+
     const newPoll = await db.createPoll({
-      slug,
-      title_en,
-      title_hi,
-      description_en,
-      description_hi,
+      slug: cleanSlug,
+      title_en: cleanTitleEn,
+      title_hi: cleanTitleHi,
+      description_en: cleanDescEn,
+      description_hi: cleanDescHi,
       status,
       start_at,
       end_at,
@@ -153,11 +161,13 @@ export async function PATCH(request: Request) {
       max_votes_per_citizen,
     } = body;
 
+    const { sanitizeText } = await import('@/lib/utils/sanitize');
+
     const updated = await db.updatePoll(pollId, {
-      title_en,
-      title_hi,
-      description_en,
-      description_hi,
+      title_en: title_en ? sanitizeText(title_en, 150) : undefined,
+      title_hi: title_hi ? sanitizeText(title_hi, 150) : undefined,
+      description_en: description_en !== undefined ? sanitizeText(description_en, 500) : undefined,
+      description_hi: description_hi !== undefined ? sanitizeText(description_hi, 500) : undefined,
       status,
       end_at,
       start_at,

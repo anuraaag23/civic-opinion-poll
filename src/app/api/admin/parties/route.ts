@@ -52,29 +52,45 @@ export async function POST(request: Request) {
       );
     }
 
-    const shortCode = (short_name || name_en.slice(0, 4)).trim().toUpperCase();
-    const partyColor = color || '#3B82F6';
-    const partyId = `party-${shortCode.toLowerCase().replace(/[^a-z0-9]/g, '')}-${Date.now().toString().slice(-4)}`;
+    const { sanitizeText, sanitizeSvg, isValidHexColor } = await import('@/lib/utils/sanitize');
+
+    const cleanNameEn = sanitizeText(name_en, 80);
+    const cleanNameHi = sanitizeText(name_hi, 80);
+    const cleanShort = sanitizeText(short_name || name_en.slice(0, 4), 10).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const partyColor = isValidHexColor(color) ? color.trim() : '#3B82F6';
+    const partyId = `party-${cleanShort.toLowerCase().replace(/[^a-z0-9]/g, '') || 'custom'}-${Date.now().toString().slice(-4)}`;
+
+    // Validate safe image URL (http/https or safe data:image/)
+    let safeLogoUrl: string | undefined = undefined;
+    if (typeof logo_url === 'string' && logo_url.trim()) {
+      const trimmed = logo_url.trim();
+      if (/^https?:\/\//i.test(trimmed) || /^data:image\/(?:png|jpeg|jpg|webp|svg\+xml);base64,/i.test(trimmed)) {
+        safeLogoUrl = trimmed;
+      }
+    }
 
     // Build SVG or use provided SVG / image data
-    const finalSvg =
-      symbol_svg ||
-      (logo_url?.startsWith('data:image') || logo_url?.startsWith('http')
-        ? `<image href="${logo_url}" width="64" height="64" />`
-        : `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="30" fill="${partyColor}" fill-opacity="0.15" stroke="${partyColor}" stroke-width="2.5"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="${partyColor}" font-size="18" font-family="sans-serif" font-weight="900">${shortCode.slice(0, 4)}</text></svg>`);
+    let finalSvg = '';
+    if (typeof symbol_svg === 'string' && symbol_svg.trim()) {
+      finalSvg = sanitizeSvg(symbol_svg);
+    } else if (safeLogoUrl) {
+      finalSvg = `<image href="${safeLogoUrl}" width="64" height="64" />`;
+    } else {
+      finalSvg = `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="30" fill="${partyColor}" fill-opacity="0.15" stroke="${partyColor}" stroke-width="2.5"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" fill="${partyColor}" font-size="18" font-family="sans-serif" font-weight="900">${cleanShort.slice(0, 4)}</text></svg>`;
+    }
 
     const newParty: Party = {
       id: partyId,
-      name_en: name_en.trim(),
-      name_hi: name_hi.trim(),
-      short_name: shortCode,
+      name_en: cleanNameEn,
+      name_hi: cleanNameHi,
+      short_name: cleanShort,
       color: partyColor,
-      logo_url: logo_url || undefined,
+      logo_url: safeLogoUrl,
       symbol_svg: finalSvg,
-      symbol_alt_en: `${name_en} Election Symbol`,
-      symbol_alt_hi: `${name_hi} चुनाव चिह्न`,
-      description_en: description_en || `Political party: ${name_en}`,
-      description_hi: description_hi || `राजनीतिक दल: ${name_hi}`,
+      symbol_alt_en: `${cleanNameEn} Election Symbol`,
+      symbol_alt_hi: `${cleanNameHi} चुनाव चिह्न`,
+      description_en: description_en ? sanitizeText(description_en, 250) : `Political party: ${cleanNameEn}`,
+      description_hi: description_hi ? sanitizeText(description_hi, 250) : `राजनीतिक दल: ${cleanNameHi}`,
       source_ref: 'Admin Custom Party Registry',
       is_active: true,
       display_order: 99,

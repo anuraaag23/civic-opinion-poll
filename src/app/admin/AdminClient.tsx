@@ -6,8 +6,7 @@ import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { OFFICIAL_PARTIES, INDIAN_STATES, IndianState, Party } from '@/lib/data/parties';
-import { Poll, OptionResult, SiteSettings, AuditEvent } from '@/lib/types';
-import { DbSupporter } from '@/lib/supabase';
+import { Poll, OptionResult, SiteSettings, AuditEvent, DbSupporter } from '@/lib/types';
 import {
   ShieldCheck,
   Users,
@@ -176,6 +175,13 @@ export function AdminClient() {
         fetch('/api/admin/audit?limit=40').catch(() => null),
         fetch('/api/admin/parties').catch(() => null),
       ]);
+
+      if (statsRes?.status === 401) {
+        setIsAuthenticated(false);
+        sessionStorage.removeItem('meravote_admin_auth');
+        sessionStorage.removeItem('meravote_admin_token');
+        return;
+      }
 
       if (statsRes?.ok) {
         const d = await statsRes.json();
