@@ -34,22 +34,22 @@ export function VoterAssuranceCard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1 items-stretch">
-        {/* Assurance 1: We NEVER ask for your EPIC or ID */}
+        {/* Assurance 1: We NEVER store your phone number */}
         <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2 flex flex-col justify-between shadow-xs">
           <div className="space-y-2">
-            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[var(--success)]">
+            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-500">
               <Lock className="w-4 h-4 shrink-0" />
-              <span>{language === 'hi' ? '1. कभी ID नहीं मांगते' : '1. We NEVER Collect Your ID'}</span>
+              <span>{language === 'hi' ? '1. नंबर कभी सहेजा नहीं जाता' : '1. Zero Phone Numbers Stored'}</span>
             </div>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               {language === 'hi'
-                ? 'हम आपसे इस मंच पर अपना EPIC नंबर या कोई भी पहचान पत्र जमा करने के लिए कभी नहीं कहते। मतदाता पंजीकरण की जांच सीधे आपके द्वारा आधिकारिक ECI वेबसाइट पर की जाती है। आपकी पहचान आपके पास सुरक्षित रहती है।'
-                : 'We NEVER ask you to submit your EPIC number or any ID proof on this platform. Electoral registration checks are performed directly by you on the official ECI portal. Your identity stays private.'}
+                ? 'आपका मोबाइल नंबर केवल व्हाट्सएप पर एकल-उपयोग ओटीपी भेजने के लिए काम आता है। सत्यापन के तुरंत बाद इसे एकतरफा हैश में बदल दिया जाता है। आपकी पहचान पूर्णतः निजी है।'
+                : 'Your mobile number is solely used to send your single-use WhatsApp OTP. It is immediately hashed cryptographically and never stored alongside your vote.'}
             </p>
           </div>
         </div>
 
-        {/* Assurance 2: Vote Once, Never Changes - Be Smart */}
+        {/* Assurance 2: Vote Once, Never Changes */}
         <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2 flex flex-col justify-between shadow-xs">
           <div className="space-y-2">
             <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[var(--accent)]">
@@ -58,23 +58,23 @@ export function VoterAssuranceCard() {
             </div>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               {language === 'hi'
-                ? 'एक सर्वेक्षण में आप केवल एक ही बार अपनी राय दर्ज कर सकते हैं। सबमिट करने के बाद आपका मत कभी भी बदला या मिटाया नहीं जा सकता — इसलिए अपनी राय समझदारी से चुनें।'
-                : 'You can only vote ONCE per poll. Once confirmed, your response is final and can NEVER be changed or re-cast — so choose thoughtfully and be smart with your opinion.'}
+                ? 'एक सर्वेक्षण में प्रति व्हाट्सएप नंबर केवल एक ही बार मत दर्ज किया जा सकता है। सबमिट करने के बाद आपका मत कभी भी बदला या मिटाया नहीं जा सकता।'
+                : 'Only ONE vote is permitted per verified WhatsApp number. Once confirmed, your response is final and can NEVER be changed or re-cast.'}
             </p>
           </div>
         </div>
 
-        {/* Assurance 3: 100% Real - Honest Self-Verification */}
+        {/* Assurance 3: 100% Free Forever */}
         <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2 flex flex-col justify-between shadow-xs">
           <div className="space-y-2">
-            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[var(--warning)]">
-              <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span>{language === 'hi' ? '3. 100% ईमानदार स्व-सत्यापन' : '3. 100% Honest Self-Verification'}</span>
+            <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400">
+              <ShieldCheck className="w-4 h-4 shrink-0" />
+              <span>{language === 'hi' ? '3. 100% निःशुल्क एवं सुरक्षित' : '3. 100% Free WhatsApp OTP'}</span>
             </div>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               {language === 'hi'
-                ? 'यह मंच असली नागरिकों की सच्ची आवाज़ है। आधिकारिक ECI पोर्टल पर सीधे जांच पूरी करें और ईमानदारी से पुष्टि करें। एक असली नागरिक, एक स्वतंत्र निष्पक्ष राय।'
-                : 'This platform reflects real people. Complete the electoral check on the official ECI portal and confirm honestly. One genuine citizen, one voice, one opinion.'}
+                ? 'व्हाट्सएप ओटीपी सेवा सभी नागरिकों के लिए पूरी तरह से निःशुल्क है। बॉट और फर्जी खातों से मुक्त, असली भारतीय नागरिकों की सच्ची राय।'
+                : 'WhatsApp OTP delivery is completely free forever. Protected against automated bots, sybil attacks, and fake entries.'}
             </p>
           </div>
         </div>

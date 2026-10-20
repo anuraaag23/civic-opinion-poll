@@ -83,35 +83,28 @@ export function HowToUseClient() {
         {/* Step 2 */}
         <GlassCard className="p-5 sm:p-7 space-y-3">
           <div className="flex items-center gap-3">
-            <span className="w-9 h-9 rounded-xl bg-[var(--accent)] text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
+            <span className="w-9 h-9 rounded-xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shrink-0 shadow-xs">
               02
             </span>
             <div>
-              <span className="text-xs font-bold text-[var(--accent)] uppercase tracking-wider block">
-                {language === 'hi' ? 'चरण 2 • रीयल सत्यापन जांच' : 'Step 2 • Real Verifier Check via ECI'}
+              <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider block">
+                {language === 'hi' ? 'चरण 2 • व्हाट्सएप ओटीपी सत्यापन' : 'Step 2 • WhatsApp OTP Verification'}
               </span>
               <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)]">
                 {language === 'hi'
-                  ? 'ECI पोर्टल पर मतदाता स्थिति की पुष्टि (शून्य डेटा रिकॉर्डिंग)'
-                  : 'Verify Voter Status on Official ECI Portal (Zero Data Recorded)'}
+                  ? 'व्हाट्सएप पर निःशुल्क सुरक्षा कोड प्राप्त करें (1 नंबर = 1 मत)'
+                  : 'Receive Free Verification Code on WhatsApp (1 Number = 1 Vote)'}
               </h2>
             </div>
           </div>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed pl-12">
             {language === 'hi'
-              ? 'बॉट हेरफेर रोकने के लिए, सत्यापन सीधे भारत निर्वाचन आयोग की आधिकारिक वेबसाइट पर किया जाता है। हमारा "रीयल सत्यापन मॉनिटर" केवल यह जांचता है कि सत्यापन सफल हुआ या विफल, परंतु आपका EPIC नंबर या कोई भी व्यक्तिगत डेटा कभी सहेजता नहीं है।'
-              : 'To prevent bots and duplicate votes, verification is conducted directly on the official Election Commission of India portal. Our Real Verifier monitors the verification status (success or failure) in real time without recording your EPIC number, name, or identity.'}
+              ? 'बॉट हेरफेर और फर्जी मतदान रोकने के लिए, सत्यापन सीधे आपके व्यक्तिगत व्हाट्सएप नंबर पर 6-अंकों के निःशुल्क ओटीपी द्वारा किया जाता है। आपका मोबाइल नंबर कभी भी वोटिंग डेटाबेस में संग्रहीत नहीं होता, केवल एकतरफा गणितीय हैश का उपयोग होता है।'
+              : 'To eliminate bots, duplicate voting, and fake accounts, verification is conducted via a free 6-digit OTP sent directly to your WhatsApp number. Your phone number is never stored in the voting database; it is protected with one-way cryptographic hashing.'}
           </p>
-          <div className="pl-12 pt-1">
-            <a
-              href={ECI_ELECTORAL_SEARCH_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--accent)] hover:underline"
-            >
-              <span>{language === 'hi' ? 'आधिकारिक ECI मतदाता खोज पोर्टल खोलें' : 'Open Official ECI Electoral Search Portal'}</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+          <div className="pl-12 pt-1 flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>{language === 'hi' ? '100% निःशुल्क एवं सुरक्षित व्हाट्सएप सत्यापन' : '100% Free Forever • Instant WhatsApp OTP Delivery'}</span>
           </div>
         </GlassCard>
 

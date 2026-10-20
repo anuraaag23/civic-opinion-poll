@@ -68,7 +68,7 @@ export function verifyOtp(phoneNumber: string, pollId: string, inputCode: string
     record.attempts += 1;
     return {
       success: false,
-      error: `Incorrect verification code. Please check your SMS and try again (${4 - record.attempts} attempts remaining).`,
+      error: `Incorrect verification code. Please check your WhatsApp messages and try again (${4 - record.attempts} attempts remaining).`,
     };
   }
 

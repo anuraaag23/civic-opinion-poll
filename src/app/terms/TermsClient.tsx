@@ -55,28 +55,28 @@ export function TermsClient() {
           </div>
         </GlassCard>
 
-        {/* Mode A Self-Verification Principles & Limitations */}
+        {/* WhatsApp OTP Verification Principles */}
         <section id="self-verification">
-          <GlassCard className="space-y-4 border-l-4 border-l-[var(--accent)] bg-[var(--bg-glass-elevated)]">
+          <GlassCard className="space-y-4 border-l-4 border-l-emerald-500 bg-[var(--bg-glass-elevated)]">
             <div className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]">
-              <div className="p-2 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)]">
+              <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
                 <CheckCircle2 className="w-5 h-5" />
               </div>
               <h2>
                 {language === 'hi'
-                  ? 'स्व-सत्यापन कार्यप्रणाली एवं सीमाएं'
-                  : 'Self-Verification Principles & Limitations (Mode A)'}
+                  ? 'व्हाट्सएप ओटीपी सत्यापन कार्यप्रणाली एवं सुरक्षा मानक'
+                  : 'WhatsApp OTP Verification & Sybil-Proof Safeguards'}
               </h2>
             </div>
             <p className="text-sm text-[var(--text-primary)] font-semibold leading-relaxed">
               {language === 'hi'
-                ? 'स्व-सत्यापन प्रतिभागी की व्यक्तिगत पुष्टि पर निर्भर करता है।'
-                : 'Self-verification relies on the participant\'s confirmation.'}
+                ? 'प्रत्येक नागरिक का सत्यापन उनके सक्रिय भारतीय व्हाट्सएप नंबर पर 6-अंकों के निःशुल्क ओटीपी द्वारा किया जाता है।'
+                : 'Each participant is authenticated via a free, single-use 6-digit OTP delivered directly to their WhatsApp.'}
             </p>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               {language === 'hi'
-                ? 'यह मंच तकनीकी रूप से यह साबित या सत्यापित नहीं कर सकता कि प्रतिभागी ने वास्तव में ECI खोज पूरी की है या बाहरी वेबसाइट पर सही विवरण दर्ज किए हैं। EPIC नंबर कभी भी हमारे सर्वर पर जमा या संग्रहीत नहीं होता। यह इस स्व-सत्यापन मॉडल की एक मौलिक सीमा है जिसे पूर्ण पारदर्शिता के साथ स्वीकार किया जाता है।'
-                : 'This platform cannot technically verify or prove whether a participant completed the ECI check or entered accurate details on the external website. EPIC numbers are never submitted or stored on our servers. This is an intentional design boundary of the self-verification model, acknowledged with complete civic transparency.'}
+                ? 'निष्पक्षता सुनिश्चित करने हेतु प्रति व्हाट्सएप नंबर केवल एक मत की अनुमति है (1 WhatsApp Number = 1 Vote)। आपका मोबाइल नंबर कभी भी वोटिंग डेटाबेस में संग्रहीत नहीं होता; मतपत्र से असंबंधित रखने के लिए एकतरफा गणितीय HMAC-SHA256 हैश का उपयोग किया जाता है।'
+                : 'To ensure integrity and prevent duplicate voting, only one vote is permitted per verified WhatsApp mobile number. Phone numbers are never stored alongside cast ballots; the system utilizes an irreversible, keyed HMAC-SHA256 cryptographic fingerprint solely for deduplication.'}
             </p>
           </GlassCard>
         </section>

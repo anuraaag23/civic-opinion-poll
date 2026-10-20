@@ -48,16 +48,16 @@ export function HowItWorksClient() {
 
         <GlassCard elevated className="space-y-4">
           <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 shadow-xs">
-            <span className="text-xs font-bold text-[var(--accent)] uppercase tracking-wider block">
-              {language === 'hi' ? '1. स्वतंत्र मतदाता सत्यापन' : '1. Independent Voter Check'}
+            <span className="text-xs font-bold text-emerald-500 uppercase tracking-wider block">
+              {language === 'hi' ? '1. सुरक्षित व्हाट्सएप सत्यापन' : '1. Secure WhatsApp OTP Check'}
             </span>
             <h3 className="text-base font-bold text-[var(--text-primary)]">
-              {language === 'hi' ? 'आधिकारिक पोर्टल पर सीधा स्व-सत्यापन' : 'Direct Verification on Official ECI Portal'}
+              {language === 'hi' ? 'व्हाट्सएप ओटीपी द्वारा सीधा सत्यापन' : 'Direct Verification via WhatsApp OTP'}
             </h3>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               {language === 'hi'
-                ? 'नागरिक आधिकारिक चुनाव आयोग पोर्टल पर सीधे अपना पंजीकरण जांचते हैं। कोई भी व्यक्तिगत पहचान, नाम या पता हमारे सर्वर पर कभी दर्ज नहीं होता।'
-                : 'Participants confirm registration directly on the official electoral portal. Zero personal records, voter names, or addresses ever reach our databases.'}
+                ? 'नागरिक अपने व्हाट्सएप नंबर पर निःशुल्क 6-अंकों का सत्यापन कोड प्राप्त करते हैं। कोई भी फोन नंबर डेटाबेस में सहेजा नहीं जाता, केवल एकतरफा गणितीय हैश का उपयोग होता है।'
+                : 'Participants verify their eligibility using a free 6-digit OTP delivered directly to their WhatsApp. Zero phone numbers or voter identities are ever stored in the voting database.'}
             </p>
           </div>
 

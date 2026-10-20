@@ -103,34 +103,34 @@ export function SafetyClient() {
             </span>
             <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)]">
               {language === 'hi'
-                ? 'रीयल सत्यापन मॉनिटर (सफल/विफल निगरानी बिना डेटा रिकॉर्डिंग)'
-                : 'Real Verifier Monitor (Monitors Success/Failure with Zero Tracking)'}
+                ? 'व्हाट्सएप ओटीपी सत्यापन इंजन (1 नंबर = 1 मत • शून्य डेटा रिकॉर्डिंग)'
+                : 'WhatsApp OTP Verification Engine (1 Number = 1 Vote • Zero PII Tracking)'}
             </h2>
           </div>
         </div>
 
         <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
           {language === 'hi'
-            ? 'मतदान की निष्पक्षता बनाए रखने के लिए, हमारा रीयल सत्यापन इंजन यह सुनिश्चित करता है कि भाग लेने वाला व्यक्ति एक वास्तविक नागरिक है। सत्यापन सीधे आधिकारिक ECI वेबसाइट (electoralsearch.eci.gov.in) पर होता है। हमारा मॉनिटर केवल सत्यापन की सफलता अथवा विफलता की निगरानी करता है, लेकिन उपयोगकर्ता का कोई भी व्यक्तिगत डेटा कभी रिकॉर्ड नहीं करता।'
-            : 'To ensure genuine democratic representation, our Real Verifier actively monitors the verification process to validate genuine citizen participation. Verification occurs directly on the official ECI portal (electoralsearch.eci.gov.in). The monitor strictly verifies success or failure in real time without recording any personal data.'}
+            ? 'मतदान की निष्पक्षता बनाए रखने और बॉट नेटवर्क या फर्जी खातों को रोकने के लिए, सत्यापन सीधे आपके व्यक्तिगत व्हाट्सएप नंबर पर 6-अंकों के निःशुल्क ओटीपी द्वारा किया जाता है। हमारा सिस्टम केवल ओटीपी की सत्यता की पुष्टि करता है, परंतु आपका मोबाइल नंबर कभी भी वोटिंग डेटाबेस में नहीं सहेजता।'
+            : 'To guarantee democratic integrity and prevent automated bot networks or duplicate votes, verification is conducted via a free 6-digit OTP delivered directly to your WhatsApp. The system strictly verifies the code without recording your mobile number or personal identity alongside your vote.'}
         </p>
 
         <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2">
           <div className="flex items-center justify-between text-xs font-bold text-[var(--text-primary)]">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              {language === 'hi' ? 'रीयल सत्यापनकर्ता मॉनिटर कार्यप्रणाली:' : 'How the Real Verifier Engine Operates:'}
+              {language === 'hi' ? 'व्हाट्सएप सत्यापन सुरक्षा कार्यप्रणाली:' : 'How the WhatsApp Verification Engine Operates:'}
             </span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-mono">0 BYTES RECORDED</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-mono">0 BYTES STORED</span>
           </div>
           <ol className="text-xs text-[var(--text-secondary)] space-y-1.5 list-decimal list-inside leading-relaxed">
             <li>
-              <strong className="text-[var(--text-primary)]">{language === 'hi' ? 'आधिकारिक ECI लिंक:' : 'Official ECI Link:'}</strong>{' '}
-              {language === 'hi' ? 'नागरिक आधिकारिक ECI सर्च पोर्टल पर सीधे अपनी मतदाता स्थिति जांचते हैं।' : 'Citizens directly check electoral status on the official ECI search portal.'}
+              <strong className="text-[var(--text-primary)]">{language === 'hi' ? 'व्हाट्सएप ओटीपी प्रेषण:' : 'WhatsApp OTP Dispatch:'}</strong>{' '}
+              {language === 'hi' ? 'नागरिक अपने व्हाट्सएप पर एक निःशुल्क एकल-उपयोग 6-अंकों का सत्यापन कोड प्राप्त करते हैं।' : 'Citizens receive a single-use 6-digit verification code directly on their WhatsApp.'}
             </li>
             <li>
-              <strong className="text-[var(--text-primary)]">{language === 'hi' ? 'रीयल-टाइम स्थिति निगरानी:' : 'Real-Time Status Monitoring:'}</strong>{' '}
-              {language === 'hi' ? 'सत्यापनकर्ता जाँचता है कि नागरिक ने ECI सत्र पूरा किया या नहीं।' : 'The engine monitors whether the verification lifecycle succeeded or failed.'}
+              <strong className="text-[var(--text-primary)]">{language === 'hi' ? 'एकतरफा गणितीय हैशिंग:' : 'One-Way Cryptographic Hashing:'}</strong>{' '}
+              {language === 'hi' ? 'सत्यापन के तुरंत बाद नंबर को HMAC-SHA256 हैश में बदल दिया जाता है ताकि दोहरा मतदान रोका जा सके।' : 'The number is instantly converted to a one-way HMAC-SHA256 fingerprint to prevent duplicate votes.'}
             </li>
             <li>
               <strong className="text-[var(--text-primary)]">{language === 'hi' ? 'गुमनाम क्रेडेंशियल का आवंटन:' : 'Anonymous Credential Issuance:'}</strong>{' '}

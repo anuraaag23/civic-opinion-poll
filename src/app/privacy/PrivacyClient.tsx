@@ -28,30 +28,30 @@ export function PrivacyClient() {
 
       {/* Core Architectural Pillars */}
       <div className="space-y-8">
-        {/* Section: What We Do Not Collect (Mode A) */}
-        <GlassCard elevated className="border-l-4 border-l-[var(--success)] space-y-4 bg-[var(--bg-glass-elevated)]">
+        {/* Section: What We Do Not Collect */}
+        <GlassCard elevated className="border-l-4 border-l-emerald-500 space-y-4 bg-[var(--bg-glass-elevated)]">
           <div className="flex items-center gap-3 text-lg font-bold text-[var(--text-primary)]">
-            <div className="p-2 rounded-xl bg-[var(--success-soft)] text-[var(--success)]">
+            <div className="p-2 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
               <Lock className="w-5 h-5" />
             </div>
             <h2>
-              {language === 'hi' ? 'हम क्या एकत्र नहीं करते' : 'What We Do Not Collect'}
+              {language === 'hi' ? 'हम क्या एकत्र नहीं करते (Zero PII Guarantee)' : 'What We Do Not Collect (Zero PII Guarantee)'}
             </h2>
           </div>
           <p className="text-sm text-[var(--text-primary)] font-semibold leading-relaxed">
             {language === 'hi'
-              ? 'हम आपसे \'मेरा वोट\' (Mera Vote) पर आपका EPIC नंबर या कोई भी पहचान पत्र जमा करने के लिए कभी नहीं कहते। मतदाता पंजीकरण की जांच सीधे आपके द्वारा आधिकारिक ECI वेबसाइट पर की जाती है।'
-              : 'We never ask you to submit your EPIC number or any personal identity proof to Mera Vote. Electoral-registration checks are performed directly by you on the official ECI website.'}
+              ? 'हम आपका मोबाइल नंबर, नाम, या व्यक्तिगत पहचान कभी भी वोटिंग डेटाबेस में संग्रहीत नहीं करते हैं।'
+              : 'We never store your raw mobile number, voter name, or personal identity alongside your vote.'}
           </p>
           <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
             {language === 'hi'
-              ? 'आपकी सर्वेक्षण प्रतिक्रिया को स्व-सत्यापन पुष्टि से अलग संग्रहीत किया जाता है।'
-              : 'Your poll response is stored separately from the self-verification confirmation.'}
+              ? 'व्हाट्सएप पर ओटीपी सत्यापन पूर्ण होते ही आपके नंबर को अपरिवर्तनीय एकतरफा क्रिप्टोग्राफिक हैश (HMAC-SHA256) में बदल दिया जाता है, जिससे कोई भी यह नहीं जान सकता कि किस नंबर ने किस दल को मत दिया।'
+              : 'Upon OTP verification via WhatsApp, your phone number is instantly converted into an irreversible one-way cryptographic hash (HMAC-SHA256), strictly isolating identity from voting choices.'}
           </p>
           <p className="text-xs text-[var(--text-tertiary)] leading-relaxed">
             {language === 'hi'
-              ? 'हमने व्यक्तिगत जानकारी के संग्रह और प्रदर्शन को कम से कम करने के लिए इस प्रणाली को डिज़ाइन किया है।'
-              : 'We designed the system to minimize the collection and exposure of personal information.'}
+              ? 'हमने व्यक्तिगत जानकारी के संग्रह को शून्य करने के लिए इस प्रणाली को पूर्णतः अनाम डिज़ाइन किया है।'
+              : 'The platform is architected to guarantee zero linkage between voter identity and confidential ballots.'}
           </p>
         </GlassCard>
 

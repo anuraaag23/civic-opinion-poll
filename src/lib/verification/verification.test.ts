@@ -119,15 +119,14 @@ describe('Real Voter ID Verification & Anonymous Voting Engine', () => {
   // TEST 9: Open poll in Hindi - all verification instructions translated
   it('TEST 9: verifies complete Hindi translations for Mode A verification instructions', () => {
     const hi = translations.hi.verification;
-    expect(hi.title).toBe('अपना मतदाता पंजीकरण सत्यापित करें');
-    expect(hi.openEciButton).toContain('ECI खोज');
-    expect(hi.completedCheckButton).toBe('मैंने जांच पूरी कर ली है');
-    expect(hi.step1Title).toBe('ECI खोज खोलें');
-    expect(hi.step2Title).toBe('अपने विवरण जांचें');
-    expect(hi.step3Title).toBe('यहां वापस आएं');
+    expect(hi.title).toBe('व्हाट्सएप ओटीपी द्वारा सत्यापन');
+    expect(hi.completedCheckButton).toBe('मैंने कोड सत्यापित कर लिया है');
+    expect(hi.step1Title).toBe('मोबाइल नंबर दर्ज करें');
+    expect(hi.step2Title).toBe('6-अंकों का ओटीपी दर्ज करें');
+    expect(hi.step3Title).toBe('गोपनीय मत दर्ज करें');
     expect(hi.disclaimer).toContain('महत्वपूर्ण:');
-    expect(hi.confirmModalTitle).toBe('स्व-सत्यापन की पुष्टि करें');
-    expect(hi.selfVerificationConfirmed).toBe('स्व-सत्यापन की पुष्टि हुई');
+    expect(hi.confirmModalTitle).toBe('व्हाट्सएप सत्यापन की पुष्टि करें');
+    expect(hi.selfVerificationConfirmed).toBe('व्हाट्सएप सत्यापन की पुष्टि हुई');
   });
 
   // TEST 10: Disallow invalid or inactive polls

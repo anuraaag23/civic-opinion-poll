@@ -45,12 +45,12 @@ export function CompactSafetySection() {
             <Lock className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <span className="text-xs font-bold text-[var(--text-primary)] block">
-                {language === 'hi' ? '1. शून्य पहचान भंडारण' : '1. Zero ID Storage'}
+                {language === 'hi' ? '1. शून्य पहचान भंडारण' : '1. Zero Identity Storage'}
               </span>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                 {language === 'hi'
-                  ? 'हम कभी भी आपका EPIC नंबर, आईडी या व्यक्तिगत विवरण नहीं मांगते और न ही सहेजते हैं।'
-                  : 'We never request, collect, or store your EPIC number, ID, or personal identity.'}
+                  ? 'हम कभी भी आपका नाम, पहचान पत्र या निजी विवरण सहेजते नहीं हैं। मतदान 100% गोपनीय है।'
+                  : 'We never store your personal identity, name, or voter card. Voting is 100% anonymous.'}
               </p>
             </div>
           </div>
@@ -70,15 +70,15 @@ export function CompactSafetySection() {
           </div>
 
           <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[var(--bg-primary)]/50 border border-[var(--border-glass)]">
-            <ShieldCheck className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <span className="text-xs font-bold text-[var(--text-primary)] block">
-                {language === 'hi' ? '3. रीयल मॉनिटर सत्यापन' : '3. Real Monitored Verification'}
+                {language === 'hi' ? '3. WhatsApp OTP सत्यापन' : '3. WhatsApp OTP Verification'}
               </span>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                 {language === 'hi'
-                  ? 'ECI पोर्टल पर सत्यापन की पुष्टि रीयल-टाइम में जांची जाती है, बिना कोई डेटा रिकॉर्ड किए।'
-                  : 'ECI voter verification status is strictly monitored in real time with 0 bytes recorded.'}
+                  ? 'मुफ़्त व्हाट्सएप ओटीपी से त्वरित सत्यापन। नंबर केवल HMAC हैश होता है, कभी डेटाबेस में सेव नहीं होता।'
+                  : 'Instant WhatsApp OTP verification (1 Number = 1 Vote). Number is HMAC-hashed, never stored in DB.'}
               </p>
             </div>
           </div>
