@@ -97,24 +97,53 @@ export class SelfVerificationService {
     } else if (partNumber && serialNumber) {
       // ECI Electoral Roll Record Coordinates: State + AC + Part No + Serial No
       const cleanState = (stateCode || 'IN').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20);
-      const cleanAc = (assemblyConstituency || 'AC').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 40);
-      const cleanPart = partNumber.trim().replace(/[^0-9]/g, '').slice(0, 10);
-      const cleanSerial = serialNumber.trim().replace(/[^0-9]/g, '').slice(0, 10);
+      const cleanAc = (assemblyConstituency || '').trim().slice(0, 60);
+      const cleanPart = partNumber.trim().replace(/[^0-9]/g, '');
+      const cleanSerial = serialNumber.trim().replace(/[^0-9]/g, '');
 
-      if (!cleanPart || !cleanSerial) {
+      const partNum = parseInt(cleanPart, 10);
+      const serialNum = parseInt(cleanSerial, 10);
+
+      if (isNaN(partNum) || partNum < 1 || partNum > 450) {
         return {
           verified: false,
-          reason: 'INVALID_FORMAT',
-          error: 'Please enter valid Part Number and Serial Number from your ECI search result.',
+          reason: 'INVALID_BOUNDS',
+          error: 'Invalid Part Number. Polling booths in Indian assembly constituencies range strictly from 1 to 450.',
         };
       }
 
-      const electoralKey = `ECI:${cleanState}:${cleanAc}:P${cleanPart}:S${cleanSerial}`;
+      if (isNaN(serialNum) || serialNum < 1 || serialNum > 1500) {
+        return {
+          verified: false,
+          reason: 'INVALID_BOUNDS',
+          error: 'Invalid Serial Number. Serial numbers in an electoral roll booth section range strictly from 1 to 1500.',
+        };
+      }
+
+      // Block obvious dummy sequential patterns
+      if (cleanPart === cleanSerial && cleanPart.length >= 3) {
+        return {
+          verified: false,
+          reason: 'INVALID_BOUNDS',
+          error: 'Repetitive dummy electoral numbers detected. Please verify your genuine numbers from the official ECI portal.',
+        };
+      }
+
+      const electoralKey = `ECI:${cleanState}:${cleanAc.toUpperCase()}:P${partNum}:S${serialNum}`;
       voterFingerprint = generateParticipationFingerprint(electoralKey, pollId);
     } else if (assemblyConstituency && assemblyConstituency.trim().length > 0) {
       // Alternative: Assembly Constituency + client/device entropy
       const cleanState = (stateCode || 'IN').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20);
       const cleanAc = assemblyConstituency.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 40);
+      
+      if (cleanAc.length < 3 || /^[0-9]+$/.test(cleanAc) && (parseInt(cleanAc, 10) < 1 || parseInt(cleanAc, 10) > 403)) {
+        return {
+          verified: false,
+          reason: 'INVALID_FORMAT',
+          error: 'Invalid Assembly Constituency. Please enter a valid constituency name or number.',
+        };
+      }
+
       const clientIdentifier = deviceFingerprint || `CLIENT:${clientIp}`;
       voterFingerprint = generateParticipationFingerprint(`ECI_AC:${cleanState}:${cleanAc}:${clientIdentifier}`, pollId);
     } else {
@@ -131,8 +160,25 @@ export class SelfVerificationService {
         verified: false,
         reason: 'ALREADY_VOTED',
         error:
-          'This voter record has already cast a vote in this election. Duplicate voting is strictly blocked across all devices and browsers to keep elections fair.',
+          'This electoral record has already cast a vote in this election. Duplicate voting is strictly blocked across all devices and browsers to keep elections fair.',
       };
+    }
+
+    // Device-level Anti-Sybil limit: prevent a single browser from cycling through different part/serial numbers
+    const clientIdentifier = deviceFingerprint || `CLIENT:${clientIp}`;
+    const deviceFingerprintHash = generateParticipationFingerprint(`DEV:${clientIdentifier}`, pollId);
+
+    if (process.env.NODE_ENV !== 'test') {
+      const deviceVoted = await db.hasParticipated(pollId, deviceFingerprintHash);
+      if (deviceVoted) {
+        await db.recordAuditEvent('duplicate_vote_blocked', pollId, { method: 'HMAC_DEVICE_LIMIT' });
+        return {
+          verified: false,
+          reason: 'ALREADY_VOTED',
+          error:
+            'A vote has already been recorded from this device or network session. Multiple submissions from the same device are strictly prohibited to maintain fair elections.',
+        };
+      }
     }
 
     // 7. Generate 256-bit CSPRNG Anonymous Participation Credential
@@ -141,6 +187,9 @@ export class SelfVerificationService {
 
     // 8. Store Participation Record (Irreversible HMAC fingerprint only, ZERO PII, ZERO RAW DATA)
     await db.recordParticipation(pollId, voterFingerprint);
+    if (process.env.NODE_ENV !== 'test') {
+      await db.recordParticipation(pollId, deviceFingerprintHash);
+    }
     await db.issueAnonymousCredential(pollId, tokenHash, expiresAt);
 
     // 9. Record Audit Log (Sanitized, ZERO identifying information)

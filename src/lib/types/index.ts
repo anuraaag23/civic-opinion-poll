@@ -112,6 +112,8 @@ export interface VerificationResult {
     | 'INVALID_FORMAT'
     | 'INVALID_PHONE'
     | 'INVALID_OTP'
+    | 'INVALID_BOUNDS'
+    | 'INVALID_ECI_SLIP'
     | 'ECI_NOT_FOUND'
     | 'BOT_CHALLENGE_FAILED';
   anonymous_token?: string;
