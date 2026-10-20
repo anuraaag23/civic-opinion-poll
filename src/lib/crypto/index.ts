@@ -23,14 +23,14 @@ export function normalizeEpic(raw: string): EpicValidationResult {
   // Trim whitespace and remove common separators like spaces or dashes
   const cleaned = raw.trim().toUpperCase().replace(/[\s\/-]/g, '');
 
-  // Exact standard Indian EPIC regex: 3 uppercase letters + 7 digits (e.g. DLH1234567, IKP4718276)
+  // Exact standard Indian EPIC regex: 3 uppercase letters + 7 digits (e.g. DLH1234567, WBG1482910)
   const standardEpicRegex = /^[A-Z]{3}[0-9]{7}$/;
 
   if (!standardEpicRegex.test(cleaned)) {
     return {
       isValid: false,
       normalized: cleaned,
-      error: 'Invalid Voter ID format. Must be standard format (3 letters followed by 7 digits, e.g. IKP4718276 or DLH2891042).',
+      error: 'Invalid Voter ID format. Must be standard format (3 letters followed by 7 digits, e.g. DLH1234567 or WBG1482910).',
     };
   }
 

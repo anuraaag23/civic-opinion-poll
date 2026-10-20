@@ -39,19 +39,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Require genuine Voter ID (EPIC)
-    if (!cleanVoterId || cleanVoterId.length === 0) {
-      return NextResponse.json(
-        {
-          verified: false,
-          reason: 'INVALID_FORMAT',
-          error:
-            'Voter ID (EPIC Card Number) is strictly required to verify voter eligibility and prevent duplicate voting.',
-        },
-        { status: 400 }
-      );
-    }
-
     // Optional Anti-Bot Arithmetic Challenge Verification
     if (mathChallenge) {
       const { num1, num2, answer } = mathChallenge;
@@ -69,6 +56,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const cleanStateCode = typeof stateCode === 'string' ? stateCode.slice(0, 30) : undefined;
+    const cleanAC = typeof assemblyConstituency === 'string' ? assemblyConstituency.slice(0, 60) : undefined;
+    const cleanPart = typeof partNumber === 'string' ? partNumber.slice(0, 20) : undefined;
+    const cleanSerial = typeof serialNumber === 'string' ? serialNumber.slice(0, 20) : undefined;
+
     // Extract sanitized client IP
     const ip =
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
@@ -80,13 +72,13 @@ export async function POST(request: NextRequest) {
       cleanPollId,
       selfVerificationConfirmed,
       ip,
-      cleanVoterId,
+      cleanVoterId || undefined,
       deviceFingerprint,
       voterName,
-      stateCode,
-      assemblyConstituency,
-      partNumber,
-      serialNumber,
+      cleanStateCode,
+      cleanAC,
+      cleanPart,
+      cleanSerial,
       eciRecordFound !== false
     );
 

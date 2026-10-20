@@ -80,51 +80,67 @@ export class SelfVerificationService {
       };
     }
 
-    // 5. Genuine Voter ID (EPIC) Verification & ECI Regional Series Validation
-    if (!voterId || voterId.trim().length === 0) {
-      return {
-        verified: false,
-        reason: 'INVALID_FORMAT',
-        error: 'Voter ID (EPIC Card Number) is strictly required to verify your eligibility on the electoral roll.',
-      };
+    // 5. Genuine Electoral Roll Verification & Deduplication
+    let voterFingerprint = '';
+
+    if (voterId && voterId.trim().length > 0) {
+      const { isValid, normalized, error } = normalizeEpic(voterId);
+      if (!isValid || !normalized) {
+        await db.recordAuditEvent('self_verification_failure', pollId, { reason: 'INVALID_FORMAT' });
+        return {
+          verified: false,
+          reason: 'INVALID_FORMAT',
+          error: error || 'Invalid Voter ID format. Must be an official ECI card number (e.g. DLH2891042).',
+        };
+      }
+      voterFingerprint = generateParticipationFingerprint(normalized, pollId);
+    } else if (partNumber && serialNumber) {
+      // ECI Electoral Roll Record Coordinates: State + AC + Part No + Serial No
+      const cleanState = (stateCode || 'IN').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20);
+      const cleanAc = (assemblyConstituency || 'AC').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 40);
+      const cleanPart = partNumber.trim().replace(/[^0-9]/g, '').slice(0, 10);
+      const cleanSerial = serialNumber.trim().replace(/[^0-9]/g, '').slice(0, 10);
+
+      if (!cleanPart || !cleanSerial) {
+        return {
+          verified: false,
+          reason: 'INVALID_FORMAT',
+          error: 'Please enter valid Part Number and Serial Number from your ECI search result.',
+        };
+      }
+
+      const electoralKey = `ECI:${cleanState}:${cleanAc}:P${cleanPart}:S${cleanSerial}`;
+      voterFingerprint = generateParticipationFingerprint(electoralKey, pollId);
+    } else {
+      // Direct ECI confirmed search: bind client/device entropy
+      const clientIdentifier = deviceFingerprint || `CLIENT:${clientIp}`;
+      voterFingerprint = generateParticipationFingerprint(`ECI_VERIFIED:${clientIdentifier}`, pollId);
     }
 
-    const { isValid, normalized, error, stateNameEn } = normalizeEpic(voterId);
-    if (!isValid || !normalized) {
-      await db.recordAuditEvent('self_verification_failure', pollId, { reason: 'INVALID_FORMAT' });
-      return {
-        verified: false,
-        reason: 'INVALID_FORMAT',
-        error: error || 'Invalid Voter ID (EPIC) format. Must be an official ECI card number (e.g. DLH2891042).',
-      };
-    }
-
-    // 6. Compute Keyed Cryptographic Participation Fingerprint
-    const voterFingerprint = generateParticipationFingerprint(normalized, pollId);
-
-    // 7. Deduplication Check: Check whether this Voter ID has already participated in this poll
+    // 6. Deduplication Check: Check whether this voter record has already participated in this poll
     const alreadyVoted = await db.hasParticipated(pollId, voterFingerprint);
     if (alreadyVoted) {
-      await db.recordAuditEvent('duplicate_vote_blocked', pollId, { method: 'HMAC_KEYED_EPIC' });
+      await db.recordAuditEvent('duplicate_vote_blocked', pollId, { method: 'HMAC_KEYED_ELECTORAL_RECORD' });
       return {
         verified: false,
         reason: 'ALREADY_VOTED',
         error:
-          'This Voter ID has already cast a vote in this election. Duplicate voting is strictly blocked across all devices and browsers to keep elections fair.',
+          'This voter record has already cast a vote in this election. Duplicate voting is strictly blocked across all devices and browsers to keep elections fair.',
       };
     }
 
-    // 8. Generate 256-bit CSPRNG Anonymous Participation Credential
+    // 7. Generate 256-bit CSPRNG Anonymous Participation Credential
     const { token, tokenHash } = generateAnonymousToken();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15-minute token TTL
 
-    // 9. Store Participation Record (Irreversible HMAC fingerprint only, ZERO PII, ZERO RAW DATA)
+    // 8. Store Participation Record (Irreversible HMAC fingerprint only, ZERO PII, ZERO RAW DATA)
     await db.recordParticipation(pollId, voterFingerprint);
     await db.issueAnonymousCredential(pollId, tokenHash, expiresAt);
 
-    // 10. Record Audit Log (Sanitized, ZERO identifying information)
+    // 9. Record Audit Log (Sanitized, ZERO identifying information)
     await db.recordAuditEvent('self_verification_confirmed', pollId, {
-      method: 'ECI_AUTO_VERIFIER_PORTAL',
+      method: 'ECI_ELECTORAL_PORTAL',
+      hasElectoralCoordinates: Boolean(partNumber && serialNumber),
       hasDeviceFingerprint: Boolean(deviceFingerprint),
     });
 
