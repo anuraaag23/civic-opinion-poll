@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
@@ -11,7 +11,6 @@ import {
   CheckCircle2,
   AlertCircle,
   Search,
-  ArrowRight,
   ShieldCheck,
   RefreshCw,
   AlertTriangle,
@@ -20,6 +19,14 @@ import {
   XCircle,
   Loader2,
   Lock,
+  ChevronDown,
+  Check,
+  HelpCircle,
+  Building2,
+  Hash,
+  MapPin,
+  FileText,
+  Info,
 } from 'lucide-react';
 
 interface VerificationFormProps {
@@ -44,10 +51,19 @@ export function VerificationForm({
   const [isCheckedConfirmed, setIsCheckedConfirmed] = useState(false);
 
   // ECI verification form fields (Zero EPIC card numbers requested)
-  const [selectedState, setSelectedState] = useState('DL');
+  const [selectedStateCode, setSelectedStateCode] = useState('DL');
+  const [isStateDropdownOpen, setIsStateDropdownOpen] = useState(false);
+  const [stateSearchQuery, setStateSearchQuery] = useState('');
+
+  // Verification method: 'coords' (Part & Serial No.) vs 'booth' (AC & Polling Booth)
+  const [verificationMethod, setVerificationMethod] = useState<'coords' | 'booth'>('coords');
   const [assemblyConstituency, setAssemblyConstituency] = useState('');
   const [partNumber, setPartNumber] = useState('');
   const [serialNumber, setSerialNumber] = useState('');
+  const [pollingBooth, setPollingBooth] = useState('');
+
+  // Show/hide helper explanation
+  const [showExplanation, setShowExplanation] = useState(true);
 
   // Workflow states:
   // 'initial' -> 'eci_pending' -> 'eci_confirm' | 'not_found' -> 'submitting' -> 'success' | 'already_voted'
@@ -56,6 +72,38 @@ export function VerificationForm({
   >('initial');
 
   const [error, setError] = useState<string | null>(null);
+
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsStateDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filter states for custom theme-matched dropdown
+  const filteredStates = useMemo(() => {
+    const q = stateSearchQuery.toLowerCase().trim();
+    if (!q) return ECI_SERIES_REGISTRY;
+    return ECI_SERIES_REGISTRY.filter(
+      (s) =>
+        s.stateNameEn.toLowerCase().includes(q) ||
+        s.stateNameHi.toLowerCase().includes(q) ||
+        s.stateCode.toLowerCase().includes(q)
+    );
+  }, [stateSearchQuery]);
+
+  const currentState = useMemo(() => {
+    return (
+      ECI_SERIES_REGISTRY.find((s) => s.stateCode === selectedStateCode) ||
+      ECI_SERIES_REGISTRY[0]
+    );
+  }, [selectedStateCode]);
 
   // Generate anti-bot math challenge
   const generateNewMathChallenge = useCallback(() => {
@@ -104,40 +152,62 @@ export function VerificationForm({
       return;
     }
 
-    // Validate ECI search coordinates
+    // Validate based on selected verification method
     const cleanPart = partNumber.trim();
     const cleanSerial = serialNumber.trim();
+    const cleanAC = assemblyConstituency.trim();
+    const cleanBooth = pollingBooth.trim();
 
-    if (!cleanPart || !cleanSerial) {
-      setError(
-        language === 'hi'
-          ? 'कृपया ECI खोज परिणाम से अपना भाग संख्या (Part No) एवं क्रम संख्या (Serial No) दर्ज करें।'
-          : 'Please enter your Part Number and Serial Number from your ECI search result.'
-      );
-      return;
+    if (verificationMethod === 'coords') {
+      if (!cleanPart || !cleanSerial) {
+        setError(
+          language === 'hi'
+            ? 'कृपया ECI खोज परिणाम से अपना भाग संख्या (Part No) एवं क्रम संख्या (Serial No) दर्ज करें।'
+            : 'Please enter your Part Number and Serial Number from your ECI search result.'
+        );
+        return;
+      }
+    } else {
+      if (!cleanAC) {
+        setError(
+          language === 'hi'
+            ? 'कृपया अपना विधानसभा क्षेत्र (Assembly Constituency) दर्ज करें।'
+            : 'Please enter your Assembly Constituency (AC).'
+        );
+        return;
+      }
     }
 
     setVerifierState('submitting');
     setError(null);
 
     try {
+      const payload: Record<string, unknown> = {
+        pollId,
+        selfVerificationConfirmed: true,
+        eciRecordFound: true,
+        stateCode: selectedStateCode,
+        assemblyConstituency: cleanAC || undefined,
+        mathChallenge: {
+          num1,
+          num2,
+          answer: parseInt(mathAnswer, 10),
+        },
+      };
+
+      if (verificationMethod === 'coords') {
+        payload.partNumber = cleanPart;
+        payload.serialNumber = cleanSerial;
+      } else {
+        payload.partNumber = undefined;
+        payload.serialNumber = undefined;
+        payload.voterName = cleanBooth || undefined;
+      }
+
       const response = await fetch('/api/verification', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pollId,
-          selfVerificationConfirmed: true,
-          eciRecordFound: true,
-          stateCode: selectedState,
-          assemblyConstituency: assemblyConstituency.trim() || undefined,
-          partNumber: cleanPart,
-          serialNumber: cleanSerial,
-          mathChallenge: {
-            num1,
-            num2,
-            answer: parseInt(mathAnswer, 10),
-          },
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
@@ -436,90 +506,352 @@ export function VerificationForm({
           </div>
         )}
 
-        {/* ── STEP 3: CONFIRM ECI ELECTORAL COORDINATES (ZERO EPIC ASKED) ── */}
+        {/* ── STEP 3: CONFIRM ECI DETAILS WITH THEME DROPDOWN & CLARIFICATION ── */}
         {verifierState === 'eci_confirm' && (
           <form
             onSubmit={(e) => {
               e.preventDefault();
               submitVerification(true);
             }}
-            className="space-y-4 animate-in fade-in duration-300"
+            className="space-y-5 animate-in fade-in duration-300"
           >
-            <div className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
-              <h4 className="text-xs font-bold text-[var(--text-primary)]">
-                {language === 'hi' ? 'ECI खोज परिणाम विवरण की पुष्टि करें' : 'Confirm ECI Electoral Roll Details'}
-              </h4>
-              <p className="text-[11px] text-[var(--text-tertiary)] leading-relaxed">
-                {language === 'hi'
-                  ? 'ECI खोज परिणाम तालिका से अपना राज्य, भाग संख्या (Part No) एवं क्रम संख्या (Serial No) दर्ज करें। कोई निजी कार्ड नंबर नहीं मांगा जाता।'
-                  : 'Enter your State, Part Number, and Serial Number from your ECI search result. Zero private card numbers are requested.'}
-              </p>
-            </div>
+            {/* Header with Mode Switcher */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <FileText className="w-4 h-4 text-[var(--accent)]" />
+                  <span>
+                    {language === 'hi'
+                      ? 'ECI खोज परिणाम विवरण की पुष्टि करें'
+                      : 'Confirm ECI Electoral Roll Record'}
+                  </span>
+                </h4>
 
-            {/* State Selection */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[var(--text-primary)]">
-                {language === 'hi' ? 'राज्य / केंद्र शासित प्रदेश *' : 'State / Union Territory *'}
-              </label>
-              <select
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs sm:text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-              >
-                {ECI_SERIES_REGISTRY.map((s) => (
-                  <option key={s.stateCode} value={s.stateCode}>
-                    {language === 'hi' ? s.stateNameHi : s.stateNameEn}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Assembly Constituency (AC) */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[var(--text-primary)]">
-                {language === 'hi' ? 'विधानसभा निर्वाचन क्षेत्र (AC)' : 'Assembly Constituency (AC)'}
-              </label>
-              <input
-                type="text"
-                value={assemblyConstituency}
-                onChange={(e) => setAssemblyConstituency(e.target.value)}
-                placeholder={language === 'hi' ? 'उदा. 40 नई दिल्ली या वाराणसी' : 'e.g. 40 New Delhi or Varanasi'}
-                className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs sm:text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-              />
-            </div>
-
-            {/* Part Number & Serial Number */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[var(--text-primary)]">
-                  {language === 'hi' ? 'भाग संख्या (Part No) *' : 'Part Number *'}
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={partNumber}
-                  onChange={(e) => setPartNumber(e.target.value.replace(/[^0-9]/g, ''))}
-                  placeholder="e.g. 142"
-                  maxLength={6}
-                  className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs sm:text-sm font-mono font-bold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                />
+                <button
+                  type="button"
+                  onClick={() => setShowExplanation(!showExplanation)}
+                  className="text-[11px] text-[var(--accent)] hover:underline flex items-center gap-1 cursor-pointer font-semibold"
+                >
+                  <HelpCircle className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'सहायता / स्पष्टीकरण' : 'Need Help?'}</span>
+                </button>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[var(--text-primary)]">
-                  {language === 'hi' ? 'क्रम संख्या (Serial No) *' : 'Serial Number *'}
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={serialNumber}
-                  onChange={(e) => setSerialNumber(e.target.value.replace(/[^0-9]/g, ''))}
-                  placeholder="e.g. 389"
-                  maxLength={6}
-                  className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs sm:text-sm font-mono font-bold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                />
+              {/* Verification Method Tabs: Coords vs Booth */}
+              <div className="grid grid-cols-2 p-1 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-bold gap-1">
+                <button
+                  type="button"
+                  onClick={() => setVerificationMethod('coords')}
+                  className={`py-2 px-2.5 rounded-lg transition-all text-center cursor-pointer ${
+                    verificationMethod === 'coords'
+                      ? 'bg-[var(--accent)] text-white shadow-xs'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  {language === 'hi' ? '1. भाग व क्रम संख्या' : '1. Part & Serial No.'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVerificationMethod('booth')}
+                  className={`py-2 px-2.5 rounded-lg transition-all text-center cursor-pointer ${
+                    verificationMethod === 'booth'
+                      ? 'bg-[var(--accent)] text-white shadow-xs'
+                      : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  {language === 'hi' ? '2. विधानसभा व केंद्र' : '2. Assembly & Booth'}
+                </button>
               </div>
             </div>
+
+            {/* Visual Clarification & ECI Table Mockup Card */}
+            {showExplanation && (
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2.5 text-xs text-[var(--text-secondary)]">
+                <div className="flex items-start gap-2 text-[var(--accent)] font-bold text-xs">
+                  <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>
+                    {language === 'hi'
+                      ? 'भाग संख्या (Part No) और क्रम संख्या (Serial No) क्या है?'
+                      : 'What are Part Number and Serial Number?'}
+                  </span>
+                </div>
+
+                <p className="leading-relaxed text-[11px] text-[var(--text-tertiary)]">
+                  {language === 'hi'
+                    ? 'जब आप electoralsearch.eci.gov.in पर सर्च करते हैं, तो परिणाम तालिका के कॉलम 8 में आपकी भाग संख्या (Part No — आपके पोलिंग बूथ का सेक्शन) और कॉलम 9 में क्रम संख्या (Serial No — वोटर लिस्ट में आपका नंबर) होती है। यह आपकी मतदाता पर्ची (Voter Slip) पर भी होती है।'
+                    : 'When you search on electoralsearch.eci.gov.in, Column 8 shows your Part Number (polling section) and Column 9 shows your Serial Number (your position on the roll). Both are also printed on your official Voter Slip.'}
+                </p>
+
+                {/* Mini ECI Result Table Visual Preview */}
+                <div className="rounded-xl overflow-hidden border border-[var(--border-glass)] bg-[var(--bg-primary)] p-2.5 space-y-1.5 font-mono text-[11px]">
+                  <div className="text-[10px] uppercase font-bold text-[var(--text-tertiary)] tracking-wider flex items-center justify-between">
+                    <span>ECI Search Result Table Mockup</span>
+                    <span className="text-[var(--accent)] font-bold">Columns 8 & 9</span>
+                  </div>
+                  <div className="grid grid-cols-4 gap-1 text-[10px] text-center bg-[var(--bg-surface)] p-2 rounded-lg border border-[var(--border-glass)]">
+                    <div className="text-[var(--text-tertiary)]">
+                      <span className="block text-[9px] text-[var(--text-tertiary)]">Name</span>
+                      <span className="text-[var(--text-primary)] font-bold truncate">Citizen</span>
+                    </div>
+                    <div className="text-[var(--text-tertiary)]">
+                      <span className="block text-[9px] text-[var(--text-tertiary)]">AC</span>
+                      <span className="text-[var(--text-primary)] font-bold truncate">40-NDL</span>
+                    </div>
+                    <div className="p-1 rounded bg-[var(--accent-soft)] border border-[var(--accent)]/40 text-[var(--accent)] font-bold">
+                      <span className="block text-[8px] uppercase">Part No (8)</span>
+                      <span>142</span>
+                    </div>
+                    <div className="p-1 rounded bg-emerald-500/15 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 font-bold">
+                      <span className="block text-[8px] uppercase">Serial (9)</span>
+                      <span>389</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── THEME-MATCHED STATE CUSTOM DROPDOWN ── */}
+            <div className="space-y-1.5" ref={dropdownRef}>
+              <label className="text-xs font-bold text-[var(--text-primary)] flex items-center justify-between">
+                <span>
+                  {language === 'hi' ? 'राज्य / केंद्र शासित प्रदेश *' : 'State / Union Territory *'}
+                </span>
+                <span className="text-[10px] text-[var(--text-tertiary)] font-normal">
+                  {currentState.stateCode}
+                </span>
+              </label>
+
+              <div className="relative">
+                {/* Trigger Button with Theme Background & Border */}
+                <button
+                  type="button"
+                  onClick={() => setIsStateDropdownOpen(!isStateDropdownOpen)}
+                  className="w-full p-2.5 sm:p-3 rounded-xl bg-[var(--bg-primary)] hover:bg-[var(--bg-surface)] border border-[var(--border-glass)] hover:border-[var(--accent)] text-left flex items-center justify-between transition-all cursor-pointer shadow-2xs group focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  aria-expanded={isStateDropdownOpen}
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span className="w-8 h-8 rounded-lg bg-[var(--accent-soft)] text-[var(--accent)] font-mono font-black text-xs flex items-center justify-center shrink-0 border border-[var(--accent)]/30">
+                      {currentState.stateCode}
+                    </span>
+                    <div className="min-w-0">
+                      <span className="text-xs sm:text-sm font-bold text-[var(--text-primary)] block truncate">
+                        {language === 'hi' ? currentState.stateNameHi : currentState.stateNameEn}
+                      </span>
+                      <span className="text-[11px] text-[var(--text-tertiary)] block truncate">
+                        {language === 'hi' ? currentState.stateNameEn : currentState.stateNameHi}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`p-1.5 rounded-lg bg-[var(--bg-surface)] text-[var(--text-secondary)] transition-transform duration-200 ${
+                      isStateDropdownOpen ? 'rotate-180' : ''
+                    }`}
+                  >
+                    <ChevronDown className="w-4 h-4" />
+                  </div>
+                </button>
+
+                {/* Dropdown Menu (Theme Surface & Opaque Floating Card) */}
+                {isStateDropdownOpen && (
+                  <div className="absolute top-full left-0 right-0 mt-1.5 z-50 bg-[var(--bg-surface)] border border-[var(--border-glass)] rounded-2xl shadow-2xl p-2.5 space-y-2 animate-in fade-in slide-in-from-top-2 duration-150 max-h-[290px] flex flex-col">
+                    {/* Search Field */}
+                    <div className="relative shrink-0">
+                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]" />
+                      <input
+                        type="text"
+                        placeholder={
+                          language === 'hi'
+                            ? 'राज्य का नाम खोजें (उदा. दिल्ली, बिहार)...'
+                            : 'Search state by name (e.g. Delhi, UP, Bihar)...'
+                        }
+                        value={stateSearchQuery}
+                        onChange={(e) => setStateSearchQuery(e.target.value)}
+                        className="w-full pl-9 pr-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-1 focus:ring-[var(--accent)]"
+                        autoFocus
+                      />
+                    </div>
+
+                    {/* Scrollable List */}
+                    <div className="overflow-y-auto overscroll-contain space-y-1 flex-1 max-h-[210px] custom-scrollbar pr-1">
+                      {filteredStates.map((s) => {
+                        const isSelected = s.stateCode === selectedStateCode;
+                        return (
+                          <button
+                            key={s.stateCode}
+                            type="button"
+                            onClick={() => {
+                              setSelectedStateCode(s.stateCode);
+                              setIsStateDropdownOpen(false);
+                              setStateSearchQuery('');
+                            }}
+                            className={`w-full p-2 rounded-xl flex items-center justify-between text-left transition-all cursor-pointer text-xs ${
+                              isSelected
+                                ? 'bg-[var(--accent-soft)] text-[var(--accent)] font-bold border border-[var(--accent)]/30'
+                                : 'hover:bg-[var(--bg-primary)] text-[var(--text-primary)]'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="w-6 h-6 rounded-md bg-[var(--border-glass)] text-[var(--text-secondary)] text-[10px] font-mono font-bold flex items-center justify-center shrink-0">
+                                {s.stateCode}
+                              </span>
+                              <div className="truncate">
+                                <span className="font-bold">
+                                  {language === 'hi' ? s.stateNameHi : s.stateNameEn}
+                                </span>
+                                <span className="text-[10px] text-[var(--text-tertiary)] ml-1">
+                                  ({language === 'hi' ? s.stateNameEn : s.stateNameHi})
+                                </span>
+                              </div>
+                            </div>
+
+                            {isSelected && (
+                              <div className="w-4 h-4 rounded-full bg-[var(--accent)] text-white flex items-center justify-center shrink-0">
+                                <Check className="w-2.5 h-2.5 stroke-[3]" />
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
+
+                      {filteredStates.length === 0 && (
+                        <div className="p-4 text-center text-xs text-[var(--text-tertiary)]">
+                          {language === 'hi' ? 'कोई राज्य नहीं मिला' : 'No state found matching query.'}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* ── OPTION A: PART NUMBER & SERIAL NUMBER ── */}
+            {verificationMethod === 'coords' && (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                {/* Assembly Constituency (AC) */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1">
+                    <Building2 className="w-3.5 h-3.5 text-[var(--accent)]" />
+                    <span>
+                      {language === 'hi'
+                        ? 'विधानसभा निर्वाचन क्षेत्र (AC - वैकल्पिक)'
+                        : 'Assembly Constituency (AC - Optional)'}
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={assemblyConstituency}
+                    onChange={(e) => setAssemblyConstituency(e.target.value)}
+                    placeholder={
+                      language === 'hi' ? 'उदा. 40 नई दिल्ली या वाराणसी' : 'e.g. 40 New Delhi or Varanasi'
+                    }
+                    className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs sm:text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  />
+                </div>
+
+                {/* Part Number & Serial Number with explicit placeholders & labels */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1">
+                      <Hash className="w-3.5 h-3.5 text-[var(--accent)]" />
+                      <span>{language === 'hi' ? 'भाग संख्या (Part Number) *' : 'Part Number *'}</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={partNumber}
+                      onChange={(e) => setPartNumber(e.target.value.replace(/[^0-9]/g, ''))}
+                      placeholder="e.g. 142"
+                      maxLength={6}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs sm:text-sm font-mono font-bold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                    />
+                    <span className="text-[10px] text-[var(--text-tertiary)] block">
+                      {language === 'hi' ? 'कॉलम 8 में दी गई संख्या (उदा. 142)' : 'Number from Column 8 (e.g. 142)'}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1">
+                      <Hash className="w-3.5 h-3.5 text-[var(--accent)]" />
+                      <span>{language === 'hi' ? 'क्रम संख्या (Serial Number) *' : 'Serial Number *'}</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={serialNumber}
+                      onChange={(e) => setSerialNumber(e.target.value.replace(/[^0-9]/g, ''))}
+                      placeholder="e.g. 389"
+                      maxLength={6}
+                      className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs sm:text-sm font-mono font-bold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                    />
+                    <span className="text-[10px] text-[var(--text-tertiary)] block">
+                      {language === 'hi' ? 'कॉलम 9 में दी गई संख्या (उदा. 389)' : 'Number from Column 9 (e.g. 389)'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ── OPTION B: ALTERNATIVE (CONSTITUENCY & POLLING BOOTH) ── */}
+            {verificationMethod === 'booth' && (
+              <div className="space-y-4 animate-in fade-in duration-200">
+                <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] space-y-1">
+                  <span className="font-bold text-[var(--accent)] block">
+                    {language === 'hi' ? 'वैकल्पिक सरल सत्यापन विधि' : 'Alternative Simple Verification'}
+                  </span>
+                  <p className="text-[11px] leading-relaxed">
+                    {language === 'hi'
+                      ? 'यदि आपको भाग या क्रम संख्या नहीं मिली, तो अपना विधानसभा क्षेत्र एवं मतदान केंद्र/इलाके का नाम दर्ज कर सत्यापन करें।'
+                      : 'If you did not note your Part/Serial numbers, verify using your Assembly Constituency and Polling Booth / Area name.'}
+                  </p>
+                </div>
+
+                {/* Assembly Constituency (AC) */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1">
+                    <Building2 className="w-3.5 h-3.5 text-[var(--accent)]" />
+                    <span>
+                      {language === 'hi'
+                        ? 'विधानसभा निर्वाचन क्षेत्र (AC) *'
+                        : 'Assembly Constituency (AC) *'}
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={assemblyConstituency}
+                    onChange={(e) => setAssemblyConstituency(e.target.value)}
+                    placeholder={
+                      language === 'hi' ? 'उदा. 40 नई दिल्ली या 388 वाराणसी' : 'e.g. 40 New Delhi or Varanasi'
+                    }
+                    className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs sm:text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  />
+                </div>
+
+                {/* Polling Booth / Station Name */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-1">
+                    <MapPin className="w-3.5 h-3.5 text-[var(--accent)]" />
+                    <span>
+                      {language === 'hi'
+                        ? 'मतदान केंद्र / विद्यालय / इलाका (वैकल्पिक)'
+                        : 'Polling Station / School / Area (Optional)'}
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={pollingBooth}
+                    onChange={(e) => setPollingBooth(e.target.value)}
+                    placeholder={
+                      language === 'hi'
+                        ? 'उदा. सर्वोदय विद्यालय या सेक्टर 14'
+                        : 'e.g. Govt Primary School or Sector 14'
+                    }
+                    className="w-full px-3 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs sm:text-sm text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Submit Action */}
             <div className="pt-2 flex flex-col sm:flex-row gap-2">
@@ -527,7 +859,11 @@ export function VerificationForm({
                 type="submit"
                 variant="primary"
                 size="lg"
-                disabled={!partNumber || !serialNumber}
+                disabled={
+                  verificationMethod === 'coords'
+                    ? !partNumber || !serialNumber
+                    : !assemblyConstituency.trim()
+                }
                 className="flex-1 justify-center gap-2 font-bold py-3"
               >
                 <CheckCircle2 className="w-4 h-4" />

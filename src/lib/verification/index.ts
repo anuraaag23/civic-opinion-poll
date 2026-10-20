@@ -111,6 +111,12 @@ export class SelfVerificationService {
 
       const electoralKey = `ECI:${cleanState}:${cleanAc}:P${cleanPart}:S${cleanSerial}`;
       voterFingerprint = generateParticipationFingerprint(electoralKey, pollId);
+    } else if (assemblyConstituency && assemblyConstituency.trim().length > 0) {
+      // Alternative: Assembly Constituency + client/device entropy
+      const cleanState = (stateCode || 'IN').trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 20);
+      const cleanAc = assemblyConstituency.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 40);
+      const clientIdentifier = deviceFingerprint || `CLIENT:${clientIp}`;
+      voterFingerprint = generateParticipationFingerprint(`ECI_AC:${cleanState}:${cleanAc}:${clientIdentifier}`, pollId);
     } else {
       // Direct ECI confirmed search: bind client/device entropy
       const clientIdentifier = deviceFingerprint || `CLIENT:${clientIp}`;
