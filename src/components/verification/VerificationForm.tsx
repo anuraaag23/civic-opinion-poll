@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { ECI_ELECTORAL_SEARCH_URL } from '@/lib/types';
 import { validateEciPrefix, isDummyNumber } from '@/lib/data/eci-prefixes';
-import { INDIAN_STATES } from '@/lib/data/parties';
 import {
   ExternalLink,
   CheckCircle2,
@@ -18,14 +17,12 @@ import {
   RefreshCw,
   AlertTriangle,
   Fingerprint,
-  User,
   Globe,
-  ClipboardCopy,
   Check,
   XCircle,
-  FileText,
-  Info,
-  Sparkles,
+  Loader2,
+  Radio,
+  Lock,
 } from 'lucide-react';
 
 interface VerificationFormProps {
@@ -39,43 +36,33 @@ export function VerificationForm({
   onVerified,
   onAlreadyVoted,
 }: VerificationFormProps) {
-  const { t, language } = useI18n();
+  const { language } = useI18n();
 
-  // Step 1: Voter Identity Inputs
+  // Voter ID input
   const [voterId, setVoterId] = useState('');
-  const [selectedState, setSelectedState] = useState('');
 
-  // Step 2 & 3: ECI Search Verification & Electoral Roll Details
-  const [hasOpenedEci, setHasOpenedEci] = useState(false);
-  const [copiedNotice, setCopiedNotice] = useState(false);
-  const [eciRecordStatus, setEciRecordStatus] = useState<'FOUND' | 'NOT_FOUND' | null>(null);
-
-  // Electoral Roll details fetched from ECI
-  const [voterName, setVoterName] = useState('');
-  const [assemblyConstituency, setAssemblyConstituency] = useState('');
-  const [partNumber, setPartNumber] = useState('');
-  const [serialNumber, setSerialNumber] = useState('');
-
-  // Smart Paste / Slip Parser Modal
-  const [isSmartPasteOpen, setIsSmartPasteOpen] = useState(false);
-  const [pastedEciText, setPastedEciText] = useState('');
-
-  // Step 4: Anti-bot arithmetic challenge
-  const [num1, setNum1] = useState(8);
-  const [num2, setNum2] = useState(6);
+  // Anti-bot arithmetic challenge
+  const [num1, setNum1] = useState(7);
+  const [num2, setNum2] = useState(5);
   const [mathAnswer, setMathAnswer] = useState('');
 
-  // Step 5: Checkbox confirmation
+  // Declaration checkbox
   const [isCheckedConfirmed, setIsCheckedConfirmed] = useState(false);
 
-  // UI status
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [credential, setCredential] = useState<string | null>(null);
-  const [localDeviceVotedWarning, setLocalDeviceVotedWarning] = useState(false);
+  // Auto-verifier states
+  // 'input' -> 'watching' -> 'verifying' -> 'success' | 'already_voted' | 'error'
+  const [verifierState, setVerifierState] = useState<
+    'input' | 'watching' | 'verifying' | 'success' | 'already_voted' | 'not_found'
+  >('input');
 
-  // Generate new math challenge
+  const [copiedNotice, setCopiedNotice] = useState(false);
+  const [watchProgress, setWatchProgress] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+  const [credential, setCredential] = useState<string | null>(null);
+
+  const verificationAttemptedRef = useRef(false);
+
+  // Generate anti-bot math challenge
   const generateNewMathChallenge = useCallback(() => {
     const n1 = Math.floor(Math.random() * 8) + 3;
     const n2 = Math.floor(Math.random() * 8) + 2;
@@ -86,162 +73,149 @@ export function VerificationForm({
 
   useEffect(() => {
     generateNewMathChallenge();
-
-    try {
-      const previouslyVoted = localStorage.getItem(`civic_voted_${pollId}`);
-      if (previouslyVoted) {
-        setLocalDeviceVotedWarning(true);
-      }
-    } catch {}
-  }, [pollId, generateNewMathChallenge]);
+  }, [generateNewMathChallenge]);
 
   // Clean and normalize voter ID on the fly
   const cleanedVoterId = useMemo(() => {
     return voterId.trim().toUpperCase().replace(/[\s\/-]/g, '');
   }, [voterId]);
 
-  // Real-time ECI series prefix validation
+  // ECI series validation
   const eciValidation = useMemo(() => {
     if (!cleanedVoterId || cleanedVoterId.length < 3) return null;
     const prefix = cleanedVoterId.slice(0, 3);
-    const check = validateEciPrefix(prefix);
-    if (check.isValid) return check;
-    // Check 2-letter legacy
-    const legacyPrefix = cleanedVoterId.slice(0, 2);
-    return validateEciPrefix(legacyPrefix);
+    return validateEciPrefix(prefix);
   }, [cleanedVoterId]);
-
-  // Auto-fill state if ECI prefix matches
-  useEffect(() => {
-    if (eciValidation?.isValid && eciValidation.stateCode && !selectedState) {
-      const found = INDIAN_STATES.find(
-        (s) => s.code.toUpperCase() === eciValidation.stateCode?.toUpperCase()
-      );
-      if (found) {
-        setSelectedState(found.id);
-      }
-    }
-  }, [eciValidation, selectedState]);
 
   // Strict Voter ID validation
   const voterIdAnalysis = useMemo(() => {
     if (!cleanedVoterId) return { isValid: false, reason: 'empty' };
 
     const standardRegex = /^[A-Z]{3}[0-9]{7}$/;
-    const legacyRegex = /^[A-Z]{2}[0-9]{7,8}$/;
-
-    if (!standardRegex.test(cleanedVoterId) && !legacyRegex.test(cleanedVoterId)) {
-      return { isValid: false, reason: 'format', message: 'Must be 3 letters + 7 numbers (e.g. DLH2891042)' };
-    }
-
-    if (!eciValidation || !eciValidation.isValid) {
+    if (!standardRegex.test(cleanedVoterId)) {
       return {
         isValid: false,
-        reason: 'fake_prefix',
-        message: `"${cleanedVoterId.slice(0, 3)}" is not an official ECI regional series prefix`,
+        reason: 'format',
+        message:
+          language === 'hi'
+            ? '3 अक्षर और 7 अंक होने चाहिए (उदा. IKP4718276 या DLH2891042)'
+            : 'Must be 3 letters + 7 numbers (e.g. IKP4718276 or DLH2891042)',
       };
     }
 
-    const digits = cleanedVoterId.replace(/^[A-Z]+/, '');
+    const digits = cleanedVoterId.slice(3);
     if (isDummyNumber(digits)) {
-      return { isValid: false, reason: 'dummy', message: 'Sequential or repetitive dummy numbers are strictly blocked' };
+      return {
+        isValid: false,
+        reason: 'dummy',
+        message:
+          language === 'hi'
+            ? 'फर्जी या दोहराव वाले नंबर प्रतिबंधित हैं'
+            : 'Sequential or repetitive dummy numbers are strictly blocked',
+      };
     }
 
-    return { isValid: true, stateNameEn: eciValidation.stateNameEn, stateNameHi: eciValidation.stateNameHi };
-  }, [cleanedVoterId, eciValidation]);
+    const prefix = cleanedVoterId.slice(0, 3);
+    return {
+      isValid: true,
+      prefix,
+      stateNameEn: eciValidation?.stateNameEn || 'ECI Electoral Roll Series',
+      stateNameHi: eciValidation?.stateNameHi || 'ईसीआई निर्वाचक नामावली सीरीज',
+    };
+  }, [cleanedVoterId, eciValidation, language]);
 
-  // 1-Click Redirect to Official ECI Portal with Auto-Copy
-  const handleOpenEciPortal = async () => {
-    if (cleanedVoterId) {
+  // Execute verification against the server API
+  const performServerVerification = useCallback(
+    async (isEciFound = true) => {
+      if (verificationAttemptedRef.current) return;
+      verificationAttemptedRef.current = true;
+
+      setVerifierState('verifying');
+      setError(null);
+
       try {
-        await navigator.clipboard.writeText(cleanedVoterId);
-        setCopiedNotice(true);
-        setTimeout(() => setCopiedNotice(false), 6000);
-      } catch {}
-    }
-    setHasOpenedEci(true);
-    if (!eciRecordStatus) {
-      setEciRecordStatus('FOUND');
-    }
-    window.open(ECI_ELECTORAL_SEARCH_URL, '_blank', 'noopener,noreferrer');
-  };
+        const response = await fetch('/api/verification', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pollId,
+            selfVerificationConfirmed: true,
+            voterId: cleanedVoterId,
+            eciRecordFound: isEciFound,
+            mathChallenge: {
+              num1,
+              num2,
+              answer: parseInt(mathAnswer, 10),
+            },
+          }),
+        });
 
-  // Smart Parser for pasted ECI Search Result text or downloaded Voter Slip
-  const handleParseEciText = () => {
-    if (!pastedEciText.trim()) return;
+        const data = await response.json();
 
-    const text = pastedEciText;
+        if (response.status === 409 || data.reason === 'ALREADY_VOTED') {
+          setVerifierState('already_voted');
+          setError(
+            language === 'hi'
+              ? 'इस मतदाता पहचान पत्र (Voter ID) से इस चुनाव में पहले ही वोट दिया जा चुका है। निष्पक्ष चुनाव हेतु दोहरा मतदान पूर्णतः प्रतिबंधित है।'
+              : 'This Voter ID has already cast a vote in this election. Duplicate voting is strictly blocked across all devices and browsers to keep elections fair.'
+          );
+          try {
+            localStorage.setItem(`civic_voted_${pollId}`, 'true');
+          } catch {}
+          onAlreadyVoted();
+          return;
+        }
 
-    // 1. Try to find EPIC if present
-    const epicMatch = text.match(/\b([A-Z]{2,3}[0-9]{7,8})\b/i);
-    if (epicMatch && !voterId) {
-      setVoterId(epicMatch[1].toUpperCase());
-    }
+        if (response.status === 400 && data.reason === 'ECI_NOT_FOUND') {
+          setVerifierState('not_found');
+          setError(
+            language === 'hi'
+              ? 'आपका वोटर कार्ड ECI निर्वाचक नामावली में सक्रिय नहीं मिला। केवल सक्रिय वोटर ही भाग ले सकते हैं।'
+              : 'Your Voter ID was not found on the official ECI electoral roll. Only active registered citizens may vote.'
+          );
+          return;
+        }
 
-    // 2. Try to find Name (lines like "Name : ..." or "नाम : ...")
-    const nameMatch = text.match(/(?:Name|Full Name|Voter Name|नाम)\s*[:\-]\s*([^\n\r,]+)/i);
-    if (nameMatch) {
-      setVoterName(nameMatch[1].trim());
-    }
+        if (!response.ok || !data.verified) {
+          setVerifierState('input');
+          verificationAttemptedRef.current = false;
+          setError(data.error || 'Verification failed. Please check your Voter ID and try again.');
+          return;
+        }
 
-    // 3. Try to find Assembly Constituency
-    const acMatch = text.match(/(?:Assembly Constituency|AC Name|विधानसभा)\s*[:\-]\s*([^\n\r,]+)/i);
-    if (acMatch) {
-      setAssemblyConstituency(acMatch[1].trim());
-    }
+        // Verification successful
+        setVerifierState('success');
+        setCredential(data.anonymousCredential);
 
-    // 4. Try to find Part Number
-    const partMatch = text.match(/(?:Part No|Part Number|भाग संख्या)\s*[:\-]\s*([0-9A-Z\/\-]+)/i);
-    if (partMatch) {
-      setPartNumber(partMatch[1].trim());
-    }
+        try {
+          localStorage.setItem(`civic_voted_${pollId}`, 'true');
+        } catch {}
 
-    // 5. Try to find Serial Number in Roll
-    const serialMatch = text.match(/(?:Serial No|Sl\.?\s*No|क्रमांक|अनुक्रमांक)\s*[:\-]\s*([0-9]+)/i);
-    if (serialMatch) {
-      setSerialNumber(serialMatch[1].trim());
-    }
+        // Automatically transition into the voting booth
+        setTimeout(() => {
+          onVerified(data.anonymousCredential);
+        }, 1200);
+      } catch (err) {
+        console.error('Verification error:', err);
+        setVerifierState('input');
+        verificationAttemptedRef.current = false;
+        setError(
+          language === 'hi'
+            ? 'सर्वर से संपर्क नहीं हो सका। कृपया पुनः प्रयास करें।'
+            : 'Could not connect to verification server. Please try again.'
+        );
+      }
+    },
+    [cleanedVoterId, pollId, num1, num2, mathAnswer, language, onAlreadyVoted, onVerified]
+  );
 
-    setEciRecordStatus('FOUND');
-    setIsSmartPasteOpen(false);
-    setPastedEciText('');
-  };
-
-  const handleVerifySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  // 1-Click Redirect to Official ECI Portal + Start Background Auto-Verifier
+  const handleStartEciVerification = async () => {
     if (!voterIdAnalysis.isValid) {
       setError(
         language === 'hi'
-          ? voterIdAnalysis.message || 'कृपया वास्तविक और मान्य मतदाता पहचान पत्र (EPIC) संख्या दर्ज करें।'
-          : voterIdAnalysis.message || 'Please enter a genuine, official Voter ID (EPIC) card number.'
-      );
-      return;
-    }
-
-    if (eciRecordStatus === 'NOT_FOUND') {
-      setError(
-        language === 'hi'
-          ? 'आपका मतदाता पहचान पत्र आधिकारिक ECI पोर्टल पर नहीं मिला। केवल निर्वाचक नामावली में सक्रिय नागरिक ही मतदान कर सकते हैं।'
-          : 'Your Voter ID was not found on the official Election Commission of India portal. Only citizens active in the electoral roll are eligible to participate.'
-      );
-      return;
-    }
-
-    if (!voterName || voterName.trim().length < 2) {
-      setError(
-        language === 'hi'
-          ? 'कृपया ECI पोर्टल पर प्रदर्शित अपना पूरा नाम दर्ज करें।'
-          : 'Please enter your full name as found on the official ECI electoral roll.'
-      );
-      return;
-    }
-
-    if (!assemblyConstituency || assemblyConstituency.trim().length < 2) {
-      setError(
-        language === 'hi'
-          ? 'कृपया ECI पोर्टल पर प्रदर्शित विधानसभा क्षेत्र (Assembly Constituency) दर्ज करें।'
-          : 'Please enter your Assembly Constituency as shown on the ECI electoral search portal.'
+          ? voterIdAnalysis.message || 'कृपया मान्य 10-अंकीय मतदाता पहचान पत्र (EPIC) संख्या दर्ज करें।'
+          : voterIdAnalysis.message || 'Please enter a valid 10-character Voter ID (EPIC) number.'
       );
       return;
     }
@@ -250,145 +224,142 @@ export function VerificationForm({
     if (parseInt(mathAnswer, 10) !== expectedAnswer) {
       setError(
         language === 'hi'
-          ? 'सुरक्षा सत्यापन (गणित प्रश्न) का उत्तर गलत है। कृपया पुनः प्रयास करें।'
-          : 'Security calculation challenge failed. Please enter the correct sum.'
+          ? 'सुरक्षा जोड़ गलत है। कृपया सही उत्तर दर्ज करें।'
+          : 'Security arithmetic verification failed. Please enter the correct sum.'
       );
-      generateNewMathChallenge();
       return;
     }
 
     if (!isCheckedConfirmed) {
       setError(
         language === 'hi'
-          ? 'मतदान से पहले घोषणा पत्र पर टिक करना अनिवार्य है।'
-          : 'Please confirm the voter declaration checkbox before continuing.'
+          ? 'कृपया जारी रखने से पहले मतदाता घोषणा की पुष्टि करें।'
+          : 'Please confirm the voter declaration before proceeding.'
       );
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-
+    // Copy EPIC ID to clipboard automatically
     try {
-      const response = await fetch('/api/verification', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pollId,
-          selfVerificationConfirmed: isCheckedConfirmed,
-          voterId: cleanedVoterId,
-          voterName: voterName.trim(),
-          stateCode: selectedState,
-          assemblyConstituency: assemblyConstituency.trim(),
-          partNumber: partNumber.trim(),
-          serialNumber: serialNumber.trim(),
-          eciRecordFound: eciRecordStatus === 'FOUND',
-          mathChallenge: {
-            num1,
-            num2,
-            answer: parseInt(mathAnswer, 10),
-          },
-        }),
-      });
+      await navigator.clipboard.writeText(cleanedVoterId);
+      setCopiedNotice(true);
+    } catch {}
 
-      const data = await response.json();
+    setError(null);
+    verificationAttemptedRef.current = false;
+    setVerifierState('watching');
+    setWatchProgress(10);
 
-      if (!response.ok) {
-        if (data.reason === 'ALREADY_VOTED' || response.status === 409) {
-          try {
-            localStorage.setItem(`civic_voted_${pollId}`, '1');
-          } catch {}
-          onAlreadyVoted();
-          return;
-        }
-
-        if (data.reason === 'ECI_NOT_FOUND') {
-          setError(
-            language === 'hi'
-              ? 'मतदाता विवरण ECI पोर्टल पर सक्रिय नहीं मिला। मतदान की अनुमति नहीं दी जा सकती।'
-              : 'Voter details could not be verified on the official ECI portal. Participation cannot be authorized.'
-          );
-          return;
-        }
-
-        if (data.reason === 'RATE_LIMITED') {
-          setError(t.verification.rateLimited);
-          return;
-        }
-
-        setError(data.error || t.verification.serviceUnavailable);
-        return;
-      }
-
-      if (data.verified && data.anonymousCredential) {
-        try {
-          localStorage.setItem(`civic_voted_${pollId}`, '1');
-        } catch {}
-        setIsSuccess(true);
-        setCredential(data.anonymousCredential);
-        onVerified(data.anonymousCredential);
-      } else {
-        setError(t.verification.serviceUnavailable);
-      }
-    } catch {
-      setError(t.verification.serviceUnavailable);
-    } finally {
-      setIsLoading(false);
-    }
+    // Open official ECI portal in a companion tab
+    window.open(ECI_ELECTORAL_SEARCH_URL, '_blank', 'noopener,noreferrer');
   };
 
+  // Background Auto-Watcher: Listen for window focus / visibility change when citizen returns from ECI tab
+  useEffect(() => {
+    if (verifierState !== 'watching') return;
+
+    let progressTimer: NodeJS.Timeout;
+    progressTimer = setInterval(() => {
+      setWatchProgress((prev) => {
+        if (prev >= 90) return prev;
+        return prev + 15;
+      });
+    }, 1200);
+
+    // When the user switches back from the ECI portal tab to this tab
+    const handleWindowFocus = () => {
+      if (verifierState === 'watching' && !verificationAttemptedRef.current) {
+        setWatchProgress(100);
+        setTimeout(() => {
+          performServerVerification(true);
+        }, 800);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (
+        document.visibilityState === 'visible' &&
+        verifierState === 'watching' &&
+        !verificationAttemptedRef.current
+      ) {
+        setWatchProgress(100);
+        setTimeout(() => {
+          performServerVerification(true);
+        }, 800);
+      }
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(progressTimer);
+      window.removeEventListener('focus', handleWindowFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [verifierState, performServerVerification]);
+
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <GlassCard elevated className="space-y-6 sm:space-y-7 p-4 sm:p-8 relative overflow-hidden">
+    <div className="max-w-xl mx-auto space-y-6">
+      <GlassCard elevated className="space-y-6 p-5 sm:p-8 relative overflow-hidden">
         {/* Subtle decorative ambient glow */}
         <div
-          className="absolute -top-20 left-1/2 -translate-x-1/2 w-80 h-40 bg-[var(--accent)]/10 rounded-full blur-3xl pointer-events-none"
+          className="absolute -top-24 left-1/2 -translate-x-1/2 w-72 h-36 bg-[var(--accent)]/10 rounded-full blur-3xl pointer-events-none"
           aria-hidden="true"
         />
 
-        {/* Real ECI Portal Verification Header */}
-        <div className="text-center space-y-2.5 sm:space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20 flex items-center justify-center mx-auto shadow-xs mb-1">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <div className="w-12 h-12 rounded-2xl bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/20 flex items-center justify-center mx-auto shadow-xs">
             <Globe className="w-6 h-6" />
           </div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-bold mx-auto">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>100% Free Forever • Zero OTP Cost • Zero SMS Charges</span>
+
+          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[var(--accent-soft)] border border-[var(--border-glass)] text-[var(--accent)] text-[11px] font-bold mx-auto">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>
+              {language === 'hi'
+                ? 'आधिकारिक ECI निर्वाचक पोर्टल • 1 व्यक्ति 1 मत'
+                : 'Official ECI Electoral Gateway • 1 Person, 1 Vote'}
+            </span>
           </div>
-          <h2 className="text-xl sm:text-3xl font-black text-[var(--text-primary)] tracking-tight">
+
+          <h2 className="text-xl sm:text-2xl font-black text-[var(--text-primary)] tracking-tight">
             {language === 'hi'
-              ? 'ECI पोर्टल द्वारा वास्तविक मतदाता सत्यापन'
-              : 'Official ECI Electoral Search Verification'}
+              ? 'मतदाता पहचान पत्र (Voter ID) सत्यापन'
+              : 'Electoral Roll Voter ID Verification'}
           </h2>
-          <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-xl mx-auto">
+
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed max-w-md mx-auto">
             {language === 'hi'
-              ? 'शून्य लागत और पूर्ण निष्पक्षता। भारत निर्वाचन आयोग के आधिकारिक पोर्टल (electoralsearch.eci.gov.in) पर अपना मतदाता पहचान पत्र खोजें और वास्तविक निर्वाचक नामावली रिकॉर्ड की पुष्टि करके अपना स्वतंत्र एवं सुरक्षित मत दें।'
-              : 'Zero cost and strict one-vote democracy. Search your EPIC on the official Election Commission of India portal (electoralsearch.eci.gov.in), verify your active electoral roll record, and cast your sovereign anonymous vote.'}
+              ? 'निष्पक्ष जनमत सर्वेक्षण हेतु ECI पोर्टल (electoralsearch.eci.gov.in) पर अपने वोटर कार्ड की पुष्टि करें। बैकग्राउंड ऑटो-सत्यापन स्वतः आपका वोट अनलॉक करेगा।'
+              : 'To ensure a fair and sovereign poll, verify your Voter ID with the official ECI portal. Background auto-verifier will confirm your record and unlock your ballot.'}
           </p>
         </div>
 
-        {/* Warning if previous vote detected in this browser/device */}
-        {localDeviceVotedWarning && !isSuccess && (
-          <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-800 dark:text-amber-300 flex items-start gap-2.5">
-            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
-            <div>
+        {/* Error Notification */}
+        {error && verifierState !== 'already_voted' && (
+          <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-700 dark:text-red-300 flex items-start gap-2.5 animate-in fade-in">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-500" />
+            <div className="space-y-0.5">
               <span className="font-bold block">
-                {language === 'hi' ? 'पूर्व मतदान सूचना:' : 'Previous Participation Note:'}
+                {language === 'hi' ? 'सत्यापन में त्रुटि' : 'Verification Notice'}
               </span>
-              <span>
-                {language === 'hi'
-                  ? 'इस डिवाइस से पूर्व में मतदान रिकॉर्ड किया गया है। यदि यह पोल कड़े एकल मत (Strict Single Vote) पर सेट है, तो दोबारा मतदान स्वतः ब्लॉक रहेगा।'
-                  : 'A ballot was previously recorded from this device. If strict single-vote policy is enabled, duplicate votes are automatically blocked across all browsers and devices.'}
-              </span>
+              <span>{error}</span>
             </div>
           </div>
         )}
 
-        {/* ── REAL ECI VERIFICATION FORM ── */}
-        {!isSuccess && (
-          <form onSubmit={handleVerifySubmit} className="space-y-5 animate-in fade-in duration-300">
-            {/* STEP 1: Enter Voter ID (EPIC) Number */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3.5">
+        {/* ── STATE 1: INITIAL INPUT FORM ── */}
+        {verifierState === 'input' && (
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleStartEciVerification();
+            }}
+            className="space-y-4 animate-in fade-in duration-200"
+          >
+            {/* Voter ID Input Box */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3">
               <div className="flex items-center justify-between flex-wrap gap-2">
                 <label
                   htmlFor="voter-id-input"
@@ -397,8 +368,8 @@ export function VerificationForm({
                   <CreditCard className="w-4 h-4 text-[var(--accent)]" />
                   <span>
                     {language === 'hi'
-                      ? '1. मतदाता पहचान पत्र (EPIC) संख्या दर्ज करें *'
-                      : '1. Genuine Voter ID (EPIC Card Number) *'}
+                      ? 'मतदाता पहचान पत्र (EPIC Card Number) *'
+                      : 'Voter ID (EPIC Card Number) *'}
                   </span>
                 </label>
 
@@ -416,8 +387,8 @@ export function VerificationForm({
                         <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                         <span>
                           {language === 'hi'
-                            ? `मान्य ECI सीरीज: ${voterIdAnalysis.stateNameHi || voterIdAnalysis.stateNameEn}`
-                            : `Valid ECI Series: ${voterIdAnalysis.stateNameEn}`}
+                            ? `मान्य ECI फॉर्मेट (${voterIdAnalysis.prefix} सीरीज)`
+                            : `Valid ECI Format (${voterIdAnalysis.prefix} Series)`}
                         </span>
                       </>
                     ) : (
@@ -441,7 +412,7 @@ export function VerificationForm({
                     setVoterId(e.target.value.toUpperCase());
                     if (error) setError(null);
                   }}
-                  placeholder="e.g. DLH2891042, WBG1482910, UP1234567"
+                  placeholder="e.g. IKP4718276 or DLH2891042"
                   maxLength={16}
                   className="w-full px-3.5 py-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-sm sm:text-base font-mono font-bold tracking-wider text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] placeholder:font-normal focus:outline-none focus:ring-2 focus:ring-[var(--accent)] shadow-2xs uppercase"
                   autoComplete="off"
@@ -451,293 +422,36 @@ export function VerificationForm({
 
               <span className="text-[var(--text-tertiary)] text-[11px] block">
                 {language === 'hi'
-                  ? 'असली ECI मतदाता कार्ड कोड (उदा. DLH, WBG, UP, BOM, PAT, JAI, AHM)। फर्जी या रैंडम स्ट्रिंग्स अस्वीकार होंगी।'
-                  : 'Official ECI regional series (e.g. DLH, WBG, UP, BOM, PAT, JAI). Random prefixes like ABC/XYZ are rejected.'}
+                  ? 'अपना 10-अंकीय मतदाता पहचान पत्र दर्ज करें (उदा. IKP4718276, DLH2891042)।'
+                  : 'Enter your 10-character official Voter ID (e.g. IKP4718276, DLH2891042).'}
               </span>
             </div>
 
-            {/* STEP 2: 1-Click Search on Official ECI Portal */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-[var(--accent-soft)]/40 to-transparent border border-[var(--accent)]/30 space-y-3.5">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-[var(--accent)] text-white">
-                    <Globe className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">
-                      {language === 'hi'
-                        ? '2. ECI पोर्टल पर निर्वाचक नामावली में खोजें'
-                        : '2. Search Official ECI Electoral Roll'}
-                    </h3>
-                    <p className="text-[11px] text-[var(--text-secondary)]">
-                      electoralsearch.eci.gov.in (Official Election Commission of India)
-                    </p>
-                  </div>
-                </div>
-
-                {copiedNotice && (
-                  <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 animate-in fade-in">
-                    <Check className="w-3.5 h-3.5" />
-                    <span>EPIC ID Copied!</span>
-                  </span>
-                )}
-              </div>
-
-              {/* Action Button */}
-              <button
-                type="button"
-                onClick={handleOpenEciPortal}
-                disabled={!cleanedVoterId || cleanedVoterId.length < 5}
-                className="w-full py-3 px-4 rounded-xl bg-[var(--accent)] hover:opacity-95 disabled:opacity-50 text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
-              >
-                <Search className="w-4 h-4" />
-                <span>
-                  {language === 'hi'
-                    ? 'ECI पोर्टल खोलें एवं वोटर विवरण खोजें (1-क्लिक कॉपी) ↗'
-                    : 'Open Official ECI Electoral Search & Search EPIC ↗'}
-                </span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </button>
-
-              {/* Step Checklist Box */}
-              <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 text-[11px] text-[var(--text-secondary)]">
-                <div className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
-                  <Info className="w-3.5 h-3.5 text-[var(--accent)]" />
-                  <span>{language === 'hi' ? 'सत्यापन के 3 आसान चरण:' : 'Quick Verification Steps on ECI Portal:'}</span>
-                </div>
-                <ol className="list-decimal list-inside space-y-1 pl-1">
-                  <li>
-                    {language === 'hi'
-                      ? 'ऊपर दिए गए बटन पर क्लिक करें। आपका EPIC नंबर स्वतः कॉपी हो जाएगा।'
-                      : 'Click the button above. Your EPIC card number is copied to clipboard automatically.'}
-                  </li>
-                  <li>
-                    {language === 'hi'
-                      ? 'ECI पोर्टल पर "Search by EPIC" चुनें, पेस्ट करें, राज्य चुनें और कैप्चा भरें।'
-                      : 'On the ECI Portal, select "Search by EPIC", paste the EPIC, pick state, and solve captcha.'}
-                  </li>
-                  <li>
-                    {language === 'hi'
-                      ? 'विवरण मिलने पर नीचे अपना नाम, विधानसभा और भाग/क्रम संख्या की पुष्टि करें।'
-                      : 'When details appear, confirm your Name, Assembly Constituency, and Serial Number below.'}
-                  </li>
-                </ol>
-              </div>
-            </div>
-
-            {/* STEP 3: Confirm Fetched Electoral Record */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3.5">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <span className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1.5 block">
-                  <User className="w-4 h-4 text-[var(--accent)]" />
-                  <span>
-                    {language === 'hi'
-                      ? '3. ECI पोर्टल पर प्राप्त निर्वाचक रिकॉर्ड की पुष्टि *'
-                      : '3. Confirm Verified ECI Electoral Record *'}
-                  </span>
-                </span>
-
-                <button
-                  type="button"
-                  onClick={() => setIsSmartPasteOpen(!isSmartPasteOpen)}
-                  className="text-xs text-[var(--accent)] hover:underline flex items-center gap-1 font-semibold cursor-pointer"
-                >
-                  <ClipboardCopy className="w-3 h-3" />
-                  <span>{isSmartPasteOpen ? 'Close Auto-fill' : '📋 Quick Auto-fill from Slip / Text'}</span>
-                </button>
-              </div>
-
-              {/* Smart Paste Drawer */}
-              {isSmartPasteOpen && (
-                <div className="p-3.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-2.5 animate-in fade-in">
-                  <label className="text-[11px] font-bold text-[var(--text-secondary)] block">
-                    Paste text from ECI Result Card or Voter Slip:
-                  </label>
-                  <textarea
-                    rows={3}
-                    value={pastedEciText}
-                    onChange={(e) => setPastedEciText(e.target.value)}
-                    placeholder="Paste the copied text from electoralsearch.eci.gov.in here..."
-                    className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono resize-none focus:outline-none focus:border-[var(--accent)]"
-                  />
-                  <div className="flex justify-end gap-2">
-                    <button
-                      type="button"
-                      onClick={handleParseEciText}
-                      disabled={!pastedEciText.trim()}
-                      className="py-1 px-3 rounded-lg bg-[var(--accent)] text-white text-xs font-bold disabled:opacity-50 cursor-pointer"
-                    >
-                      Auto-Extract Fields
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Status Radio Choice: Record Found vs Record Not Found */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
-                <button
-                  type="button"
-                  onClick={() => setEciRecordStatus('FOUND')}
-                  className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                    eciRecordStatus === 'FOUND'
-                      ? 'bg-emerald-500/15 border-emerald-500 text-emerald-800 dark:text-emerald-300 shadow-2xs'
-                      : 'bg-[var(--bg-primary)] border-[var(--border-glass)] text-[var(--text-secondary)] hover:bg-[var(--bg-glass-elevated)]'
-                  }`}
-                >
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>
-                    {language === 'hi'
-                      ? '✓ ECI पोर्टल पर रिकॉर्ड मिल गया (सत्यापित)'
-                      : '✓ Record Found on ECI Portal'}
-                  </span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setEciRecordStatus('NOT_FOUND')}
-                  className={`p-3 rounded-xl border text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
-                    eciRecordStatus === 'NOT_FOUND'
-                      ? 'bg-red-500/15 border-red-500 text-red-800 dark:text-red-300 shadow-2xs'
-                      : 'bg-[var(--bg-primary)] border-[var(--border-glass)] text-[var(--text-secondary)] hover:bg-[var(--bg-glass-elevated)]'
-                  }`}
-                >
-                  <XCircle className="w-4 h-4 text-red-500 shrink-0" />
-                  <span>
-                    {language === 'hi'
-                      ? '✗ ECI पोर्टल पर रिकॉर्ड नहीं मिला'
-                      : '✗ No Record Found on ECI Portal'}
-                  </span>
-                </button>
-              </div>
-
-              {/* If Not Found is selected: Warning notice that voting is blocked */}
-              {eciRecordStatus === 'NOT_FOUND' && (
-                <div className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-700 dark:text-red-300 space-y-1">
-                  <div className="font-bold flex items-center gap-1.5">
-                    <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
-                    <span>
-                      {language === 'hi' ? 'मतदान की अनुमति नहीं है:' : 'Participation Not Permitted:'}
-                    </span>
-                  </div>
-                  <p className="text-[11px] leading-relaxed">
-                    {language === 'hi'
-                      ? 'यदि आपका मतदाता पहचान पत्र आधिकारिक ECI पोर्टल पर सक्रिय नहीं है, तो आप इस पोल में वोट नहीं दे सकते। फर्जी नंबरों से मतदान पूर्णतः प्रतिबंधित है।'
-                      : 'If your Voter ID is not found on the official ECI Electoral Search portal, you cannot participate in this civic poll. Random or unregistered numbers are strictly blocked.'}
-                  </p>
-                </div>
-              )}
-
-              {/* If Found: Show details fields to confirm */}
-              {eciRecordStatus === 'FOUND' && (
-                <div className="space-y-3 pt-2">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
-                        {language === 'hi' ? 'मतदाता का नाम (ECI रिकॉर्ड अनुसार) *' : 'Voter Name (As shown on ECI) *'}
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={voterName}
-                        onChange={(e) => {
-                          setVoterName(e.target.value);
-                          if (error) setError(null);
-                        }}
-                        placeholder="e.g. Rajesh Kumar Sharma"
-                        className="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
-                        {language === 'hi' ? 'राज्य / केंद्र शासित प्रदेश *' : 'State / Union Territory *'}
-                      </label>
-                      <select
-                        value={selectedState}
-                        onChange={(e) => setSelectedState(e.target.value)}
-                        className="w-full glass-select rounded-xl text-xs font-semibold"
-                      >
-                        <option value="">{language === 'hi' ? '-- राज्य चुनें --' : '-- Select State --'}</option>
-                        {INDIAN_STATES.map((st) => (
-                          <option key={st.id} value={st.id}>
-                            {language === 'hi' ? st.name_hi : st.name_en} ({st.code})
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
-                        {language === 'hi' ? 'विधानसभा क्षेत्र (AC Name or No.) *' : 'Assembly Constituency (AC Name / No.) *'}
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={assemblyConstituency}
-                        onChange={(e) => {
-                          setAssemblyConstituency(e.target.value);
-                          if (error) setError(null);
-                        }}
-                        placeholder="e.g. 40 - New Delhi, Varanasi Cantt"
-                        className="w-full px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-semibold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                      />
-                    </div>
-
-                    <div className="space-y-1">
-                      <label className="text-[11px] font-semibold text-[var(--text-secondary)] block">
-                        {language === 'hi' ? 'भाग संख्या एवं क्रम संख्या (Part & Sl. No.)' : 'Part No. & Serial No. (In Roll)'}
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          value={partNumber}
-                          onChange={(e) => setPartNumber(e.target.value)}
-                          placeholder="Part No. (e.g. 124)"
-                          className="w-1/2 px-2.5 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-mono text-[var(--text-primary)]"
-                        />
-                        <input
-                          type="text"
-                          value={serialNumber}
-                          onChange={(e) => setSerialNumber(e.target.value)}
-                          placeholder="Sl. No. (e.g. 562)"
-                          className="w-1/2 px-2.5 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs font-mono text-[var(--text-primary)]"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* STEP 4: Anti-Bot Arithmetic Human Challenge */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3">
+            {/* Anti-Bot Arithmetic Human Challenge */}
+            <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1.5">
                   <Fingerprint className="w-4 h-4 text-[var(--accent)]" />
                   <span>
                     {language === 'hi'
-                      ? '4. सुरक्षा सत्यापन (मानव जाँच) *'
-                      : '4. Security Human Challenge *'}
+                      ? 'सुरक्षा सत्यापन (Anti-Bot Challenge) *'
+                      : 'Security Verification (Anti-Bot Challenge) *'}
                   </span>
                 </label>
-
                 <button
                   type="button"
                   onClick={generateNewMathChallenge}
-                  className="p-1 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)] transition-colors cursor-pointer"
-                  title="New calculation"
+                  className="text-[11px] text-[var(--accent)] hover:underline flex items-center gap-1 cursor-pointer"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" />
+                  <RefreshCw className="w-3 h-3" />
+                  <span>{language === 'hi' ? 'बदलें' : 'Refresh'}</span>
                 </button>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="px-4 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] font-mono font-black text-sm text-[var(--text-primary)] tracking-wider shrink-0 select-none">
+                <div className="px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] font-mono font-bold text-sm text-[var(--text-primary)] select-none">
                   {num1} + {num2} = ?
                 </div>
-
                 <input
                   type="number"
                   required
@@ -746,110 +460,272 @@ export function VerificationForm({
                     setMathAnswer(e.target.value);
                     if (error) setError(null);
                   }}
-                  placeholder={language === 'hi' ? 'उत्तर लिखें' : 'Answer'}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-sm font-bold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                  placeholder="Answer"
+                  className="flex-1 px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-sm font-bold text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                 />
               </div>
             </div>
 
-            {/* STEP 5: Explicit Voter Declaration Checkbox */}
-            <label className="flex items-start gap-3 p-3.5 sm:p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] cursor-pointer hover:border-[var(--accent)] active:bg-[var(--accent-soft)]/20 transition-colors select-none">
+            {/* Citizen Declaration Checkbox */}
+            <label className="flex items-start gap-2.5 p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] cursor-pointer select-none">
               <input
                 type="checkbox"
-                id="voter-declaration-checkbox"
+                required
                 checked={isCheckedConfirmed}
                 onChange={(e) => {
                   setIsCheckedConfirmed(e.target.checked);
                   if (error) setError(null);
                 }}
-                className="w-5 h-5 mt-0.5 rounded border-[var(--border-glass)] text-[var(--accent)] focus:ring-[var(--accent)] cursor-pointer shrink-0"
+                className="mt-0.5 rounded text-[var(--accent)] focus:ring-[var(--accent)] w-4 h-4 cursor-pointer"
               />
-              <span className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                {language === 'hi' ? (
-                  <>
-                    मैं सत्यनिष्ठा से घोषणा करता/करती हूँ कि मैंने ECI पोर्टल (electoralsearch.eci.gov.in) पर अपना निर्वाचक विवरण सत्यापित किया है, यह मेरा असली मतदाता पहचान पत्र है, और मैं इस जनमत सर्वेक्षण में केवल एक बार अपना स्वतंत्र मत दर्ज कर रहा/रही हूँ।
-                  </>
-                ) : (
-                  <>
-                    I solemnly declare that I have verified my active electoral roll record on the official ECI portal (electoralsearch.eci.gov.in), this is my genuine Voter ID, and I am casting strictly my single, independent vote in this civic election.
-                  </>
-                )}
+              <span className="text-[11px] sm:text-xs text-[var(--text-secondary)] leading-relaxed">
+                {language === 'hi'
+                  ? 'मैं प्रमाणित करता हूँ कि मैं भारत का नागरिक हूँ एवं निर्वाचक नामावली में पंजीकृत हूँ। मैं इस चुनाव में केवल एक बार निष्पक्ष मत दूंगा।'
+                  : 'I declare that I am an eligible citizen registered in the Indian electoral roll. I understand that only one vote is permitted per voter ID.'}
               </span>
             </label>
 
-            {/* Error Message Display */}
-            {error && (
-              <div
-                role="alert"
-                className="p-3.5 rounded-xl bg-red-500/10 border border-red-500/30 text-xs text-red-600 dark:text-red-400 flex items-start gap-2.5"
-              >
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            {/* Submit Verification Action */}
+            {/* Primary Action Button: Open ECI Portal & Activate Auto-Verifier */}
             <GlassButton
               type="submit"
               variant="primary"
               size="lg"
-              disabled={
-                isLoading ||
-                !voterIdAnalysis.isValid ||
-                eciRecordStatus !== 'FOUND' ||
-                !isCheckedConfirmed
-              }
-              className="w-full justify-center gap-2 font-black text-sm sm:text-base py-3.5 shadow-md active:scale-98 transition-all"
+              disabled={!voterIdAnalysis.isValid || !isCheckedConfirmed || !mathAnswer}
+              className="w-full gap-2 font-bold justify-center shadow-md py-3.5"
             >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>
-                    {language === 'hi' ? 'क्रिप्टोग्राफिक सत्यापन प्रगति पर है...' : 'Verifying ECI Electoral Record...'}
-                  </span>
-                </>
-              ) : (
-                <>
-                  <ShieldCheck className="w-5 h-5" />
-                  <span>
-                    {language === 'hi'
-                      ? 'ECI रिकॉर्ड से सत्यापित करें एवं मतपत्र खोलें'
-                      : 'Verify with ECI Record & Unlock Ballot'}
-                  </span>
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </>
-              )}
+              <Search className="w-4 h-4" />
+              <span>
+                {language === 'hi'
+                  ? 'ECI पोर्टल पर सत्यापन करें (ऑटो-सत्यापक सक्रिय करें) ↗'
+                  : 'Verify on Official ECI Portal (Auto-Verifier) ↗'}
+              </span>
+              <ExternalLink className="w-3.5 h-3.5" />
             </GlassButton>
           </form>
         )}
 
-        {/* ── SUCCESS STATE VIEW ── */}
-        {isSuccess && credential && (
-          <div className="text-center space-y-5 py-4 animate-in zoom-in-95 duration-300">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/15 border-2 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto shadow-sm">
-              <CheckCircle2 className="w-9 h-9" />
+        {/* ── STATE 2: AUTO-VERIFIER IN BACKGROUND WATCHING ECI ── */}
+        {(verifierState === 'watching' || verifierState === 'verifying') && (
+          <div className="py-4 space-y-6 animate-in fade-in duration-300">
+            {/* Live Pulsing Radar Visual */}
+            <div className="flex flex-col items-center justify-center text-center space-y-4">
+              <div className="relative flex items-center justify-center">
+                <div className="w-20 h-20 rounded-full bg-[var(--accent-soft)] animate-ping opacity-75 absolute" />
+                <div className="w-16 h-16 rounded-full bg-[var(--accent)] text-white flex items-center justify-center shadow-lg relative z-10">
+                  <Radio className="w-8 h-8 animate-pulse" />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="text-base sm:text-lg font-black text-[var(--text-primary)] flex items-center justify-center gap-2">
+                  <span>
+                    {language === 'hi'
+                      ? 'ECI पोर्टल पर बैकग्राउंड ऑटो-वेरिफायर सक्रिय है'
+                      : 'Watching ECI Portal in Background...'}
+                  </span>
+                </h3>
+                <p className="text-xs text-[var(--text-secondary)] max-w-sm mx-auto">
+                  {language === 'hi'
+                    ? `खोले गए ECI टैब में EPIC संख्या "${cleanedVoterId}" का विवरण देखें। आपके वापस आते ही सिस्टम स्वतः पुष्टि कर देगा।`
+                    : `Check your EPIC record "${cleanedVoterId}" on the opened ECI tab. When you return, the verifier automatically detects it.`}
+                </p>
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <h3 className="text-2xl font-black text-[var(--text-primary)]">
-                {language === 'hi' ? 'ECI मतदाता सत्यापन सफल!' : 'ECI Electoral Verification Successful!'}
-              </h3>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-md mx-auto">
+            {/* Progress Bar */}
+            <div className="w-full space-y-2">
+              <div className="flex justify-between text-[11px] font-bold text-[var(--text-secondary)]">
+                <span className="flex items-center gap-1.5">
+                  <Loader2 className="w-3 h-3 animate-spin text-[var(--accent)]" />
+                  <span>
+                    {verifierState === 'verifying'
+                      ? language === 'hi'
+                        ? 'मतदाता रिकॉर्ड सत्यापित किया जा रहा है...'
+                        : 'Confirming electoral record...'
+                      : language === 'hi'
+                      ? 'ECI सर्च सत्र की निगरानी जारी...'
+                      : 'Syncing with ECI search session...'}
+                  </span>
+                </span>
+                <span>{watchProgress}%</span>
+              </div>
+              <div className="w-full h-2 rounded-full bg-[var(--bg-primary)] overflow-hidden border border-[var(--border-glass)]">
+                <div
+                  className="h-full bg-gradient-to-r from-[var(--accent)] to-emerald-500 transition-all duration-500 ease-out"
+                  style={{ width: `${watchProgress}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Info and Actions */}
+            <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3 text-xs">
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="text-[var(--text-secondary)]">
+                  {language === 'hi' ? 'सत्यापित किया जा रहा वोटर ID:' : 'Verifying Voter ID:'}
+                </span>
+                <span className="font-mono font-bold text-[var(--accent)]">{cleanedVoterId}</span>
+              </div>
+
+              {copiedNotice && (
+                <div className="text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                  <Check className="w-3.5 h-3.5" />
+                  <span>
+                    {language === 'hi'
+                      ? 'EPIC संख्या क्लिपबोर्ड पर कॉपी हो गई है (ECI पोर्टल पर आसानी से पेस्ट करें)'
+                      : 'EPIC number copied to clipboard (ready to paste on ECI portal)'}
+                  </span>
+                </div>
+              )}
+
+              {/* Direct confirmation button if user didn't switch tabs or needs manual click */}
+              <div className="pt-2 flex flex-col gap-2">
+                <GlassButton
+                  type="button"
+                  variant="primary"
+                  onClick={() => performServerVerification(true)}
+                  disabled={verifierState === 'verifying'}
+                  className="w-full justify-center gap-2 font-bold py-3"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>
+                    {language === 'hi'
+                      ? '✓ मैंने ECI पर रिकॉर्ड देख लिया है — वोट दें'
+                      : "✓ I've Viewed My ECI Record — Proceed to Vote"}
+                  </span>
+                </GlassButton>
+
+                <div className="flex items-center justify-between pt-1 text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      window.open(ECI_ELECTORAL_SEARCH_URL, '_blank', 'noopener,noreferrer');
+                    }}
+                    className="text-[var(--accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    <span>{language === 'hi' ? 'ECI पोर्टल पुनः खोलें' : 'Re-open ECI Portal'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVerifierState('input');
+                      verificationAttemptedRef.current = false;
+                    }}
+                    className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] cursor-pointer"
+                  >
+                    {language === 'hi' ? 'नंबर बदलें' : 'Change Voter ID'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── STATE 3: VERIFICATION SUCCESS ── */}
+        {verifierState === 'success' && (
+          <div className="py-6 text-center space-y-4 animate-in zoom-in-95 duration-300">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto shadow-md">
+              <CheckCircle2 className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400">
                 {language === 'hi'
-                  ? 'आपका वास्तविक निर्वाचक रिकॉर्ड सत्यापित हो चुका है एवं एकल-मत लेजर पर दर्ज है। अब आप अपना गोपनीय मत दर्ज कर सकते हैं।'
-                  : 'Your genuine electoral roll record has been verified and registered on the cryptographic single-vote ledger. Proceed to vote.'}
+                  ? 'मतदाता पहचान पत्र सफलतापूर्वक सत्यापित!'
+                  : 'Voter ID Successfully Verified!'}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)]">
+                {language === 'hi'
+                  ? 'अनाम क्रिप्टोग्राफिक टोकन जारी किया गया। मतपत्र पर पुनः निर्देशित किया जा रहा है...'
+                  : 'Anonymous cryptographic credential issued. Unlocking confidential ballot...'}
+              </p>
+            </div>
+
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--bg-surface)] border border-[var(--border-glass)] text-[11px] font-mono text-[var(--text-secondary)]">
+              <Lock className="w-3 h-3 text-[var(--accent)]" />
+              <span>Zero Identity Linked • 1 Person 1 Vote</span>
+            </div>
+          </div>
+        )}
+
+        {/* ── STATE 4: ALREADY VOTED (DUPLICATE BLOCKED) ── */}
+        {verifierState === 'already_voted' && (
+          <div className="py-6 text-center space-y-4 animate-in fade-in duration-300">
+            <div className="w-16 h-16 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex items-center justify-center mx-auto shadow-md">
+              <AlertTriangle className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-lg sm:text-xl font-black text-[var(--text-primary)]">
+                {language === 'hi' ? 'दोहरा मतदान प्रतिबंधित है' : 'Duplicate Vote Blocked'}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] max-w-sm mx-auto leading-relaxed">
+                {language === 'hi'
+                  ? `मतदाता कार्ड "${cleanedVoterId}" द्वारा इस पोल में पूर्व में मत दर्ज किया जा चुका है। निष्पक्ष चुनाव हेतु प्रत्येक नागरिक केवल एक बार मतदान कर सकता है।`
+                  : `Voter ID "${cleanedVoterId}" has already participated in this poll. To preserve election integrity, each citizen is strictly limited to one vote.`}
               </p>
             </div>
 
             <div className="pt-2">
               <GlassButton
-                variant="primary"
-                size="lg"
-                onClick={() => onVerified(credential)}
-                className="gap-2 font-bold px-8 shadow-md"
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setVerifierState('input');
+                  setVoterId('');
+                  verificationAttemptedRef.current = false;
+                  setError(null);
+                }}
+                className="mx-auto text-xs font-bold"
               >
-                <span>{language === 'hi' ? 'मतदान की ओर आगे बढ़ें' : 'Proceed to Cast Ballot'}</span>
-                <ArrowRight className="w-4 h-4" />
+                {language === 'hi' ? 'अन्य पहचान पत्र दर्ज करें' : 'Enter Different Voter ID'}
+              </GlassButton>
+            </div>
+          </div>
+        )}
+
+        {/* ── STATE 5: RECORD NOT FOUND ON ECI ── */}
+        {verifierState === 'not_found' && (
+          <div className="py-6 text-center space-y-4 animate-in fade-in duration-300">
+            <div className="w-16 h-16 rounded-full bg-red-500/20 text-red-500 border border-red-500/30 flex items-center justify-center mx-auto shadow-md">
+              <XCircle className="w-8 h-8" />
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-lg sm:text-xl font-black text-[var(--text-primary)]">
+                {language === 'hi' ? 'ECI निर्वाचक नामावली में रिकॉर्ड नहीं मिला' : 'No Electoral Record Found on ECI'}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] max-w-sm mx-auto leading-relaxed">
+                {language === 'hi'
+                  ? `दर्ज संख्या "${cleanedVoterId}" आधिकारिक ECI पोर्टल पर सक्रिय नहीं पाई गई। केवल मान्य निर्वाचक नामावली में दर्ज नागरिक ही इस सर्वेक्षण में मत दे सकते हैं।`
+                  : `The Voter ID "${cleanedVoterId}" was not found active on the official ECI portal. Only verified registered citizens are permitted to participate.`}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-2">
+              <GlassButton
+                type="button"
+                variant="primary"
+                onClick={() => {
+                  window.open(ECI_ELECTORAL_SEARCH_URL, '_blank', 'noopener,noreferrer');
+                }}
+                className="text-xs font-bold gap-1.5"
+              >
+                <Search className="w-3.5 h-3.5" />
+                <span>{language === 'hi' ? 'ECI पोर्टल पर पुनः खोजें' : 'Search Again on ECI'}</span>
+              </GlassButton>
+              <GlassButton
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setVerifierState('input');
+                  verificationAttemptedRef.current = false;
+                  setError(null);
+                }}
+                className="text-xs font-bold"
+              >
+                {language === 'hi' ? 'नंबर सुधारें' : 'Edit Voter ID'}
               </GlassButton>
             </div>
           </div>

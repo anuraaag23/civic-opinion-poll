@@ -23,30 +23,22 @@ export function normalizeEpic(raw: string): EpicValidationResult {
   // Trim whitespace and remove common separators like spaces or dashes
   const cleaned = raw.trim().toUpperCase().replace(/[\s\/-]/g, '');
 
-  // Exact standard Indian EPIC regex: 3 uppercase letters + 7 digits (e.g. DLH1234567)
+  // Exact standard Indian EPIC regex: 3 uppercase letters + 7 digits (e.g. DLH1234567, IKP4718276)
   const standardEpicRegex = /^[A-Z]{3}[0-9]{7}$/;
-  // Legacy state 2-letter format (e.g. UP1234567, BR1234567)
-  const legacyEpicRegex = /^[A-Z]{2}[0-9]{7,8}$/;
 
-  if (!standardEpicRegex.test(cleaned) && !legacyEpicRegex.test(cleaned)) {
+  if (!standardEpicRegex.test(cleaned)) {
     return {
       isValid: false,
       normalized: cleaned,
-      error: 'Invalid Voter ID format. Must be standard format like DLH2891042 (3 letters followed by 7 digits).',
+      error: 'Invalid Voter ID format. Must be standard format (3 letters followed by 7 digits, e.g. IKP4718276 or DLH2891042).',
     };
   }
 
-  // Extract prefix
+  // Extract 3-letter prefix
   const prefix = cleaned.slice(0, 3);
   const prefixCheck = validateEciPrefix(prefix);
 
-  // If 3-letter didn't match, check 2-letter legacy (e.g. UP, BR, RJ, GJ)
-  const legacyPrefix = cleaned.slice(0, 2);
-  const legacyCheck = !prefixCheck.isValid ? validateEciPrefix(legacyPrefix) : null;
-
-  const validCheck = prefixCheck.isValid ? prefixCheck : legacyCheck;
-
-  if (!validCheck || !validCheck.isValid) {
+  if (!prefixCheck || !prefixCheck.isValid) {
     return {
       isValid: false,
       normalized: cleaned,
@@ -67,9 +59,9 @@ export function normalizeEpic(raw: string): EpicValidationResult {
   return {
     isValid: true,
     normalized: cleaned,
-    stateCode: validCheck.stateCode,
-    stateNameEn: validCheck.stateNameEn,
-    stateNameHi: validCheck.stateNameHi,
+    stateCode: prefixCheck.stateCode,
+    stateNameEn: prefixCheck.stateNameEn,
+    stateNameHi: prefixCheck.stateNameHi,
   };
 }
 

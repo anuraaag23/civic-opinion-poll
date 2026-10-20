@@ -114,35 +114,17 @@ export class SelfVerificationService {
       };
     }
 
-    // 8. ECI Electoral Record Details Validation
-    if (!voterName || voterName.trim().length < 2) {
-      return {
-        verified: false,
-        reason: 'INVALID_FORMAT',
-        error: 'Please enter your full name as found on the official ECI electoral search portal.',
-      };
-    }
-
-    if (!assemblyConstituency || assemblyConstituency.trim().length < 2) {
-      return {
-        verified: false,
-        reason: 'INVALID_FORMAT',
-        error:
-          'Assembly Constituency (as displayed on the ECI electoral search portal) is required to verify your voter registration.',
-      };
-    }
-
-    // 9. Generate 256-bit CSPRNG Anonymous Participation Credential
+    // 8. Generate 256-bit CSPRNG Anonymous Participation Credential
     const { token, tokenHash } = generateAnonymousToken();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15-minute token TTL
 
-    // 10. Store Participation Record (Irreversible HMAC fingerprint only, ZERO PII, ZERO RAW DATA)
+    // 9. Store Participation Record (Irreversible HMAC fingerprint only, ZERO PII, ZERO RAW DATA)
     await db.recordParticipation(pollId, voterFingerprint);
     await db.issueAnonymousCredential(pollId, tokenHash, expiresAt);
 
-    // 11. Record Audit Log (Sanitized, ZERO identifying information)
+    // 10. Record Audit Log (Sanitized, ZERO identifying information)
     await db.recordAuditEvent('self_verification_confirmed', pollId, {
-      method: 'ECI_ELECTORAL_SEARCH_PORTAL',
+      method: 'ECI_AUTO_VERIFIER_PORTAL',
       hasDeviceFingerprint: Boolean(deviceFingerprint),
     });
 
