@@ -40,10 +40,12 @@ export class SelfVerificationService {
     clientIp = '127.0.0.1',
     voterId?: string,
     deviceFingerprint?: string,
-    phoneNumber?: string,
-    otpCode?: string,
     voterName?: string,
-    stateCode?: string
+    stateCode?: string,
+    assemblyConstituency?: string,
+    partNumber?: string,
+    serialNumber?: string,
+    eciRecordFound = true
   ): Promise<VerificationResult> {
     // 1. Rate Limit Check
     if (!checkRateLimit(clientIp)) {
@@ -67,99 +69,80 @@ export class SelfVerificationService {
       return { verified: false, reason: 'INVALID_POLL', error: 'This poll is not currently active.' };
     }
 
-    let voterFingerprint: string | undefined;
-    let phoneFingerprint: string | undefined;
-
-    // 4. Genuine Voter ID (EPIC) Verification & ECI Regional Series Validation
-    if (voterId) {
-      const { isValid, normalized, error, stateNameEn } = normalizeEpic(voterId);
-      if (!isValid || !normalized) {
-        await db.recordAuditEvent('self_verification_failure', pollId, { reason: 'INVALID_FORMAT' });
-        return {
-          verified: false,
-          reason: 'INVALID_FORMAT',
-          error: error || 'Invalid Voter ID (EPIC) format. Must be an official ECI card number (e.g. DLH2891042).',
-        };
-      }
-
-      // Compute Keyed Cryptographic Participation Fingerprint
-      voterFingerprint = generateParticipationFingerprint(normalized, pollId);
-
-      // Check whether this Voter ID has already participated in this poll
-      const alreadyVoted = await db.hasParticipated(pollId, voterFingerprint);
-      if (alreadyVoted) {
-        await db.recordAuditEvent('duplicate_vote_blocked', pollId, { method: 'HMAC_KEYED_EPIC' });
-        return {
-          verified: false,
-          reason: 'ALREADY_VOTED',
-          error:
-            'This Voter ID has already cast a vote in this election. Duplicate voting is strictly blocked across all devices and browsers to keep elections fair.',
-        };
-      }
+    // 4. Check if citizen reported that record was NOT found on ECI
+    if (eciRecordFound === false) {
+      await db.recordAuditEvent('self_verification_failure', pollId, { reason: 'ECI_NOT_FOUND' });
+      return {
+        verified: false,
+        reason: 'ECI_NOT_FOUND',
+        error:
+          'Your Voter ID details were not found on the official Election Commission of India portal (electoralsearch.eci.gov.in). Only citizens with an active electoral roll record can participate in this election.',
+      };
     }
 
-    // 5. Genuine Mobile Number & OTP Verification (Anti-Sybil Defense)
-    if (phoneNumber) {
-      const phoneValidation = normalizePhone(phoneNumber);
-      if (!phoneValidation.isValid || !phoneValidation.normalized) {
-        return {
-          verified: false,
-          reason: 'INVALID_PHONE',
-          error: phoneValidation.error || 'Invalid Indian mobile number.',
-        };
-      }
-
-      const cleanPhone = phoneValidation.normalized;
-
-      // Verify OTP if provided
-      if (otpCode) {
-        const otpCheck = verifyOtp(cleanPhone, pollId, otpCode);
-        if (!otpCheck.success) {
-          return {
-            verified: false,
-            reason: 'INVALID_OTP',
-            error: otpCheck.error || 'Invalid verification code. Please check your SMS and try again.',
-          };
-        }
-      }
-
-      // Check whether this Phone Number has already participated in this poll
-      phoneFingerprint = generatePhoneFingerprint(cleanPhone, pollId);
-      const phoneAlreadyVoted = await db.hasParticipated(pollId, phoneFingerprint);
-      if (phoneAlreadyVoted) {
-        await db.recordAuditEvent('duplicate_vote_blocked', pollId, { method: 'HMAC_KEYED_PHONE' });
-        return {
-          verified: false,
-          reason: 'ALREADY_VOTED',
-          error:
-            'This mobile number has already cast a vote in this election. Each citizen phone number can only vote once per election.',
-        };
-      }
+    // 5. Genuine Voter ID (EPIC) Verification & ECI Regional Series Validation
+    if (!voterId || voterId.trim().length === 0) {
+      return {
+        verified: false,
+        reason: 'INVALID_FORMAT',
+        error: 'Voter ID (EPIC Card Number) is strictly required to verify your eligibility on the electoral roll.',
+      };
     }
 
-    // Fallback participation identifier
-    const participationIdentifier = voterFingerprint || phoneFingerprint || generateAnonymousToken().tokenHash;
+    const { isValid, normalized, error, stateNameEn } = normalizeEpic(voterId);
+    if (!isValid || !normalized) {
+      await db.recordAuditEvent('self_verification_failure', pollId, { reason: 'INVALID_FORMAT' });
+      return {
+        verified: false,
+        reason: 'INVALID_FORMAT',
+        error: error || 'Invalid Voter ID (EPIC) format. Must be an official ECI card number (e.g. DLH2891042).',
+      };
+    }
 
-    // 6. Generate 256-bit CSPRNG Anonymous Participation Credential
+    // 6. Compute Keyed Cryptographic Participation Fingerprint
+    const voterFingerprint = generateParticipationFingerprint(normalized, pollId);
+
+    // 7. Deduplication Check: Check whether this Voter ID has already participated in this poll
+    const alreadyVoted = await db.hasParticipated(pollId, voterFingerprint);
+    if (alreadyVoted) {
+      await db.recordAuditEvent('duplicate_vote_blocked', pollId, { method: 'HMAC_KEYED_EPIC' });
+      return {
+        verified: false,
+        reason: 'ALREADY_VOTED',
+        error:
+          'This Voter ID has already cast a vote in this election. Duplicate voting is strictly blocked across all devices and browsers to keep elections fair.',
+      };
+    }
+
+    // 8. ECI Electoral Record Details Validation
+    if (!voterName || voterName.trim().length < 2) {
+      return {
+        verified: false,
+        reason: 'INVALID_FORMAT',
+        error: 'Please enter your full name as found on the official ECI electoral search portal.',
+      };
+    }
+
+    if (!assemblyConstituency || assemblyConstituency.trim().length < 2) {
+      return {
+        verified: false,
+        reason: 'INVALID_FORMAT',
+        error:
+          'Assembly Constituency (as displayed on the ECI electoral search portal) is required to verify your voter registration.',
+      };
+    }
+
+    // 9. Generate 256-bit CSPRNG Anonymous Participation Credential
     const { token, tokenHash } = generateAnonymousToken();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15-minute token TTL
 
-    // 7. Store Participation Record (Irreversible HMAC fingerprints only, ZERO PII, ZERO RAW DATA)
-    if (voterFingerprint) {
-      await db.recordParticipation(pollId, voterFingerprint);
-    }
-    if (phoneFingerprint) {
-      await db.recordParticipation(pollId, phoneFingerprint);
-    }
-    if (!voterFingerprint && !phoneFingerprint) {
-      await db.recordParticipation(pollId, participationIdentifier);
-    }
-
+    // 10. Store Participation Record (Irreversible HMAC fingerprint only, ZERO PII, ZERO RAW DATA)
+    await db.recordParticipation(pollId, voterFingerprint);
     await db.issueAnonymousCredential(pollId, tokenHash, expiresAt);
 
-    // 8. Record Audit Log (Sanitized, ZERO identifying information)
+    // 11. Record Audit Log (Sanitized, ZERO identifying information)
     await db.recordAuditEvent('self_verification_confirmed', pollId, {
-      method: phoneNumber ? 'MULTI_FACTOR_EPIC_PHONE_OTP' : voterId ? 'REAL_HMAC_VOTER_ID' : 'ANONYMOUS_TOKEN',
+      method: 'ECI_ELECTORAL_SEARCH_PORTAL',
       hasDeviceFingerprint: Boolean(deviceFingerprint),
     });
 

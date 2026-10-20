@@ -10,10 +10,12 @@ export async function POST(request: NextRequest) {
       voterId,
       deviceFingerprint,
       mathChallenge,
-      phoneNumber,
-      otpCode,
       voterName,
       stateCode,
+      assemblyConstituency,
+      partNumber,
+      serialNumber,
+      eciRecordFound,
     } = body;
 
     if (!pollId) {
@@ -70,17 +72,19 @@ export async function POST(request: NextRequest) {
       request.headers.get('x-real-ip') ||
       '127.0.0.1';
 
-    // Process real Voter ID & Multi-Factor cryptographic verification and deduplication
+    // Process real Voter ID & ECI Electoral Search verification and deduplication
     const result = await selfVerificationService.processSelfVerification(
       pollId,
       selfVerificationConfirmed,
       ip,
       voterId,
       deviceFingerprint,
-      phoneNumber,
-      otpCode,
       voterName,
-      stateCode
+      stateCode,
+      assemblyConstituency,
+      partNumber,
+      serialNumber,
+      eciRecordFound !== false
     );
 
     if (!result.verified) {
