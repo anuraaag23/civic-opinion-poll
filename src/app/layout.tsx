@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/lib/theme/context';
 import { GlassNavbar } from '@/components/layout/GlassNavbar';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { SiteAnnouncementBanner } from '@/components/layout/SiteAnnouncementBanner';
+import { MaintenanceGuard } from '@/components/layout/MaintenanceGuard';
 import { Footer } from '@/components/layout/Footer';
 import { FloatingSupportWidget } from '@/components/support/FloatingSupportWidget';
 import { OfflineDetector } from '@/components/common/OfflineDetector';
@@ -103,34 +104,36 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen min-h-[100dvh] flex flex-col antialiased overflow-x-hidden selection:bg-[var(--accent)] selection:text-white">
         <ThemeProvider>
           <I18nProvider>
-            {/* Ambient depth lighting */}
-            <div className="civic-ambient-depth" aria-hidden="true" />
+            <MaintenanceGuard>
+              {/* Ambient depth lighting */}
+              <div className="civic-ambient-depth" aria-hidden="true" />
 
-            {/* Permanent Top Legal Disclaimer */}
-            <DisclaimerBanner compact />
+              {/* Permanent Top Legal Disclaimer */}
+              <DisclaimerBanner compact />
 
-            {/* Dynamic Emergency / Platform Announcement Banner */}
-            <SiteAnnouncementBanner />
+              {/* Dynamic Emergency / Platform Announcement Banner */}
+              <SiteAnnouncementBanner />
 
-            {/* Glass Navigation */}
-            <GlassNavbar />
+              {/* Glass Navigation */}
+              <GlassNavbar />
 
-            {/* Main Application Content */}
-            <main className="flex-1 w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 relative z-10 overflow-x-hidden">
-              {children}
-            </main>
+              {/* Main Application Content */}
+              <main className="flex-1 w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 relative z-10 overflow-x-hidden">
+                {children}
+              </main>
 
-            {/* Footer */}
-            <Footer />
+              {/* Footer */}
+              <Footer />
 
-            {/* Persistent Floating Support Widget (homepage only) */}
-            <FloatingSupportWidget />
+              {/* Persistent Floating Support Widget (homepage only) */}
+              <FloatingSupportWidget />
 
-            {/* Global Real-Time Offline / No Internet Window & Detector */}
-            <OfflineDetector />
+              {/* Global Real-Time Offline / No Internet Window & Detector */}
+              <OfflineDetector />
 
-            {/* Accessible Dedicated Custom Portal Root for Modals & Dialogs */}
-            <div id="modal-root" />
+              {/* Accessible Dedicated Custom Portal Root for Modals & Dialogs */}
+              <div id="modal-root" />
+            </MaintenanceGuard>
           </I18nProvider>
         </ThemeProvider>
       </body>

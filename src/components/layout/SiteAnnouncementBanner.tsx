@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useI18n } from '@/lib/i18n/context';
 import { AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
 import { SiteSettings } from '@/lib/types';
@@ -10,25 +10,44 @@ export function SiteAnnouncementBanner() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchSettings() {
-      try {
-        const res = await fetch('/api/admin/settings');
-        const data = await res.json();
-        if (isMounted && data.success && data.data) {
-          setSettings(data.data);
-        }
-      } catch {
-        // ignore background fetch error
+  const fetchSettings = useCallback(async () => {
+    try {
+      const res = await fetch('/api/site-status', {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' },
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        setSettings(data.data);
       }
+    } catch {
+      // ignore background fetch error
     }
-
-    fetchSettings();
-    return () => {
-      isMounted = false;
-    };
   }, []);
+
+  useEffect(() => {
+    fetchSettings();
+
+    // 1. Polling interval to ensure real-time alerts appear within 3 seconds
+    const interval = setInterval(fetchSettings, 3000);
+
+    // 2. Immediate local window event listener
+    const handleUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent<SiteSettings>;
+      if (customEvent.detail) {
+        setSettings(customEvent.detail);
+        // If settings changed, un-dismiss so newly published alert appears
+        setDismissed(false);
+      }
+    };
+
+    window.addEventListener('site_settings_updated', handleUpdate);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('site_settings_updated', handleUpdate);
+    };
+  }, [fetchSettings]);
 
   if (!settings || !settings.emergencyBannerEnabled || dismissed) {
     return null;

@@ -16,12 +16,13 @@ export async function GET(
 
     const searchParams = request.nextUrl.searchParams;
     const rawTimeframe = searchParams.get('timeframe');
+    const monthParam = searchParams.get('month') || '2026-10';
     const timeframe: '7d' | 'month' | 'year' | 'all' =
       rawTimeframe === '7d' || rawTimeframe === 'month' || rawTimeframe === 'year'
         ? rawTimeframe
         : 'all';
 
-    const results = await db.getPollResults(poll.id, timeframe);
+    const results = await db.getPollResults(poll.id, timeframe, monthParam);
     const stateParam = searchParams.get('state');
 
     if (stateParam && results) {
@@ -54,6 +55,7 @@ export async function GET(
         results: recalculated,
         updatedAt: results.updated_at,
         timeframe,
+        selectedMonth: monthParam,
         timeframeLabelEn: results.timeframe_label_en,
         timeframeLabelHi: results.timeframe_label_hi,
         pollMonth: results.poll_month || 'October',
@@ -71,6 +73,7 @@ export async function GET(
       results: results?.results || [],
       updatedAt: results?.updated_at || new Date().toISOString(),
       timeframe,
+      selectedMonth: monthParam,
       timeframeLabelEn: results?.timeframe_label_en,
       timeframeLabelHi: results?.timeframe_label_hi,
       pollMonth: results?.poll_month || 'October',

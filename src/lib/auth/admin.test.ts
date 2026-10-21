@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
   verifyAdminPasscode,
+  verifyAdminCredentials,
   createAdminSessionToken,
   verifyAdminSessionToken,
   checkAdminRateLimit,
@@ -8,6 +9,7 @@ import {
   clearAdminRateLimit,
   verifyAdminRequest,
 } from './admin';
+import { db } from '../db';
 
 describe('Admin Authentication & Security', () => {
   const testIp = '192.168.1.100';
@@ -16,15 +18,19 @@ describe('Admin Authentication & Security', () => {
     clearAdminRateLimit(testIp);
   });
 
-  describe('Passcode Verification (Timing-Safe)', () => {
-    it('should verify the correct passcode', () => {
-      expect(verifyAdminPasscode('meravote2026')).toBe(true);
+  describe('Database-Backed Admin Credential Verification', () => {
+    it('should verify the initial admin account credentials', async () => {
+      const account = await db.getAdminAccount();
+      expect(account.loginId).toBeDefined();
+      // Default seed or configured password verification
+      const isValid = await verifyAdminCredentials(account.loginId, process.env.ADMIN_PASSWORD || 'MeraVote@2026');
+      expect(isValid).toBe(true);
     });
 
-    it('should reject incorrect passcodes', () => {
-      expect(verifyAdminPasscode('wrongpassword')).toBe(false);
-      expect(verifyAdminPasscode('')).toBe(false);
-      expect(verifyAdminPasscode('meravote202')).toBe(false);
+    it('should reject incorrect credentials', async () => {
+      expect(await verifyAdminCredentials('admin', 'wrongpassword')).toBe(false);
+      expect(await verifyAdminCredentials('', '')).toBe(false);
+      expect(await verifyAdminCredentials('wrong_user_id', 'somepassword')).toBe(false);
     });
   });
 

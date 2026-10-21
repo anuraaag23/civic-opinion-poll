@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { NextRequest } from 'next/server';
+import { db } from '../db';
 
-const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE || 'meravote2026';
 const SESSION_SECRET =
   process.env.ADMIN_SESSION_SECRET ||
   process.env.VOTING_HMAC_SECRET ||
@@ -75,7 +75,17 @@ export function clearAdminRateLimit(ip: string) {
 }
 
 /**
- * Timing-safe comparison of provided passcode against expected passcode.
+ * Timing-safe database-backed comparison of provided credentials against stored admin credentials.
+ */
+export async function verifyAdminCredentials(loginId: string, password: string): Promise<boolean> {
+  if (!loginId || !password || typeof loginId !== 'string' || typeof password !== 'string') {
+    return false;
+  }
+  return db.verifyAdminLogin(loginId, password);
+}
+
+/**
+ * Timing-safe comparison of provided passcode against configured hash or active DB credentials.
  */
 export function verifyAdminPasscode(provided: string): boolean {
   if (!provided || typeof provided !== 'string') return false;
@@ -92,8 +102,23 @@ export function verifyAdminPasscode(provided: string): boolean {
     } catch {}
   }
 
-  const expectedHash = crypto.createHash('sha256').update(ADMIN_PASSCODE).digest();
-  return crypto.timingSafeEqual(providedHash, expectedHash);
+  // Fallback to checking active store credentials if already loaded in memory
+  const account = (db as any).civicStore?.adminAccount;
+  if (account) {
+    const computed = crypto.scryptSync(provided.trim(), account.passwordSalt, 64).toString('hex');
+    const a = Buffer.from(computed, 'hex');
+    const b = Buffer.from(account.passwordHash, 'hex');
+    if (a.length === b.length) {
+      return crypto.timingSafeEqual(a, b);
+    }
+  }
+
+  if (process.env.ADMIN_PASSWORD) {
+    const expectedHash = crypto.createHash('sha256').update(process.env.ADMIN_PASSWORD.trim()).digest();
+    return crypto.timingSafeEqual(providedHash, expectedHash);
+  }
+
+  return false;
 }
 
 /**

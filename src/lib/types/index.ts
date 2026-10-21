@@ -150,6 +150,7 @@ export interface AuditEvent {
     | 'admin_poll_update'
     | 'admin_party_update'
     | 'admin_settings_update'
+    | 'admin_credentials_updated'
     | 'admin_votes_reset'
     | 'admin_poll_create'
     | 'admin_poll_delete';
@@ -160,6 +161,10 @@ export interface AuditEvent {
 
 export interface SiteSettings {
   maintenanceMode: boolean;
+  maintenanceTitleEn?: string;
+  maintenanceTitleHi?: string;
+  maintenanceMessageEn?: string;
+  maintenanceMessageHi?: string;
   emergencyBannerEnabled: boolean;
   emergencyBannerTextEn: string;
   emergencyBannerTextHi: string;
@@ -167,6 +172,14 @@ export interface SiteSettings {
   allowVoting: boolean;
   rateLimitPerHour: number;
   lastUpdated: string;
+}
+
+export interface AdminAccount {
+  loginId: string;
+  passwordHash: string;
+  passwordSalt: string;
+  adminPathSlug: string;
+  updatedAt: string;
 }
 
 export interface DbSupporter {

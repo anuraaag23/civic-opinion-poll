@@ -27,11 +27,26 @@ import {
   Building2,
   MapPin,
   Calendar,
+  Zap,
+  Landmark,
 } from 'lucide-react';
 
 interface LiveResultsViewProps {
   pollIdOrSlug: string;
 }
+
+const MONTH_OPTIONS = [
+  { key: '2026-10', nameEn: 'October 2026 (Current)', nameHi: 'अक्टूबर 2026 (वर्तमान)' },
+  { key: '2026-09', nameEn: 'September 2026', nameHi: 'सितंबर 2026' },
+  { key: '2026-08', nameEn: 'August 2026', nameHi: 'अगस्त 2026' },
+  { key: '2026-07', nameEn: 'July 2026', nameHi: 'जुलाई 2026' },
+  { key: '2026-06', nameEn: 'June 2026', nameHi: 'जून 2026' },
+  { key: '2026-05', nameEn: 'May 2026', nameHi: 'मई 2026' },
+  { key: '2026-04', nameEn: 'April 2026', nameHi: 'अप्रैल 2026' },
+  { key: '2026-03', nameEn: 'March 2026', nameHi: 'मार्च 2026' },
+  { key: '2026-02', nameEn: 'February 2026', nameHi: 'फरवरी 2026' },
+  { key: '2026-01', nameEn: 'January 2026', nameHi: 'जनवरी 2026' },
+];
 
 const REGIONAL_TICKER_EN = [
   'Self-verified participant from Uttar Pradesh recorded anonymously',
@@ -64,8 +79,9 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
 
   // Timeframe Filter: 7 Days / Month / Year / All Time
   const [timeframe, setTimeframe] = useState<'7d' | 'month' | 'year' | 'all'>('all');
-  const [timeframeLabelEn, setTimeframeLabelEn] = useState<string>('All Time (Cumulative Tally)');
-  const [timeframeLabelHi, setTimeframeLabelHi] = useState<string>('कुल परिणाम (समग्र गणना)');
+  const [selectedMonth, setSelectedMonth] = useState<string>('2026-10');
+  const [timeframeLabelEn, setTimeframeLabelEn] = useState<string>('All Time (Overall Results)');
+  const [timeframeLabelHi, setTimeframeLabelHi] = useState<string>('कुल परिणाम (समग्र मत)');
   const [pollMonth, setPollMonth] = useState<string>('October');
   const [pollYear, setPollYear] = useState<number>(2026);
 
@@ -86,8 +102,8 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
     try {
       const endpoint =
         scope === 'PM'
-          ? `/api/polls/${pollIdOrSlug || 'poll-national-2029'}/results?timeframe=${timeframe}`
-          : `/api/polls/poll-state-cm-2029/results?state=${selectedStateId}&timeframe=${timeframe}`;
+          ? `/api/polls/${pollIdOrSlug || 'poll-national-2029'}/results?timeframe=${timeframe}&month=${selectedMonth}`
+          : `/api/polls/poll-state-cm-2029/results?state=${selectedStateId}&timeframe=${timeframe}&month=${selectedMonth}`;
 
       const res = await fetch(endpoint);
       const data = await res.json();
@@ -108,7 +124,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
     } finally {
       setIsLoading(false);
     }
-  }, [scope, selectedStateId, pollIdOrSlug, timeframe]);
+  }, [scope, selectedStateId, pollIdOrSlug, timeframe, selectedMonth]);
 
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
@@ -127,8 +143,8 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
 
     const endpoint =
       scope === 'PM'
-        ? `/api/polls/${pollIdOrSlug || 'poll-national-2029'}/results?timeframe=${timeframe}`
-        : `/api/polls/poll-state-cm-2029/results?state=${selectedStateId}&timeframe=${timeframe}`;
+        ? `/api/polls/${pollIdOrSlug || 'poll-national-2029'}/results?timeframe=${timeframe}&month=${selectedMonth}`
+        : `/api/polls/poll-state-cm-2029/results?state=${selectedStateId}&timeframe=${timeframe}&month=${selectedMonth}`;
 
     fetch(endpoint)
       .then((res) => res.json())
@@ -165,7 +181,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
       clearInterval(interval);
       clearInterval(tickerTimer);
     };
-  }, [loadResults, scope, selectedStateId, pollIdOrSlug, timeframe]);
+  }, [loadResults, scope, selectedStateId, pollIdOrSlug, timeframe, selectedMonth]);
 
   const maxPercentage = Math.max(...results.map((r) => r.percentage), 1);
   const pollTitle = language === 'hi' ? pollTitleHi : pollTitleEn;
@@ -204,7 +220,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
         </div>
         <div className="flex items-center gap-1.5 text-xs text-[var(--text-secondary)] font-mono">
           <Activity className="w-3.5 h-3.5 text-[var(--accent)]" />
-          <span>Real-time Tally</span>
+          <span>{language === 'hi' ? 'वास्तविक समय परिणाम' : 'Real-time Results'}</span>
         </div>
       </div>
 
@@ -258,9 +274,9 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
         </div>
       )}
 
-      {/* Page Title & Scope Header */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-2 flex-wrap">
+      {/* Page Title & Scope Header - Centered Symmetric Layout */}
+      <div className="space-y-2.5 text-center">
+        <div className="flex items-center justify-center gap-2 flex-wrap">
           <GlassBadge variant="accent">
             <BarChart3 className="w-3.5 h-3.5" />
             <span>{scope === 'PM' ? 'National Lok Sabha 2029' : `${currentState?.name_en || 'State'} Assembly`}</span>
@@ -284,10 +300,10 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
           </span>
         </div>
 
-        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)] text-center">
           {pollTitle || (scope === 'PM' ? 'Prime Minister Poll Results' : 'Chief Minister Poll Results')}
         </h1>
-        <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+        <p className="text-xs sm:text-sm text-[var(--text-secondary)] text-center max-w-xl mx-auto leading-relaxed">
           {scope === 'PM'
             ? language === 'hi'
               ? 'संपूर्ण भारत स्तर पर लोकसभा के लिए राष्ट्रीय नागरिक जनमत का लाइव वितरण।'
@@ -310,27 +326,53 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
           </span>
         </div>
 
+        {/* Real Icons (No Emojis) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
-            { id: '7d', labelEn: '⚡ Last 7 Days', labelHi: '⚡ पिछले 7 दिन' },
-            { id: 'month', labelEn: '📅 This Month (Oct)', labelHi: '📅 इस माह (अक्टूबर)' },
-            { id: 'year', labelEn: '🏛️ Yearly (2026)', labelHi: '🏛️ वर्ष 2026' },
-            { id: 'all', labelEn: '📊 All Time', labelHi: '📊 कुल परिणाम' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setTimeframe(tab.id as any)}
-              className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
-                timeframe === tab.id
-                  ? 'bg-[var(--accent)] text-white shadow-sm ring-1 ring-[var(--accent)] scale-[1.02]'
-                  : 'bg-[var(--bg-primary)]/70 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)] border border-[var(--border-glass)]'
-              }`}
-            >
-              <span>{language === 'hi' ? tab.labelHi : tab.labelEn}</span>
-            </button>
-          ))}
+            { id: '7d', labelEn: 'Last 7 Days', labelHi: 'पिछले 7 दिन', icon: Zap, iconColor: 'text-amber-500' },
+            { id: 'month', labelEn: 'Monthly', labelHi: 'मासिक परिणाम', icon: Calendar, iconColor: 'text-blue-500' },
+            { id: 'year', labelEn: 'Yearly (2026)', labelHi: 'वर्ष 2026', icon: Landmark, iconColor: 'text-emerald-500' },
+            { id: 'all', labelEn: 'All Time', labelHi: 'कुल परिणाम', icon: BarChart3, iconColor: 'text-[var(--accent)]' },
+          ].map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setTimeframe(tab.id as any)}
+                className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
+                  timeframe === tab.id
+                    ? 'bg-[var(--accent)] text-white shadow-sm ring-1 ring-[var(--accent)] scale-[1.02]'
+                    : 'bg-[var(--bg-primary)]/70 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)] border border-[var(--border-glass)]'
+                }`}
+              >
+                <Icon className={`w-3.5 h-3.5 shrink-0 ${timeframe === tab.id ? 'text-white' : tab.iconColor}`} />
+                <span>{language === 'hi' ? tab.labelHi : tab.labelEn}</span>
+              </button>
+            );
+          })}
         </div>
+
+        {/* Dedicated Monthly Filter Dropdown when viewing Monthly breakdown */}
+        {timeframe === 'month' && (
+          <div className="pt-2 border-t border-[var(--border-glass)] flex flex-col sm:flex-row sm:items-center justify-between gap-2 animate-in fade-in duration-200">
+            <span className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+              <span>{language === 'hi' ? 'विशिष्ट माह का परिणाम देखें:' : 'Inspect Month Separately:'}</span>
+            </span>
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="glass-select text-xs font-bold rounded-xl py-1.5 px-3 w-full sm:max-w-xs cursor-pointer"
+            >
+              {MONTH_OPTIONS.map((m) => (
+                <option key={m.key} value={m.key}>
+                  {language === 'hi' ? m.nameHi : m.nameEn}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Mandatory Non-Affiliation Disclaimer */}

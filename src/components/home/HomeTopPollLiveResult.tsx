@@ -160,7 +160,7 @@ export function HomeTopPollLiveResult() {
                 </h3>
                 <GlassBadge variant="success" size="sm">
                   <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
-                  {language === 'hi' ? 'लाइव मतगणना' : 'Live Tally'}
+                  {language === 'hi' ? 'लाइव परिणाम' : 'Live Results'}
                 </GlassBadge>
               </div>
               <span className="text-xs text-[var(--text-tertiary)] font-medium">

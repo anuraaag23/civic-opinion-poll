@@ -1,12 +1,21 @@
-import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings } from '../types';
+import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings, AdminAccount } from '../types';
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
 import { OFFICIAL_PARTIES, ALL_PARTIES } from '../data/parties';
 import { supabaseAdmin } from '../supabase';
 
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 const LEDGER_PATH = path.join(process.cwd(), '.data', 'civic_ledger.json');
+
+export function hashAdminPassword(password: string, salt: string): string {
+  return crypto.scryptSync(password.trim(), salt, 64).toString('hex');
+}
+
+export function generateAdminSalt(): string {
+  return crypto.randomBytes(16).toString('hex');
+}
 
 // In-Memory & Persistent Storage Cache (Guarantees local zero-config operation and unit testing)
 class StorageStore {
@@ -17,9 +26,15 @@ class StorageStore {
   participation: Map<string, ParticipationRecord> = new Map();
   // tokenHash -> { pollId, expiresAt, usedAt }
   tokens: Map<string, { pollId: string; expiresAt: string; usedAt?: string }> = new Map();
+  // Admin credentials (Login ID, salt, hash, secret path slug)
+  adminAccount: AdminAccount | null = null;
   // Site & Emergency Configuration
   siteSettings: SiteSettings = {
     maintenanceMode: false,
+    maintenanceTitleEn: 'Platform Under Scheduled Maintenance',
+    maintenanceTitleHi: 'मंच पर तकनीकी रखरखाव जारी है',
+    maintenanceMessageEn: 'We are performing routine security and infrastructure upgrades. All voting records are secure and polling will resume shortly.',
+    maintenanceMessageHi: 'हम नियमित तकनीकी रखरखाव कर रहे हैं। सभी जनमत रिकॉर्ड पूरी तरह सुरक्षित हैं और मतदान शीघ्र पुनः प्रारंभ होगा।',
     emergencyBannerEnabled: false,
     emergencyBannerTextEn: '',
     emergencyBannerTextHi: '',
@@ -50,6 +65,20 @@ class StorageStore {
       this.voteCounts.set(pollId, countsMap);
     });
 
+    // Initialize adminAccount default
+    const initialLoginId = process.env.ADMIN_LOGIN_ID || 'admin';
+    const initialPassword = process.env.ADMIN_PASSWORD || 'MeraVote@2026';
+    const initialSlug = process.env.ADMIN_PATH_SLUG || 'admin-ctrl-pnl';
+    const salt = generateAdminSalt();
+    const hash = hashAdminPassword(initialPassword, salt);
+    this.adminAccount = {
+      loginId: initialLoginId,
+      passwordHash: hash,
+      passwordSalt: salt,
+      adminPathSlug: initialSlug,
+      updatedAt: new Date().toISOString(),
+    };
+
     // Load persistent ledger records if available on disk (skip in test environment)
     if (process.env.NODE_ENV === 'test') return;
     try {
@@ -66,6 +95,15 @@ class StorageStore {
             const m = new Map<string, number>(opts);
             this.voteCounts.set(pId, m);
           });
+        }
+        if (data.adminAccount) {
+          this.adminAccount = data.adminAccount;
+        }
+        if (data.siteSettings) {
+          this.siteSettings = {
+            ...this.siteSettings,
+            ...data.siteSettings,
+          };
         }
       }
     } catch {
@@ -86,6 +124,8 @@ class StorageStore {
           k,
           Array.from(v.entries()),
         ]),
+        adminAccount: this.adminAccount,
+        siteSettings: this.siteSettings,
       };
       fs.writeFileSync(LEDGER_PATH, JSON.stringify(data), 'utf-8');
     } catch {
@@ -258,7 +298,8 @@ export const db = {
 
   async getPollResults(
     pollId: string,
-    timeframe: '7d' | 'month' | 'year' | 'all' = 'all'
+    timeframe: '7d' | 'month' | 'year' | 'all' = 'all',
+    monthKey: string = '2026-10'
   ): Promise<PollResults | null> {
     let poll = civicStore.polls.get(pollId);
     if (!poll) {
@@ -269,13 +310,28 @@ export const db = {
 
     const countsMap = civicStore.voteCounts.get(pollId) || new Map<string, number>();
 
+    const availableMonths = [
+      { key: '2026-10', nameEn: 'October 2026', nameHi: 'अक्टूबर 2026', monthEn: 'October', weight: 0.684 },
+      { key: '2026-09', nameEn: 'September 2026', nameHi: 'सितंबर 2026', monthEn: 'September', weight: 0.542 },
+      { key: '2026-08', nameEn: 'August 2026', nameHi: 'अगस्त 2026', monthEn: 'August', weight: 0.490 },
+      { key: '2026-07', nameEn: 'July 2026', nameHi: 'जुलाई 2026', monthEn: 'July', weight: 0.435 },
+      { key: '2026-06', nameEn: 'June 2026', nameHi: 'जून 2026', monthEn: 'June', weight: 0.380 },
+      { key: '2026-05', nameEn: 'May 2026', nameHi: 'मई 2026', monthEn: 'May', weight: 0.325 },
+      { key: '2026-04', nameEn: 'April 2026', nameHi: 'अप्रैल 2026', monthEn: 'April', weight: 0.270 },
+      { key: '2026-03', nameEn: 'March 2026', nameHi: 'मार्च 2026', monthEn: 'March', weight: 0.215 },
+      { key: '2026-02', nameEn: 'February 2026', nameHi: 'फरवरी 2026', monthEn: 'February', weight: 0.160 },
+      { key: '2026-01', nameEn: 'January 2026', nameHi: 'जनवरी 2026', monthEn: 'January', weight: 0.110 },
+    ];
+
+    const currentMonthConfig = availableMonths.find((m) => m.key === monthKey) || availableMonths[0];
+
     // Timeframe multipliers for granular demonstration views
     // 7d = ~15.2% of votes (representing recent 7-day surge)
-    // month = ~68.4% of votes (representing active month of October)
+    // month = specific month weight from availableMonths
     // year = 100% of votes (current year 2026)
     // all = 100% of cumulative votes
     const multiplier =
-      timeframe === '7d' ? 0.152 : timeframe === 'month' ? 0.684 : 1.0;
+      timeframe === '7d' ? 0.152 : timeframe === 'month' ? currentMonthConfig.weight : 1.0;
 
     let totalVotes = 0;
     const optionCounts = new Map<string, number>();
@@ -318,16 +374,16 @@ export const db = {
         hi: 'पिछले 7 दिन (हालिया रुझान)',
       },
       month: {
-        en: 'Monthly (October 2026)',
-        hi: 'मासिक परिणाम (अक्टूबर 2026)',
+        en: `Monthly (${currentMonthConfig.nameEn})`,
+        hi: `मासिक परिणाम (${currentMonthConfig.nameHi})`,
       },
       year: {
         en: 'Yearly (2026 Annual)',
         hi: 'वार्षिक परिणाम (वर्ष 2026)',
       },
       all: {
-        en: 'All Time (Cumulative Tally)',
-        hi: 'कुल परिणाम (समग्र गणना)',
+        en: 'All Time (Overall Results)',
+        hi: 'कुल परिणाम (समग्र मत)',
       },
     };
 
@@ -341,7 +397,7 @@ export const db = {
       timeframe,
       timeframe_label_en: timeframeLabels[timeframe]?.en || timeframeLabels.all.en,
       timeframe_label_hi: timeframeLabels[timeframe]?.hi || timeframeLabels.all.hi,
-      poll_month: poll.poll_month || 'October',
+      poll_month: currentMonthConfig.monthEn,
       poll_year: poll.poll_year || 2026,
       results,
     };
@@ -558,12 +614,16 @@ export const db = {
         const { data } = await supabaseAdmin.from('site_settings').select('*').eq('id', 'global').maybeSingle();
         if (data) {
           civicStore.siteSettings = {
-            maintenanceMode: data.maintenance_mode,
-            emergencyBannerEnabled: data.emergency_banner_enabled,
+            maintenanceMode: Boolean(data.maintenance_mode),
+            maintenanceTitleEn: data.maintenance_title_en || civicStore.siteSettings.maintenanceTitleEn || 'Platform Under Scheduled Maintenance',
+            maintenanceTitleHi: data.maintenance_title_hi || civicStore.siteSettings.maintenanceTitleHi || 'मंच पर तकनीकी रखरखाव जारी है',
+            maintenanceMessageEn: data.maintenance_message_en || civicStore.siteSettings.maintenanceMessageEn || 'We are performing routine security and infrastructure upgrades. All voting records are secure and polling will resume shortly.',
+            maintenanceMessageHi: data.maintenance_message_hi || civicStore.siteSettings.maintenanceMessageHi || 'हम नियमित तकनीकी रखरखाव कर रहे हैं। सभी जनमत रिकॉर्ड पूरी तरह सुरक्षित हैं और मतदान शीघ्र पुनः प्रारंभ होगा।',
+            emergencyBannerEnabled: Boolean(data.emergency_banner_enabled),
             emergencyBannerTextEn: data.emergency_banner_text_en || '',
             emergencyBannerTextHi: data.emergency_banner_text_hi || '',
             emergencyBannerType: (data.emergency_banner_type as any) || 'info',
-            allowVoting: data.allow_voting,
+            allowVoting: data.allow_voting !== false,
             rateLimitPerHour: data.rate_limit_per_hour || 60,
             lastUpdated: data.last_updated || new Date().toISOString(),
           };
@@ -579,11 +639,17 @@ export const db = {
       ...updates,
       lastUpdated: new Date().toISOString(),
     };
+    civicStore.saveLedger();
+
     if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
       try {
         await supabaseAdmin.from('site_settings').upsert({
           id: 'global',
           maintenance_mode: civicStore.siteSettings.maintenanceMode,
+          maintenance_title_en: civicStore.siteSettings.maintenanceTitleEn,
+          maintenance_title_hi: civicStore.siteSettings.maintenanceTitleHi,
+          maintenance_message_en: civicStore.siteSettings.maintenanceMessageEn,
+          maintenance_message_hi: civicStore.siteSettings.maintenanceMessageHi,
           emergency_banner_enabled: civicStore.siteSettings.emergencyBannerEnabled,
           emergency_banner_text_en: civicStore.siteSettings.emergencyBannerTextEn,
           emergency_banner_text_hi: civicStore.siteSettings.emergencyBannerTextHi,
@@ -596,6 +662,140 @@ export const db = {
     }
     await this.recordAuditEvent('admin_settings_update', undefined, { updates });
     return { ...civicStore.siteSettings };
+  },
+
+  async getAdminAccount(): Promise<AdminAccount> {
+    if (civicStore.adminAccount) {
+      return { ...civicStore.adminAccount };
+    }
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        const { data } = await supabaseAdmin
+          .from('site_settings')
+          .select('admin_login_id, admin_password_hash, admin_password_salt, admin_url_slug, last_updated')
+          .eq('id', 'global')
+          .maybeSingle();
+
+        if (data && data.admin_login_id && data.admin_password_hash && data.admin_password_salt) {
+          civicStore.adminAccount = {
+            loginId: data.admin_login_id,
+            passwordHash: data.admin_password_hash,
+            passwordSalt: data.admin_password_salt,
+            adminPathSlug: data.admin_url_slug || 'admin-ctrl-pnl',
+            updatedAt: data.last_updated || new Date().toISOString(),
+          };
+          civicStore.saveLedger();
+          return { ...civicStore.adminAccount };
+        }
+      } catch {}
+    }
+
+    // Default initialization into database if not present
+    const initialLoginId = process.env.ADMIN_LOGIN_ID || 'admin';
+    const initialPassword = process.env.ADMIN_PASSWORD || 'MeraVote@2026';
+    const initialSlug = process.env.ADMIN_PATH_SLUG || 'admin-ctrl-pnl';
+    const salt = generateAdminSalt();
+    const hash = hashAdminPassword(initialPassword, salt);
+
+    civicStore.adminAccount = {
+      loginId: initialLoginId,
+      passwordHash: hash,
+      passwordSalt: salt,
+      adminPathSlug: initialSlug,
+      updatedAt: new Date().toISOString(),
+    };
+    civicStore.saveLedger();
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('site_settings').upsert({
+          id: 'global',
+          admin_login_id: initialLoginId,
+          admin_password_hash: hash,
+          admin_password_salt: salt,
+          admin_url_slug: initialSlug,
+          last_updated: new Date().toISOString(),
+        });
+      } catch {}
+    }
+
+    return { ...civicStore.adminAccount };
+  },
+
+  async verifyAdminLogin(loginId: string, password: string): Promise<boolean> {
+    if (!loginId || !password || typeof loginId !== 'string' || typeof password !== 'string') {
+      return false;
+    }
+    const account = await this.getAdminAccount();
+    if (account.loginId.trim().toLowerCase() !== loginId.trim().toLowerCase()) {
+      return false;
+    }
+    try {
+      const computedHash = hashAdminPassword(password, account.passwordSalt);
+      const bufA = Buffer.from(computedHash, 'hex');
+      const bufB = Buffer.from(account.passwordHash, 'hex');
+      if (bufA.length !== bufB.length) return false;
+      return crypto.timingSafeEqual(bufA, bufB);
+    } catch {
+      return false;
+    }
+  },
+
+  async updateAdminAccount(updates: {
+    loginId?: string;
+    password?: string;
+    adminPathSlug?: string;
+  }): Promise<AdminAccount> {
+    const account = await this.getAdminAccount();
+    let loginId = account.loginId;
+    let passwordHash = account.passwordHash;
+    let passwordSalt = account.passwordSalt;
+    let adminPathSlug = account.adminPathSlug;
+
+    if (updates.loginId && updates.loginId.trim()) {
+      loginId = updates.loginId.trim();
+    }
+    if (updates.password && updates.password.trim()) {
+      passwordSalt = generateAdminSalt();
+      passwordHash = hashAdminPassword(updates.password.trim(), passwordSalt);
+    }
+    if (updates.adminPathSlug && updates.adminPathSlug.trim()) {
+      adminPathSlug = updates.adminPathSlug.trim().replace(/^\/+/, '').replace(/^@/, '');
+    }
+
+    const updated: AdminAccount = {
+      loginId,
+      passwordHash,
+      passwordSalt,
+      adminPathSlug,
+      updatedAt: new Date().toISOString(),
+    };
+
+    civicStore.adminAccount = updated;
+    civicStore.saveLedger();
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('site_settings').upsert({
+          id: 'global',
+          admin_login_id: updated.loginId,
+          admin_password_hash: updated.passwordHash,
+          admin_password_salt: updated.passwordSalt,
+          admin_url_slug: updated.adminPathSlug,
+          last_updated: updated.updatedAt,
+        });
+      } catch (err) {
+        console.error('Failed to update admin account in Supabase:', err);
+      }
+    }
+
+    await this.recordAuditEvent('admin_credentials_updated', undefined, {
+      loginId: updated.loginId,
+      adminPathSlug: updated.adminPathSlug,
+    });
+
+    return updated;
   },
 
   async getDetailedPolls(): Promise<Array<Poll & { optionResults: OptionResult[] }>> {

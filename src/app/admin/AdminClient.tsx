@@ -13,6 +13,8 @@ import {
   Vote,
   AlertTriangle,
   Lock,
+  User,
+  CheckCircle2,
   Layers,
   RefreshCw,
   Settings,
@@ -62,9 +64,24 @@ export function AdminClient() {
 
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [passcode, setPasscode] = useState('');
+  const [loginId, setLoginId] = useState('admin');
+  const [password, setPassword] = useState('');
   const [authError, setAuthError] = useState('');
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+
+  // Admin Database Account Management State
+  const [accountInfo, setAccountInfo] = useState<{
+    loginId: string;
+    adminPathSlug: string;
+    updatedAt: string;
+  } | null>(null);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newAdminLoginId, setNewAdminLoginId] = useState('');
+  const [newAdminPassword, setNewAdminPassword] = useState('');
+  const [confirmAdminPassword, setConfirmAdminPassword] = useState('');
+  const [isUpdatingAccount, setIsUpdatingAccount] = useState(false);
+  const [accountUpdateSuccess, setAccountUpdateSuccess] = useState<string | null>(null);
+  const [accountUpdateError, setAccountUpdateError] = useState<string | null>(null);
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<
@@ -167,13 +184,14 @@ export function AdminClient() {
   const fetchAllData = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      const [statsRes, pollsRes, settingsRes, supportersRes, auditRes, partiesRes] = await Promise.all([
+      const [statsRes, pollsRes, settingsRes, supportersRes, auditRes, partiesRes, accountRes] = await Promise.all([
         fetch('/api/admin/stats').catch(() => null),
         fetch('/api/admin/polls').catch(() => null),
         fetch('/api/admin/settings').catch(() => null),
         fetch('/api/admin/supporters').catch(() => null),
         fetch('/api/admin/audit?limit=40').catch(() => null),
         fetch('/api/admin/parties').catch(() => null),
+        fetch('/api/admin/account').catch(() => null),
       ]);
 
       if (statsRes?.status === 401) {
@@ -192,6 +210,14 @@ export function AdminClient() {
         const d = await partiesRes.json();
         if (d.success && Array.isArray(d.parties)) {
           setAllParties(d.parties);
+        }
+      }
+
+      if (accountRes?.ok) {
+        const d = await accountRes.json();
+        if (d.success && d.data) {
+          setAccountInfo(d.data);
+          setNewAdminLoginId(d.data.loginId);
         }
       }
 
@@ -253,7 +279,7 @@ export function AdminClient() {
     };
   }, [isAuthenticated, fetchAllData]);
 
-  // Handle Passcode Unlock
+  // Handle Admin Login Submit
   const handleAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
@@ -263,7 +289,7 @@ export function AdminClient() {
       const res = await fetch('/api/admin/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ passcode }),
+        body: JSON.stringify({ loginId: loginId.trim(), password }),
       });
       const data = await res.json();
 
@@ -278,8 +304,8 @@ export function AdminClient() {
         setAuthError(
           data.error ||
           (language === 'hi'
-            ? 'अमान्य व्यवस्थापक पासकोड। पहुंच अस्वीकृत।'
-            : 'Invalid administrative passcode. Access denied.')
+            ? 'अमान्य व्यवस्थापक क्रेडेंशियल्स। पहुंच अस्वीकृत।'
+            : 'Invalid administrative credentials. Access denied.')
         );
       }
     } catch {
@@ -291,8 +317,77 @@ export function AdminClient() {
 
   const handleSignOut = () => {
     sessionStorage.removeItem('meravote_admin_auth');
+    sessionStorage.removeItem('meravote_admin_token');
     setIsAuthenticated(false);
-    setPasscode('');
+    setPassword('');
+  };
+
+  // Handle Database Admin Account Update
+  const handleUpdateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAccountUpdateError(null);
+    setAccountUpdateSuccess(null);
+
+    if (!currentPassword) {
+      setAccountUpdateError(
+        language === 'hi'
+          ? 'वर्तमान पासवर्ड दर्ज करना अनिवार्य है'
+          : 'Current password is required to confirm changes'
+      );
+      return;
+    }
+
+    if (newAdminPassword && newAdminPassword.length < 8) {
+      setAccountUpdateError(
+        language === 'hi'
+          ? 'नया पासवर्ड कम से कम 8 वर्णों का होना चाहिए'
+          : 'New password must be at least 8 characters long'
+      );
+      return;
+    }
+
+    if (newAdminPassword && newAdminPassword !== confirmAdminPassword) {
+      setAccountUpdateError(
+        language === 'hi'
+          ? 'नया पासवर्ड और पुष्टि पासवर्ड मेल नहीं खाते'
+          : 'New passwords do not match'
+      );
+      return;
+    }
+
+    setIsUpdatingAccount(true);
+    try {
+      const res = await fetch('/api/admin/account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currentPassword,
+          newLoginId: newAdminLoginId.trim() || undefined,
+          newPassword: newAdminPassword || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAccountUpdateSuccess(
+          language === 'hi'
+            ? 'व्यवस्थापक क्रेडेंशियल्स डेटाबेस में सफलतापूर्वक अपडेट किए गए'
+            : 'Admin credentials successfully updated in the database'
+        );
+        setCurrentPassword('');
+        setNewAdminPassword('');
+        setConfirmAdminPassword('');
+        if (data.data) {
+          setAccountInfo(data.data);
+          setNewAdminLoginId(data.data.loginId);
+        }
+      } else {
+        setAccountUpdateError(data.error || 'Failed to update credentials');
+      }
+    } catch {
+      setAccountUpdateError('Server error updating credentials');
+    } finally {
+      setIsUpdatingAccount(false);
+    }
   };
 
   // Poll Management Handlers
@@ -370,13 +465,13 @@ export function AdminClient() {
       });
       const data = await res.json();
       if (data.success) {
-        showToast(language === 'hi' ? 'मत गणना अद्यतित की गई' : 'Vote tally updated');
+        showToast(language === 'hi' ? 'मत संख्या अद्यतित की गई' : 'Vote count updated');
         fetchAllData();
       } else {
         showToast(data.error || 'Failed to update count', true);
       }
     } catch {
-      showToast('Error updating tally', true);
+      showToast('Error updating vote count', true);
     }
   };
 
@@ -707,6 +802,11 @@ export function AdminClient() {
       const data = await res.json();
       if (data.success) {
         setSettings(data.data);
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(
+            new CustomEvent('site_settings_updated', { detail: data.data })
+          );
+        }
         showToast(language === 'hi' ? 'वेबसाइट सेटिंग्स सुरक्षित की गईं' : 'Platform settings saved successfully');
       } else {
         showToast(data.error || 'Failed to save settings', true);
@@ -754,7 +854,7 @@ export function AdminClient() {
     }
   };
 
-  // Passcode Gate UI
+  // Authentication Gate UI
   if (!isAuthenticated) {
     return (
       <div className="max-w-md mx-auto py-12 sm:py-20 px-4 space-y-6">
@@ -767,8 +867,8 @@ export function AdminClient() {
           </h1>
           <p className="text-xs text-[var(--text-secondary)]">
             {language === 'hi'
-              ? 'वेबसाइट और सर्वेक्षणों के पूर्ण नियंत्रण के लिए पासकोड दर्ज करें'
-              : 'Enter master administrator passcode to unlock full platform controls'}
+              ? 'वेबसाइट और सर्वेक्षणों के सुरक्षित प्रबंधन हेतु व्यवस्थापक पहचान सत्यापित करें'
+              : 'Enter master administrator credentials to access platform controls'}
           </p>
         </div>
 
@@ -776,21 +876,40 @@ export function AdminClient() {
           <form onSubmit={handleAuthSubmit} className="space-y-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                {language === 'hi' ? 'मास्टर पासकोड' : 'Master Passcode'}
+                {language === 'hi' ? 'लॉगिन आईडी (Login ID)' : 'Admin Login ID'}
               </label>
-              <div className="relative">
+              <div className="relative flex items-center">
+                <User className="w-4 h-4 text-[var(--text-tertiary)] absolute left-3.5 pointer-events-none" />
+                <input
+                  type="text"
+                  value={loginId}
+                  onChange={(e) => setLoginId(e.target.value)}
+                  placeholder="admin"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)] transition-all font-mono"
+                  autoFocus
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                {language === 'hi' ? 'पासवर्ड (Password)' : 'Admin Password'}
+              </label>
+              <div className="relative flex items-center">
+                <Lock className="w-4 h-4 text-[var(--text-tertiary)] absolute left-3.5 pointer-events-none" />
                 <input
                   type="password"
-                  value={passcode}
-                  onChange={(e) => setPasscode(e.target.value)}
-                  placeholder="Enter passcode..."
-                  className="w-full px-4 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)] transition-all font-mono"
-                  autoFocus
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent)] transition-all font-mono"
+                  required
                 />
               </div>
               <p className="text-[11px] text-[var(--text-tertiary)] flex items-center gap-1.5">
-                <Lock className="w-3 h-3 text-[var(--accent)] shrink-0" />
-                <span>{language === 'hi' ? 'सुरक्षित सत्र • केवल अधिकृत पहुंच' : 'Encrypted session • Authorized personnel only'}</span>
+                <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+                <span>{language === 'hi' ? 'डेटाबेस द्वारा सुरक्षित सत्यापन • अनधिकृत प्रयास अवरुद्ध' : 'Database-verified scrypt hashing • Strict brute-force protection'}</span>
               </p>
             </div>
 
@@ -1114,32 +1233,35 @@ export function AdminClient() {
                                 e.target.value as 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES'
                               )
                             }
-                            className="bg-transparent text-[11px] font-bold text-[var(--text-primary)] focus:outline-none cursor-pointer"
+                            className="glass-select text-[11px] font-bold rounded-lg py-1 px-2.5 cursor-pointer"
                           >
                             <option value="STRICT_SINGLE_VOTE">
-                              🛡️ Strict 1-Vote (User Never Votes Again)
+                              Strict 1-Vote (User Never Votes Again)
                             </option>
                             <option value="ALLOW_ONE_REVOTE">
-                              🔄 Allow 1 Revote (Max 2 Votes)
+                              Allow 1 Revote (Max 2 Votes)
                             </option>
                             <option value="ALLOW_MULTIPLE_VOTES">
-                              ♾️ Allow Multiple Votes
+                              Allow Multiple Votes
                             </option>
                           </select>
                         </div>
                         {poll.voting_policy === 'STRICT_SINGLE_VOTE' && (
-                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
-                            ✓ Permanent single-vote lock active
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold inline-flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 shrink-0" />
+                            <span>Permanent single-vote lock active</span>
                           </span>
                         )}
                         {poll.voting_policy === 'ALLOW_ONE_REVOTE' && (
-                          <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
-                            ✓ 1 vote change permitted
+                          <span className="text-[10px] text-blue-600 dark:text-blue-400 font-semibold inline-flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 shrink-0" />
+                            <span>1 vote change permitted</span>
                           </span>
                         )}
                         {poll.voting_policy === 'ALLOW_MULTIPLE_VOTES' && (
-                          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold">
-                            ✓ Continuous sentiment polling
+                          <span className="text-[10px] text-purple-600 dark:text-purple-400 font-semibold inline-flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 shrink-0" />
+                            <span>Continuous sentiment polling</span>
                           </span>
                         )}
                       </div>
@@ -1247,7 +1369,7 @@ export function AdminClient() {
                                   type="button"
                                   onClick={() => handleUpdateOptionTally(poll.id, opt.option_id)}
                                   className="py-1.5 px-2.5 rounded-lg bg-[var(--accent)] hover:opacity-90 text-white font-bold text-[11px] transition-all cursor-pointer active:scale-95"
-                                  title="Save new vote tally"
+                                  title="Save new vote count"
                                 >
                                   Save
                                 </button>
@@ -1289,10 +1411,11 @@ export function AdminClient() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Core Switches */}
+            {/* Core Switches & Real-Time Maintenance Mode */}
             <GlassCard elevated className="space-y-5">
-              <h3 className="text-base font-bold text-[var(--text-primary)] pb-2 border-b border-[var(--border-glass)]">
-                Platform Operational Switches
+              <h3 className="text-base font-bold text-[var(--text-primary)] pb-2 border-b border-[var(--border-glass)] flex items-center gap-2">
+                <Sliders className="w-4 h-4 text-[var(--accent)]" />
+                <span>Platform Operational Switches</span>
               </h3>
 
               {/* Allow Voting Switch */}
@@ -1314,23 +1437,110 @@ export function AdminClient() {
                 </label>
               </div>
 
-              {/* Maintenance Mode */}
-              <div className="flex items-center justify-between p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)]">
-                <div>
-                  <h4 className="text-xs sm:text-sm font-bold text-[var(--text-primary)]">Maintenance Mode</h4>
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    Display maintenance notice to incoming visitors
-                  </p>
+              {/* Real-time Maintenance Mode */}
+              <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+                      <span>Maintenance Mode</span>
+                      {tempSettings.maintenanceMode ? (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 font-bold border border-red-500/30">
+                          LIVE ACTIVE
+                        </span>
+                      ) : (
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-bold border border-emerald-500/30">
+                          OFFLINE / NORMAL
+                        </span>
+                      )}
+                    </h4>
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Instant real-time lock: displays custom maintenance screen to all public visitors while keeping admin controls accessible
+                    </p>
+                  </div>
+                  <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={tempSettings.maintenanceMode}
+                      onChange={(e) => setTempSettings({ ...tempSettings, maintenanceMode: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                  </label>
                 </div>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={tempSettings.maintenanceMode}
-                    onChange={(e) => setTempSettings({ ...tempSettings, maintenanceMode: e.target.checked })}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
-                </label>
+
+                {/* Maintenance Custom Message & Title Inputs */}
+                <div className="pt-2 border-t border-[var(--border-glass)] space-y-3">
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                      Maintenance Notice Title (English)
+                    </label>
+                    <input
+                      type="text"
+                      value={tempSettings.maintenanceTitleEn || ''}
+                      onChange={(e) => setTempSettings({ ...tempSettings, maintenanceTitleEn: e.target.value })}
+                      placeholder="e.g. Platform Under Scheduled Maintenance"
+                      className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                      Maintenance Notice Title (Hindi - शीर्षक)
+                    </label>
+                    <input
+                      type="text"
+                      value={tempSettings.maintenanceTitleHi || ''}
+                      onChange={(e) => setTempSettings({ ...tempSettings, maintenanceTitleHi: e.target.value })}
+                      placeholder="उदा. मंच पर निर्धारित तकनीकी रखरखाव जारी है"
+                      className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                      Maintenance Message / Description (English)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={tempSettings.maintenanceMessageEn || ''}
+                      onChange={(e) => setTempSettings({ ...tempSettings, maintenanceMessageEn: e.target.value })}
+                      placeholder="Explain the scheduled upgrade or maintenance details to citizens..."
+                      className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] resize-none"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                      Maintenance Message / Description (Hindi - विवरण)
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={tempSettings.maintenanceMessageHi || ''}
+                      onChange={(e) => setTempSettings({ ...tempSettings, maintenanceMessageHi: e.target.value })}
+                      placeholder="नागरिकों के लिए हिंदी में रखरखाव का विवरण लिखें..."
+                      className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] resize-none"
+                    />
+                  </div>
+
+                  {/* Maintenance Live Preview */}
+                  <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs space-y-1">
+                    <div className="flex items-center gap-1.5 font-bold text-amber-700 dark:text-amber-400">
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Maintenance Screen Preview</span>
+                    </div>
+                    <p className="font-bold text-[var(--text-primary)]">
+                      {language === 'hi' && tempSettings.maintenanceTitleHi
+                        ? tempSettings.maintenanceTitleHi
+                        : tempSettings.maintenanceTitleEn || 'Platform Under Scheduled Maintenance'}
+                    </p>
+                    <p className="text-[var(--text-secondary)] text-[11px]">
+                      {language === 'hi' && tempSettings.maintenanceMessageHi
+                        ? tempSettings.maintenanceMessageHi
+                        : tempSettings.maintenanceMessageEn ||
+                          'We are currently performing scheduled security and infrastructure enhancements. All voting records are cryptographically secured.'}
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* Rate Limit Per Hour */}
@@ -1355,91 +1565,204 @@ export function AdminClient() {
               </div>
             </GlassCard>
 
-            {/* Emergency Alert Banner Config */}
-            <GlassCard elevated className="space-y-5">
-              <div className="flex items-center justify-between pb-2 border-b border-[var(--border-glass)]">
-                <h3 className="text-base font-bold text-[var(--text-primary)]">Site-Wide Alert Banner</h3>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={tempSettings.emergencyBannerEnabled}
-                    onChange={(e) =>
-                      setTempSettings({ ...tempSettings, emergencyBannerEnabled: e.target.checked })
-                    }
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent)]"></div>
-                </label>
-              </div>
-
-              {/* Banner Severity Type */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                  Alert Severity
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {(['info', 'warning', 'alert'] as const).map((sev) => (
-                    <button
-                      key={sev}
-                      type="button"
-                      onClick={() => setTempSettings({ ...tempSettings, emergencyBannerType: sev })}
-                      className={`py-2 px-3 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer ${
-                        tempSettings.emergencyBannerType === sev
-                          ? 'bg-[var(--accent)] text-white shadow-sm'
-                          : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border-glass)]'
-                      }`}
-                    >
-                      {sev}
-                    </button>
-                  ))}
+            {/* Emergency Alert Banner Config & Database Admin Account */}
+            <div className="space-y-6">
+              <GlassCard elevated className="space-y-5">
+                <div className="flex items-center justify-between pb-2 border-b border-[var(--border-glass)]">
+                  <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                    <Bell className="w-4 h-4 text-[var(--accent)]" />
+                    <span>Site-Wide Alert Banner</span>
+                  </h3>
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={tempSettings.emergencyBannerEnabled}
+                      onChange={(e) =>
+                        setTempSettings({ ...tempSettings, emergencyBannerEnabled: e.target.checked })
+                      }
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-300 dark:bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[var(--accent)]"></div>
+                  </label>
                 </div>
-              </div>
 
-              {/* English Text */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                  English Banner Announcement
-                </label>
-                <input
-                  type="text"
-                  value={tempSettings.emergencyBannerTextEn}
-                  onChange={(e) => setTempSettings({ ...tempSettings, emergencyBannerTextEn: e.target.value })}
-                  placeholder="e.g. Server maintenance scheduled tonight at 11:00 PM IST."
-                  className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
-                />
-              </div>
-
-              {/* Hindi Text */}
-              <div className="space-y-1">
-                <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                  Hindi Banner Announcement
-                </label>
-                <input
-                  type="text"
-                  value={tempSettings.emergencyBannerTextHi}
-                  onChange={(e) => setTempSettings({ ...tempSettings, emergencyBannerTextHi: e.target.value })}
-                  placeholder="उदा. आज रात 11:00 बजे सर्वर रखरखाव निर्धारित है।"
-                  className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
-                />
-              </div>
-
-              {/* Live Preview */}
-              {tempSettings.emergencyBannerEnabled && (
-                <div className="space-y-1 pt-2">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-tertiary)]">
-                    Live Preview
-                  </span>
-                  <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-900 dark:text-blue-200 text-xs flex items-center gap-2">
-                    <Info className="w-4 h-4 text-blue-500 shrink-0" />
-                    <span>
-                      {language === 'hi' && tempSettings.emergencyBannerTextHi
-                        ? tempSettings.emergencyBannerTextHi
-                        : tempSettings.emergencyBannerTextEn || 'Your announcement will appear here.'}
-                    </span>
+                {/* Banner Severity Type */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                    Alert Severity
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(['info', 'warning', 'alert'] as const).map((sev) => (
+                      <button
+                        key={sev}
+                        type="button"
+                        onClick={() => setTempSettings({ ...tempSettings, emergencyBannerType: sev })}
+                        className={`py-2 px-3 rounded-lg text-xs font-bold capitalize transition-all cursor-pointer ${
+                          tempSettings.emergencyBannerType === sev
+                            ? 'bg-[var(--accent)] text-white shadow-sm'
+                            : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] border border-[var(--border-glass)]'
+                        }`}
+                      >
+                        {sev}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )}
-            </GlassCard>
+
+                {/* English Text */}
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                    English Banner Announcement
+                  </label>
+                  <input
+                    type="text"
+                    value={tempSettings.emergencyBannerTextEn}
+                    onChange={(e) => setTempSettings({ ...tempSettings, emergencyBannerTextEn: e.target.value })}
+                    placeholder="e.g. Server maintenance scheduled tonight at 11:00 PM IST."
+                    className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                  />
+                </div>
+
+                {/* Hindi Text */}
+                <div className="space-y-1">
+                  <label className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                    Hindi Banner Announcement
+                  </label>
+                  <input
+                    type="text"
+                    value={tempSettings.emergencyBannerTextHi}
+                    onChange={(e) => setTempSettings({ ...tempSettings, emergencyBannerTextHi: e.target.value })}
+                    placeholder="उदा. आज रात 11:00 बजे सर्वर रखरखाव निर्धारित है।"
+                    className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                  />
+                </div>
+
+                {/* Live Preview */}
+                {tempSettings.emergencyBannerEnabled && (
+                  <div className="space-y-1 pt-2">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-tertiary)]">
+                      Live Preview
+                    </span>
+                    <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-900 dark:text-blue-200 text-xs flex items-center gap-2">
+                      <Info className="w-4 h-4 text-blue-500 shrink-0" />
+                      <span>
+                        {language === 'hi' && tempSettings.emergencyBannerTextHi
+                          ? tempSettings.emergencyBannerTextHi
+                          : tempSettings.emergencyBannerTextEn || 'Your announcement will appear here.'}
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </GlassCard>
+
+              {/* Database-Backed Admin Credentials & Security Card */}
+              <GlassCard elevated className="space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-[var(--border-glass)]">
+                  <div className="space-y-0.5">
+                    <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                      <KeyRound className="w-4 h-4 text-[var(--accent)]" />
+                      <span>Admin Credentials & Security</span>
+                    </h3>
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      Stored in secure database with cryptographic scrypt hashing (not hardcoded)
+                    </p>
+                  </div>
+                  {accountInfo && (
+                    <GlassBadge variant="neutral">
+                      <span>ID: {accountInfo.loginId}</span>
+                    </GlassBadge>
+                  )}
+                </div>
+
+                <form onSubmit={handleUpdateAccount} className="space-y-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                        Admin Login ID
+                      </label>
+                      <input
+                        type="text"
+                        value={newAdminLoginId}
+                        onChange={(e) => setNewAdminLoginId(e.target.value)}
+                        placeholder="admin"
+                        className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                        Current Password (Required)
+                      </label>
+                      <input
+                        type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Verify current password"
+                        className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                        New Password (Min 8 chars)
+                      </label>
+                      <input
+                        type="password"
+                        value={newAdminPassword}
+                        onChange={(e) => setNewAdminPassword(e.target.value)}
+                        placeholder="Leave blank to keep same"
+                        className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
+                        Confirm New Password
+                      </label>
+                      <input
+                        type="password"
+                        value={confirmAdminPassword}
+                        onChange={(e) => setConfirmAdminPassword(e.target.value)}
+                        placeholder="Re-enter new password"
+                        className="w-full px-3 py-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                      />
+                    </div>
+                  </div>
+
+                  {accountUpdateSuccess && (
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-xs flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 shrink-0" />
+                      <span>{accountUpdateSuccess}</span>
+                    </div>
+                  )}
+
+                  {accountUpdateError && (
+                    <div className="p-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{accountUpdateError}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between pt-1">
+                    <span className="text-[11px] text-[var(--text-tertiary)]">
+                      {accountInfo?.updatedAt ? `Last updated: ${new Date(accountInfo.updatedAt).toLocaleDateString()}` : ''}
+                    </span>
+                    <button
+                      type="submit"
+                      disabled={isUpdatingAccount}
+                      className="py-2 px-4 rounded-xl bg-[var(--accent)] hover:opacity-90 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>{isUpdatingAccount ? 'Updating...' : 'Update Admin Credentials'}</span>
+                    </button>
+                  </div>
+                </form>
+              </GlassCard>
+            </div>
           </div>
         </div>
       )}
@@ -1860,13 +2183,13 @@ export function AdminClient() {
                     className="w-full glass-select rounded-xl text-xs font-bold"
                   >
                     <option value="STRICT_SINGLE_VOTE">
-                      🛡️ Strict 1-Vote Limit (User can NEVER vote again in this poll)
+                      Strict 1-Vote Limit (User can NEVER vote again in this poll)
                     </option>
                     <option value="ALLOW_ONE_REVOTE">
-                      🔄 Allow 1 Revote (User can change/re-cast vote once, max 2 votes)
+                      Allow 1 Revote (User can change/re-cast vote once, max 2 votes)
                     </option>
                     <option value="ALLOW_MULTIPLE_VOTES">
-                      ♾️ Allow Multiple Votes (Multiple submissions permitted)
+                      Allow Multiple Votes (Multiple submissions permitted)
                     </option>
                   </select>
                 </div>
@@ -1967,7 +2290,10 @@ export function AdminClient() {
 
                 {!autoTranslateEnabled && (
                   <div className="px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-700 dark:text-amber-300 flex items-center gap-2">
-                    <span className="font-bold shrink-0">✓ {language === 'hi' ? 'मैन्युअल मोड सक्रिय:' : 'Manual Mode Active:'}</span>
+                    <span className="font-bold shrink-0 inline-flex items-center gap-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                      <span>{language === 'hi' ? 'मैन्युअल मोड सक्रिय:' : 'Manual Mode Active:'}</span>
+                    </span>
                     <span>
                       {language === 'hi'
                         ? 'अंग्रेजी और हिंदी बॉक्स पूरी तरह स्वतंत्र हैं। आप दोनों में अपनी पसंद का कोई भी अलग टेक्स्ट लिख सकते हैं।'
@@ -2137,8 +2463,9 @@ export function AdminClient() {
                           : 'User can NEVER vote again in this poll (blocked across incognito, cookie clear & browser changes)'}
                       </p>
                     </div>
-                    <span className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400">
-                      🛡️ Recommended for Elections
+                    <span className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 shrink-0" />
+                      <span>Recommended for Elections</span>
                     </span>
                   </label>
 
@@ -2170,8 +2497,9 @@ export function AdminClient() {
                           : 'Voters can re-cast or change their vote exactly one time (total 2 submissions maximum)'}
                       </p>
                     </div>
-                    <span className="mt-2 text-[10px] font-bold text-blue-600 dark:text-blue-400">
-                      🔄 1 Vote-Change Allowed
+                    <span className="mt-2 text-[10px] font-bold text-blue-600 dark:text-blue-400 inline-flex items-center gap-1.5">
+                      <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+                      <span>1 Vote-Change Allowed</span>
                     </span>
                   </label>
 
@@ -2203,8 +2531,9 @@ export function AdminClient() {
                           : 'Multiple votes permitted for continuous pulse and sentiment tracking'}
                       </p>
                     </div>
-                    <span className="mt-2 text-[10px] font-bold text-purple-600 dark:text-purple-400">
-                      ♾️ Continuous Polling
+                    <span className="mt-2 text-[10px] font-bold text-purple-600 dark:text-purple-400 inline-flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 shrink-0" />
+                      <span>Continuous Polling</span>
                     </span>
                   </label>
                 </div>
@@ -2654,8 +2983,9 @@ export function AdminClient() {
                   </div>
                   <div className="text-[11px] text-[var(--text-secondary)]">
                     {createPartyLogo ? (
-                      <span className="text-emerald-600 dark:text-emerald-400 font-bold">
-                        ✓ Logo ready to save
+                      <span className="text-emerald-600 dark:text-emerald-400 font-bold inline-flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+                        <span>Logo ready to save</span>
                       </span>
                     ) : (
                       <span>Optional. If not provided, an official monogram badge will be generated.</span>

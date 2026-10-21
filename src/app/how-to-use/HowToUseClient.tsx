@@ -102,7 +102,7 @@ export function HowToUseClient() {
           </p>
           <div className="pl-12 pt-1 flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>{language === 'hi' ? '100% निःशुल्क एवं सुरक्षित व्हाट्सएप सत्यापन' : '100% Free Forever • Instant WhatsApp OTP Delivery'}</span>
+            <span>{language === 'hi' ? '100% सुरक्षित एवं निःशुल्क व्हाट्सएप सत्यापन' : '100% Safe & Free • Instant WhatsApp OTP Delivery'}</span>
           </div>
         </GlassCard>
 

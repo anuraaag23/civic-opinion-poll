@@ -91,10 +91,10 @@ export function HowItWorksClient() {
 
           <div className="p-4 sm:p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1.5 shadow-xs">
             <span className="text-xs font-bold text-[var(--success)] uppercase tracking-wider block">
-              {language === 'hi' ? '4. सुरक्षित गणना' : '4. Tamper-Proof Tallying'}
+              {language === 'hi' ? '4. सुरक्षित गणना' : '4. Tamper-Proof Vote Counting'}
             </span>
             <h3 className="text-base font-bold text-[var(--text-primary)]">
-              {language === 'hi' ? 'अखंड सार्वजनिक मतगणना' : 'Instant Aggregate-Only Increment'}
+              {language === 'hi' ? 'अखंड सार्वजनिक परिणाम' : 'Instant Aggregate-Only Increment'}
             </h3>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               {language === 'hi'

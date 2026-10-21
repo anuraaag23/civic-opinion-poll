@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import {
-  verifyAdminPasscode,
   createAdminSessionToken,
   checkAdminRateLimit,
   recordAdminAuthFailure,
@@ -32,22 +31,32 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
-    const { passcode } = body;
+    const body = await request.json().catch(() => ({}));
+    const { loginId, password, passcode } = body;
 
-    if (!passcode || typeof passcode !== 'string') {
+    let isValid = false;
+
+    // A) If Login ID and Password provided:
+    if (loginId && password && typeof loginId === 'string' && typeof password === 'string') {
+      isValid = await db.verifyAdminLogin(loginId.trim(), password);
+    } else if (passcode && typeof passcode === 'string') {
+      // B) Passcode-only fallback (checks against default or primary admin account)
+      const account = await db.getAdminAccount();
+      isValid = await db.verifyAdminLogin(account.loginId, passcode);
+    } else {
       return NextResponse.json(
-        { success: false, error: 'Passcode is required' },
+        { success: false, error: 'Login ID and password are required' },
         { status: 400 }
       );
     }
 
-    // 2. Timing-safe constant-time passcode validation
-    if (verifyAdminPasscode(passcode)) {
+    // 2. Successful authentication
+    if (isValid) {
       clearAdminRateLimit(ip);
 
       await db.recordAuditEvent('admin_login', undefined, {
         timestamp: new Date().toISOString(),
+        loginId: loginId || 'admin',
         success: true,
       });
 
@@ -76,13 +85,14 @@ export async function POST(request: NextRequest) {
 
     await db.recordAuditEvent('admin_login', undefined, {
       timestamp: new Date().toISOString(),
+      loginId: loginId || 'unknown',
       success: false,
     });
 
     return NextResponse.json(
       {
         success: false,
-        error: 'Invalid administrative passcode. Access denied.',
+        error: 'Invalid administrative credentials. Access denied.',
       },
       { status: 401 }
     );

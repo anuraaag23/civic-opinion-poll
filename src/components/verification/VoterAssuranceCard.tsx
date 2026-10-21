@@ -64,17 +64,17 @@ export function VoterAssuranceCard() {
           </div>
         </div>
 
-        {/* Assurance 3: 100% Free Forever */}
+        {/* Assurance 3: 100% Safe WhatsApp OTP (Always Free for All Citizens) */}
         <div className="p-5 sm:p-6 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2 flex flex-col justify-between shadow-xs">
           <div className="space-y-2">
             <div className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-emerald-600 dark:text-emerald-400">
               <ShieldCheck className="w-4 h-4 shrink-0" />
-              <span>{language === 'hi' ? '3. 100% निःशुल्क एवं सुरक्षित' : '3. 100% Free WhatsApp OTP'}</span>
+              <span>{language === 'hi' ? '3. 100% सुरक्षित व्हाट्सएप ओटीपी' : '3. 100% Safe WhatsApp OTP'}</span>
             </div>
             <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
               {language === 'hi'
-                ? 'व्हाट्सएप ओटीपी सेवा सभी नागरिकों के लिए पूरी तरह से निःशुल्क है। बॉट और फर्जी खातों से मुक्त, असली भारतीय नागरिकों की सच्ची राय।'
-                : 'WhatsApp OTP delivery is completely free forever. Protected against automated bots, sybil attacks, and fake entries.'}
+                ? 'व्हाट्सएप ओटीपी सत्यापन 100% सुरक्षित, स्पैम-मुक्त और सभी भारतीय नागरिकों के लिए सदैव पूर्णतः निःशुल्क है। आपका नंबर कभी स्टोर नहीं होता और मतदान पूरी तरह गोपनीय रहता है।'
+                : 'WhatsApp OTP verification is 100% safe, spam-free, and completely free for every citizen. Your number is never stored, never shared, and your ballot remains 100% anonymous.'}
             </p>
           </div>
         </div>

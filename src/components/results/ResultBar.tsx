@@ -67,15 +67,12 @@ export function ResultBar({ result, maxPercentage }: ResultBarProps) {
         </div>
       </div>
 
-      {/* Clean 2D Horizontal Bar */}
+      {/* Clean 2D Horizontal Bar - Formally filled by actual percentage (not artificially inflated to 100%) */}
       <div className="w-full h-2.5 rounded-full bg-[var(--border-glass)] overflow-hidden">
         <div
           className="h-full rounded-full bg-gradient-to-r from-[var(--accent)] to-[var(--accent-hover)] transition-all duration-500 ease-out"
           style={{
-            width: `${Math.min(
-              100,
-              Math.max(2, maxPercentage > 0 ? (result.percentage / maxPercentage) * 100 : result.percentage)
-            )}%`,
+            width: `${result.count === 0 ? 0 : Math.min(100, Math.max(1.5, result.percentage))}%`,
           }}
         />
       </div>
