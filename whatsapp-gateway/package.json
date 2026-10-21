@@ -1,0 +1,16 @@
+{
+  "name": "mera-vote-whatsapp-gateway",
+  "version": "1.0.0",
+  "description": "Lightweight 100% free Baileys WhatsApp OTP Gateway for Mera Vote",
+  "main": "server.mjs",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
+    "express": "^4.21.2",
+    "pino": "^9.6.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}

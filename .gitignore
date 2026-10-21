@@ -43,3 +43,9 @@ next-env.d.ts
 
 # local persistent ledgers
 /.data/
+
+# WhatsApp Baileys session credentials (keep strictly private)
+baileys_auth_info/
+whatsapp-gateway/baileys_auth_info/
+whatsapp-gateway/node_modules/
+
