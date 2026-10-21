@@ -210,7 +210,7 @@ export function HomeClient() {
                       key={p.id}
                       className="p-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-2"
                     >
-                      <div className="w-7 h-7 rounded-lg bg-white p-0.5 flex items-center justify-center shrink-0 border border-[var(--border-glass)] shadow-2xs overflow-hidden">
+                      <div className="w-10 h-10 rounded-xl bg-white p-0.5 flex items-center justify-center shrink-0 border border-[var(--border-glass)] shadow-2xs overflow-hidden">
                         {p.logo_url && (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img src={p.logo_url} alt={p.name_en} className="w-full h-full object-contain" />
@@ -309,7 +309,7 @@ export function HomeClient() {
                         key={p.id}
                         className="p-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-2"
                       >
-                        <div className="w-7 h-7 rounded-lg bg-white p-0.5 flex items-center justify-center shrink-0 border border-[var(--border-glass)] shadow-2xs overflow-hidden">
+                        <div className="w-10 h-10 rounded-xl bg-white p-0.5 flex items-center justify-center shrink-0 border border-[var(--border-glass)] shadow-2xs overflow-hidden">
                           {p.logo_url && (
                             /* eslint-disable-next-line @next/next/no-img-element */
                             <img src={p.logo_url} alt={p.name_en} className="w-full h-full object-contain" />

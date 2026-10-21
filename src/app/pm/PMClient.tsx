@@ -131,13 +131,13 @@ export function PMClient() {
                         key={party.id}
                         className="p-3 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-3 shadow-xs"
                       >
-                        <div className="w-12 h-12 rounded-xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1.5 flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-xs overflow-hidden">
                           {party.logo_url ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
                             <img
                               src={party.logo_url}
                               alt={party.name_en}
-                              className="w-full h-full object-contain"
+                              className="w-full h-full object-contain drop-shadow-2xs"
                               loading="lazy"
                             />
                           ) : (

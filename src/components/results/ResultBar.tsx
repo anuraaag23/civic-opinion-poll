@@ -21,18 +21,18 @@ export function ResultBar({ result, maxPercentage }: ResultBarProps) {
       <div className="flex items-center justify-between gap-4">
         {/* Party Identity */}
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-9 h-9 rounded-lg p-1.5 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl p-1 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden shadow-xs hover:scale-105 transition-transform">
             {result.logo_url && !imgError ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={result.logo_url}
                 alt={result.party_short_name}
-                className="w-full h-full object-contain"
+                className="w-full h-full object-contain drop-shadow-2xs"
                 onError={() => setImgError(true)}
               />
             ) : (
               <div
-                className="w-full h-full flex items-center justify-center"
+                className="w-full h-full flex items-center justify-center p-0.5"
                 dangerouslySetInnerHTML={{ __html: result.symbol_svg }}
               />
             )}

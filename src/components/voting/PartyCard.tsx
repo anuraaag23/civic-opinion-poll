@@ -52,9 +52,9 @@ export function PartyCard({
     >
       {/* Party Symbol & Information */}
       <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-        {/* Verified Authentic High-Quality Party Logo */}
+        {/* Verified Authentic High-Quality Party Logo - Highly Visible */}
         <div
-          className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl p-1.5 sm:p-2 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 shadow-sm overflow-hidden"
+          className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl p-1 sm:p-1.5 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 shadow-sm overflow-hidden"
           title={symbolAlt}
         >
           {party.logo_url && !imgError ? (
@@ -62,7 +62,7 @@ export function PartyCard({
             <img
               src={party.logo_url}
               alt={symbolAlt}
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain drop-shadow-xs"
               loading="lazy"
               onError={() => setImgError(true)}
             />

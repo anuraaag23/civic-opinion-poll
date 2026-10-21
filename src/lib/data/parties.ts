@@ -79,7 +79,7 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Aam Aadmi Party',
     name_hi: 'आम आदमी पार्टी',
     short_name: 'AAP',
-    logo_url: '/parties/aap.jpg',
+    logo_url: '/parties/aap.png',
     color: '#0284C7',
     candidate_name_en: 'Arvind Kejriwal',
     candidate_name_hi: 'अरविंद केजरीवाल',
@@ -102,7 +102,7 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Bahujan Samaj Party',
     name_hi: 'बहुजन समाज पार्टी',
     short_name: 'BSP',
-    logo_url: '/parties/bsp.jpg',
+    logo_url: '/parties/bsp.png',
     color: '#1D4ED8',
     candidate_name_en: 'Mayawati',
     candidate_name_hi: 'मायावती',
@@ -125,7 +125,7 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Communist Party of India (Marxist)',
     name_hi: 'भारत की कम्युनिस्ट पार्टी (मार्क्सवादी)',
     short_name: 'CPI(M)',
-    logo_url: '/parties/cpim.jpg',
+    logo_url: '/parties/cpim.png',
     color: '#DC2626',
     candidate_name_en: 'Left Front Leadership',
     candidate_name_hi: 'वाम मोर्चा नेतृत्व',
@@ -172,17 +172,23 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Other Registered State Parties / Independents',
     name_hi: 'अन्य पंजीकृत राज्य दल / निर्दलीय',
     short_name: 'Others',
-    logo_url: '/parties/others.svg',
+    logo_url: '/parties/others.png',
     color: '#64748B',
     candidate_name_en: 'Independent / Other PM Nominee',
     candidate_name_hi: 'निर्दलीय / अन्य प्रधानमंत्री प्रत्याशी',
     candidate_role_en: 'PM Candidate',
     candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
-    symbol_alt_en: 'Civic Scale - Other Parties and Independent Candidates',
-    symbol_alt_hi: 'संतुलन तराजू - अन्य दल एवं निर्दलीय उम्मीदवार',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-slate-600">
-      <line x1="32" y1="12" x2="32" y2="50" stroke="currentColor" stroke-width="2.5"/>
-      <line x1="16" y1="22" x2="48" y2="22" stroke="currentColor" stroke-width="2.5"/>
+    symbol_alt_en: 'Election Ballot Box & Vote - Other Parties & Independent Candidates',
+    symbol_alt_hi: 'मतपेटी एवं मतपत्र - अन्य पंजीकृत दल व निर्दलीय उम्मीदवार',
+    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-slate-700">
+      <circle cx="32" cy="32" r="30" fill="#1e293b"/>
+      <rect x="18" y="28" width="28" height="22" rx="3" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
+      <rect x="15" y="25" width="34" height="5" rx="1.5" fill="#475569" stroke="#cbd5e1" stroke-width="1"/>
+      <rect x="25" y="11" width="14" height="15" rx="1.5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
+      <line x1="28" y1="14" x2="36" y2="14" stroke="#94a3b8" stroke-width="1"/>
+      <line x1="28" y1="17" x2="36" y2="17" stroke="#94a3b8" stroke-width="1"/>
+      <path d="M29 22 L32 25 L36 19" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="32" y="42" text-anchor="middle" fill="#f1f5f9" font-family="system-ui, sans-serif" font-size="6" font-weight="bold">OTH</text>
     </svg>`,
     description_en: 'All other recognized state parties and independent civic candidates.',
     description_hi: 'अन्य सभी मान्यता प्राप्त राज्य स्तरीय दल एवं निर्दलीय उम्मीदवार।',
@@ -201,12 +207,16 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_name_hi: 'इनमें से कोई नहीं',
     candidate_role_en: 'Rejection Choice',
     candidate_role_hi: 'अस्वीकृति विकल्प',
-    symbol_alt_en: 'Ballot stamp with cross - NOTA Civic Expression',
-    symbol_alt_hi: 'मतपत्र पर क्रॉस - नोटा नागरिक अभिव्यक्ति',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-stone-600">
-      <rect x="14" y="14" width="36" height="36" rx="6" stroke="currentColor" stroke-width="2.5"/>
-      <line x1="22" y1="22" x2="42" y2="42" stroke="currentColor" stroke-width="3"/>
-      <line x1="42" y1="22" x2="22" y2="42" stroke="currentColor" stroke-width="3"/>
+    symbol_alt_en: 'Ballot Stamp with Cross - NOTA Official Civic Option',
+    symbol_alt_hi: 'मतपत्र पर क्रॉस - नोटा आधिकारिक नागरिक अभिव्यक्ति',
+    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-stone-700">
+      <rect x="12" y="10" width="40" height="44" rx="4" fill="#ffffff" stroke="#334155" stroke-width="2.5"/>
+      <line x1="18" y1="20" x2="46" y2="20" stroke="#cbd5e1" stroke-width="2"/>
+      <line x1="18" y1="27" x2="46" y2="27" stroke="#cbd5e1" stroke-width="2"/>
+      <line x1="18" y1="34" x2="46" y2="34" stroke="#cbd5e1" stroke-width="2"/>
+      <line x1="18" y1="41" x2="46" y2="41" stroke="#cbd5e1" stroke-width="2"/>
+      <line x1="16" y1="14" x2="48" y2="50" stroke="#dc2626" stroke-width="4.5" stroke-linecap="round"/>
+      <line x1="48" y1="14" x2="16" y2="50" stroke="#dc2626" stroke-width="4.5" stroke-linecap="round"/>
     </svg>`,
     description_en: 'Civic expression of not supporting any listed political option.',
     description_hi: 'सूचीबद्ध किसी भी राजनीतिक विकल्प का समर्थन न करने की नागरिक अभिव्यक्ति।',

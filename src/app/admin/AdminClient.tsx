@@ -1950,7 +1950,7 @@ export function AdminClient() {
                       className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center justify-between gap-3 shadow-sm relative group"
                     >
                       <div className="flex items-center gap-3.5 min-w-0">
-                        <div className="w-12 h-12 rounded-xl p-1 bg-[var(--bg-primary)] border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden">
+                        <div className="w-14 h-14 rounded-2xl p-1 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden shadow-xs">
                           {party.logo_url ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
                             <img src={party.logo_url} alt={party.name_en} className="w-full h-full object-contain" />
@@ -2804,7 +2804,7 @@ export function AdminClient() {
                                 }}
                                 className="rounded text-[var(--accent)] focus:ring-[var(--accent)] shrink-0"
                               />
-                              <div className="w-5 h-5 rounded bg-white border border-[var(--border-glass)] p-0.5 flex items-center justify-center shrink-0 overflow-hidden">
+                              <div className="w-7 h-7 rounded-lg bg-white border border-[var(--border-glass)] p-0.5 flex items-center justify-center shrink-0 overflow-hidden shadow-2xs">
                                 {party.logo_url ? (
                                   /* eslint-disable-next-line @next/next/no-img-element */
                                   <img src={party.logo_url} alt={party.name_en} className="w-full h-full object-contain" />

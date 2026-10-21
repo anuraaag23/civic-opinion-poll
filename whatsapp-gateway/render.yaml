@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: meravote-whatsapp-gateway
+    env: node
+    plan: free
+    region: singapore
+    buildCommand: npm install
+    startCommand: node server.mjs
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: WHATSAPP_BAILEYS_API_KEY
+        generateValue: true

@@ -55,7 +55,7 @@ const DEFAULT_TOP_PARTIES: LeaderboardItem[] = [
     shortName: 'AAP',
     nameEn: 'Aam Aadmi Party',
     nameHi: 'आम आदमी पार्टी',
-    logoUrl: '/parties/aap.jpg',
+    logoUrl: '/parties/aap.png',
     color: '#0072B0',
     count: 11890,
     percentage: 9.3,
@@ -65,7 +65,7 @@ const DEFAULT_TOP_PARTIES: LeaderboardItem[] = [
     shortName: 'Others',
     nameEn: 'Other Parties & NOTA',
     nameHi: 'अन्य दल एवं नोटा',
-    logoUrl: '/parties/others.svg',
+    logoUrl: '/parties/others.png',
     color: '#64748B',
     count: 15220,
     percentage: 11.7,
@@ -195,8 +195,8 @@ export function HomeTopPollLiveResult() {
                       #{idx + 1}
                     </span>
 
-                    {/* Authentic Party Logo */}
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white p-1 flex items-center justify-center shrink-0 border border-[var(--border-glass)] shadow-2xs overflow-hidden">
+                    {/* Authentic Party Logo - High Visibility */}
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white p-1 flex items-center justify-center shrink-0 border border-[var(--border-glass)] shadow-xs overflow-hidden">
                       {item.logoUrl && !hasError ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
                         <img
@@ -206,7 +206,7 @@ export function HomeTopPollLiveResult() {
                           className="w-full h-full object-contain"
                         />
                       ) : (
-                        <Vote className="w-4 h-4 text-[var(--accent)]" />
+                        <Vote className="w-5 h-5 text-[var(--accent)]" />
                       )}
                     </div>
 
