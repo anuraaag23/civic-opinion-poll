@@ -20,8 +20,16 @@ export async function GET(
     // If state filter is requested (for CM poll)
     if (stateParam) {
       const stateParties = getPartiesForState(stateParam);
-      const partyIdSet = new Set(stateParties.map((p) => p.id));
-      const filteredOptions = poll.options.filter((opt) => partyIdSet.has(opt.party_id));
+      const partyMap = new Map(stateParties.map((p) => [p.id, p]));
+      const filteredOptions = poll.options
+        .filter((opt) => partyMap.has(opt.party_id))
+        .map((opt) => {
+          const sp = partyMap.get(opt.party_id);
+          return {
+            ...opt,
+            party: sp ? { ...sp } : opt.party,
+          };
+        });
 
       const stateInfo = getStateById(stateParam);
 

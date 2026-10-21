@@ -14,7 +14,7 @@ import { NATIONAL_PARTIES, getPartiesForState, getStateById } from '@/lib/data/p
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { GlassBadge } from '@/components/ui/GlassBadge';
-import { ArrowRight, BarChart3, ShieldCheck, Users, Clock, Vote, Globe, Building2, MapPin } from 'lucide-react';
+import { ArrowRight, BarChart3, ShieldCheck, Users, Clock, Vote, Globe, Building2, MapPin, Calendar } from 'lucide-react';
 
 export function HomeClient() {
   const { t, language } = useI18n();
@@ -147,10 +147,16 @@ export function HomeClient() {
                   <Globe className="w-3.5 h-3.5 text-blue-700 dark:text-blue-300 shrink-0" />
                   <span>{language === 'hi' ? '1. प्रधानमंत्री (PM) वर्ग' : '1. Prime Minister (PM) Section'}</span>
                 </div>
-                <GlassBadge variant="neutral">
-                  <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
-                  <span>{language === 'hi' ? 'संपूर्ण भारत' : 'India Only'}</span>
-                </GlassBadge>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <GlassBadge variant="neutral">
+                    <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+                    <span>{language === 'hi' ? 'संपूर्ण भारत' : 'India Only'}</span>
+                  </GlassBadge>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                    <Calendar className="w-3 h-3" />
+                    <span>{language === 'hi' ? 'अक्टूबर 2026' : 'October 2026'}</span>
+                  </span>
+                </div>
               </div>
 
               <div>
@@ -210,7 +216,14 @@ export function HomeClient() {
                           <img src={p.logo_url} alt={p.name_en} className="w-full h-full object-contain" />
                         )}
                       </div>
-                      <span className="text-xs font-bold text-[var(--text-primary)] truncate">{p.short_name}</span>
+                      <div className="min-w-0">
+                        <span className="text-xs font-bold text-[var(--text-primary)] block truncate">{p.short_name}</span>
+                        {(p.candidate_name_en || p.candidate_name_hi) && (
+                          <span className="text-[10px] text-[var(--accent)] font-semibold block truncate">
+                            {language === 'hi' ? p.candidate_name_hi || p.candidate_name_en : p.candidate_name_en}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -247,10 +260,16 @@ export function HomeClient() {
                   <Building2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-300 shrink-0" />
                   <span>{language === 'hi' ? '2. मुख्यमंत्री (CM) वर्ग' : '2. Chief Minister (CM) Section'}</span>
                 </div>
-                <GlassBadge variant="neutral">
-                  <MapPin className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                  <span>{language === 'hi' ? 'राज्यवार चयन' : 'State-by-State'}</span>
-                </GlassBadge>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <GlassBadge variant="neutral">
+                    <MapPin className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    <span>{language === 'hi' ? 'राज्यवार चयन' : 'State-by-State'}</span>
+                  </GlassBadge>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                    <Calendar className="w-3 h-3" />
+                    <span>{language === 'hi' ? 'अक्टूबर 2026' : 'October 2026'}</span>
+                  </span>
+                </div>
               </div>
 
               <div>
@@ -296,7 +315,14 @@ export function HomeClient() {
                             <img src={p.logo_url} alt={p.name_en} className="w-full h-full object-contain" />
                           )}
                         </div>
-                        <span className="text-xs font-bold text-[var(--text-primary)] truncate">{p.short_name}</span>
+                        <div className="min-w-0">
+                        <span className="text-xs font-bold text-[var(--text-primary)] block truncate">{p.short_name}</span>
+                        {(p.candidate_name_en || p.candidate_name_hi) && (
+                          <span className="text-[10px] text-[var(--accent)] font-semibold block truncate">
+                            {language === 'hi' ? p.candidate_name_hi || p.candidate_name_en : p.candidate_name_en}
+                          </span>
+                        )}
+                      </div>
                       </div>
                     ))}
                   </div>

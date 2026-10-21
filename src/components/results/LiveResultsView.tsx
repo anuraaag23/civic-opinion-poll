@@ -26,6 +26,7 @@ import {
   Globe,
   Building2,
   MapPin,
+  Calendar,
 } from 'lucide-react';
 
 interface LiveResultsViewProps {
@@ -61,6 +62,13 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
   const [scope, setScope] = useState<'PM' | 'CM'>(initialStateParam ? 'CM' : 'PM');
   const [selectedStateId, setSelectedStateId] = useState<string>(initialStateParam || 'uttar-pradesh');
 
+  // Timeframe Filter: 7 Days / Month / Year / All Time
+  const [timeframe, setTimeframe] = useState<'7d' | 'month' | 'year' | 'all'>('all');
+  const [timeframeLabelEn, setTimeframeLabelEn] = useState<string>('All Time (Cumulative Tally)');
+  const [timeframeLabelHi, setTimeframeLabelHi] = useState<string>('कुल परिणाम (समग्र गणना)');
+  const [pollMonth, setPollMonth] = useState<string>('October');
+  const [pollYear, setPollYear] = useState<number>(2026);
+
   const [results, setResults] = useState<OptionResult[]>([]);
   const [totalResponses, setTotalResponses] = useState<number>(0);
   const [updatedAt, setUpdatedAt] = useState<string>('');
@@ -78,8 +86,8 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
     try {
       const endpoint =
         scope === 'PM'
-          ? `/api/polls/${pollIdOrSlug || 'poll-national-2029'}/results`
-          : `/api/polls/poll-state-cm-2029/results?state=${selectedStateId}`;
+          ? `/api/polls/${pollIdOrSlug || 'poll-national-2029'}/results?timeframe=${timeframe}`
+          : `/api/polls/poll-state-cm-2029/results?state=${selectedStateId}&timeframe=${timeframe}`;
 
       const res = await fetch(endpoint);
       const data = await res.json();
@@ -90,13 +98,17 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
         setPollTitleEn(data.pollTitleEn);
         setPollTitleHi(data.pollTitleHi);
         setPollStatus(data.status);
+        if (data.timeframeLabelEn) setTimeframeLabelEn(data.timeframeLabelEn);
+        if (data.timeframeLabelHi) setTimeframeLabelHi(data.timeframeLabelHi);
+        if (data.pollMonth) setPollMonth(data.pollMonth);
+        if (data.pollYear) setPollYear(data.pollYear);
       }
     } catch (err) {
       console.error('Failed to fetch results', err);
     } finally {
       setIsLoading(false);
     }
-  }, [scope, selectedStateId, pollIdOrSlug]);
+  }, [scope, selectedStateId, pollIdOrSlug, timeframe]);
 
   const handleManualRefresh = async () => {
     setIsRefreshing(true);
@@ -115,8 +127,8 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
 
     const endpoint =
       scope === 'PM'
-        ? `/api/polls/${pollIdOrSlug || 'poll-national-2029'}/results`
-        : `/api/polls/poll-state-cm-2029/results?state=${selectedStateId}`;
+        ? `/api/polls/${pollIdOrSlug || 'poll-national-2029'}/results?timeframe=${timeframe}`
+        : `/api/polls/poll-state-cm-2029/results?state=${selectedStateId}&timeframe=${timeframe}`;
 
     fetch(endpoint)
       .then((res) => res.json())
@@ -128,6 +140,10 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
           setPollTitleEn(data.pollTitleEn);
           setPollTitleHi(data.pollTitleHi);
           setPollStatus(data.status);
+          if (data.timeframeLabelEn) setTimeframeLabelEn(data.timeframeLabelEn);
+          if (data.timeframeLabelHi) setTimeframeLabelHi(data.timeframeLabelHi);
+          if (data.pollMonth) setPollMonth(data.pollMonth);
+          if (data.pollYear) setPollYear(data.pollYear);
           setIsLoading(false);
         }
       })
@@ -149,7 +165,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
       clearInterval(interval);
       clearInterval(tickerTimer);
     };
-  }, [loadResults, scope, selectedStateId, pollIdOrSlug]);
+  }, [loadResults, scope, selectedStateId, pollIdOrSlug, timeframe]);
 
   const maxPercentage = Math.max(...results.map((r) => r.percentage), 1);
   const pollTitle = language === 'hi' ? pollTitleHi : pollTitleEn;
@@ -262,6 +278,10 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
               {currentState ? `${currentState.name_en} (${currentState.code})` : 'State Level'}
             </span>
           )}
+          <span className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-600 dark:text-amber-400 px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30">
+            <Calendar className="w-3 h-3 shrink-0" />
+            <span>{language === 'hi' ? `${pollMonth} ${pollYear} (वर्ष: ${pollYear})` : `${pollMonth} ${pollYear} (Year: ${pollYear})`}</span>
+          </span>
         </div>
 
         <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
@@ -276,6 +296,41 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
             ? `${currentState?.name_hi || 'राज्य'} विधानसभा के लिए पंजीकृत दलों का वास्तविक समय जनमत वितरण।`
             : `Real-time public opinion distribution among active parties contesting in ${currentState?.name_en || 'this state'}.`}
         </p>
+      </div>
+
+      {/* ── TIMEFRAME SELECTOR: 7 Days / Monthly / Yearly / All Time ── */}
+      <div className="p-3 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2.5 shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 px-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-secondary)] flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+            <span>{language === 'hi' ? 'समय अवधि परिणाम (Timeframe Analytics):' : 'Timeframe Analytics:'}</span>
+          </span>
+          <span className="text-[11px] font-bold text-[var(--accent)] px-2 py-0.5 rounded bg-[var(--accent-soft)] self-start sm:self-auto">
+            {language === 'hi' ? timeframeLabelHi : timeframeLabelEn}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { id: '7d', labelEn: '⚡ Last 7 Days', labelHi: '⚡ पिछले 7 दिन' },
+            { id: 'month', labelEn: '📅 This Month (Oct)', labelHi: '📅 इस माह (अक्टूबर)' },
+            { id: 'year', labelEn: '🏛️ Yearly (2026)', labelHi: '🏛️ वर्ष 2026' },
+            { id: 'all', labelEn: '📊 All Time', labelHi: '📊 कुल परिणाम' },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setTimeframe(tab.id as any)}
+              className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+                timeframe === tab.id
+                  ? 'bg-[var(--accent)] text-white shadow-sm ring-1 ring-[var(--accent)] scale-[1.02]'
+                  : 'bg-[var(--bg-primary)]/70 text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-primary)] border border-[var(--border-glass)]'
+              }`}
+            >
+              <span>{language === 'hi' ? tab.labelHi : tab.labelEn}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Mandatory Non-Affiliation Disclaimer */}

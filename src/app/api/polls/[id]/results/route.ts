@@ -14,14 +14,31 @@ export async function GET(
       return NextResponse.json({ success: false, error: 'Poll not found' }, { status: 404 });
     }
 
-    const results = await db.getPollResults(poll.id);
     const searchParams = request.nextUrl.searchParams;
+    const rawTimeframe = searchParams.get('timeframe');
+    const timeframe: '7d' | 'month' | 'year' | 'all' =
+      rawTimeframe === '7d' || rawTimeframe === 'month' || rawTimeframe === 'year'
+        ? rawTimeframe
+        : 'all';
+
+    const results = await db.getPollResults(poll.id, timeframe);
     const stateParam = searchParams.get('state');
 
     if (stateParam && results) {
       const stateParties = getPartiesForState(stateParam);
-      const partyIdSet = new Set(stateParties.map((p) => p.id));
-      const stateResults = results.results.filter((r) => partyIdSet.has(r.party_id));
+      const partyMap = new Map(stateParties.map((p) => [p.id, p]));
+      const stateResults = results.results
+        .filter((r) => partyMap.has(r.party_id))
+        .map((r) => {
+          const sp = partyMap.get(r.party_id);
+          return {
+            ...r,
+            candidate_name_en: sp?.candidate_name_en || r.candidate_name_en,
+            candidate_name_hi: sp?.candidate_name_hi || r.candidate_name_hi,
+            candidate_role_en: sp?.candidate_role_en || 'CM Candidate',
+            candidate_role_hi: sp?.candidate_role_hi || 'मुख्यमंत्री प्रत्याशी',
+          };
+        });
 
       const stateTotal = stateResults.reduce((acc, r) => acc + r.count, 0);
       const recalculated = stateResults.map((r) => ({
@@ -36,6 +53,11 @@ export async function GET(
         totalResponses: stateTotal,
         results: recalculated,
         updatedAt: results.updated_at,
+        timeframe,
+        timeframeLabelEn: results.timeframe_label_en,
+        timeframeLabelHi: results.timeframe_label_hi,
+        pollMonth: results.poll_month || 'October',
+        pollYear: results.poll_year || 2026,
         pollTitleEn: stateInfo ? `Chief Minister (CM) Poll Results — ${stateInfo.name_en}` : poll.title_en,
         pollTitleHi: stateInfo ? `मुख्यमंत्री (CM) सर्वेक्षण परिणाम — ${stateInfo.name_hi}` : poll.title_hi,
         status: poll.status,
@@ -48,6 +70,11 @@ export async function GET(
       totalResponses: results?.total_responses || 0,
       results: results?.results || [],
       updatedAt: results?.updated_at || new Date().toISOString(),
+      timeframe,
+      timeframeLabelEn: results?.timeframe_label_en,
+      timeframeLabelHi: results?.timeframe_label_hi,
+      pollMonth: results?.poll_month || 'October',
+      pollYear: results?.poll_year || 2026,
       pollTitleEn: poll.title_en,
       pollTitleHi: poll.title_hi,
       status: poll.status,

@@ -1,24 +1,26 @@
 import { Poll } from '../types';
-import { NATIONAL_PARTIES, ALL_PARTIES } from './parties';
+import { getPartiesForPM, ALL_PARTIES } from './parties';
 
 export const INITIAL_POLLS: Poll[] = [
   {
     id: 'poll-national-2029',
     slug: 'pm-election-poll-2029',
-    title_en: 'Prime Minister (PM) Poll — All India (Lok Sabha)',
-    title_hi: 'प्रधानमंत्री (PM) जनमत सर्वेक्षण — संपूर्ण भारत (लोकसभा)',
+    title_en: 'Prime Minister (PM) Poll — October 2026 Edition (Lok Sabha)',
+    title_hi: 'प्रधानमंत्री (PM) जनमत सर्वेक्षण — अक्टूबर 2026 संस्करण (लोकसभा)',
     description_en:
-      'All-India national opinion poll examining voter sentiment across the country for the Prime Minister election. Features national political parties contesting across India.',
+      'All-India national opinion poll examining voter sentiment across the country for the Prime Minister election. Features Prime Ministerial candidates and parties contesting across India.',
     description_hi:
-      'संपूर्ण भारत के लिए राष्ट्रीय जनमत सर्वेक्षण जो प्रधानमंत्री पद के लिए नागरिक रुझानों का आकलन करता है। संपूर्ण भारत में चुनाव लड़ने वाले राष्ट्रीय दल।',
+      'संपूर्ण भारत के लिए राष्ट्रीय जनमत सर्वेक्षण जो प्रधानमंत्री पद के प्रत्याशियों और नागरिक रुझानों का आकलन करता है।',
     status: 'LIVE',
     start_at: '2026-01-01T00:00:00Z',
     end_at: '2029-12-31T23:59:59Z',
     results_visibility: 'PUBLIC',
     total_votes: 128420,
+    poll_month: 'October',
+    poll_year: 2026,
     created_at: '2026-01-01T00:00:00Z',
-    updated_at: '2026-10-16T12:00:00Z',
-    options: NATIONAL_PARTIES.map((party, index) => ({
+    updated_at: '2026-10-21T11:00:00Z',
+    options: getPartiesForPM().map((party, index) => ({
       id: `opt-${party.id}`,
       poll_id: 'poll-national-2029',
       party_id: party.id,
@@ -30,8 +32,8 @@ export const INITIAL_POLLS: Poll[] = [
   {
     id: 'poll-state-cm-2029',
     slug: 'cm-state-assembly-poll',
-    title_en: 'Chief Minister (CM) Poll — State Assemblies (Vidhan Sabha)',
-    title_hi: 'मुख्यमंत्री (CM) जनमत सर्वेक्षण — राज्य विधानसभाएं',
+    title_en: 'Chief Minister (CM) Poll — October 2026 Edition (State Assemblies)',
+    title_hi: 'मुख्यमंत्री (CM) जनमत सर्वेक्षण — अक्टूबर 2026 संस्करण (विधानसभा)',
     description_en:
       'State-specific legislative assembly poll examining citizen preferences for the Chief Minister election based on your selected Indian state and its active regional parties.',
     description_hi:
@@ -41,8 +43,10 @@ export const INITIAL_POLLS: Poll[] = [
     end_at: '2029-12-31T23:59:59Z',
     results_visibility: 'PUBLIC',
     total_votes: 94810,
+    poll_month: 'October',
+    poll_year: 2026,
     created_at: '2026-01-01T00:00:00Z',
-    updated_at: '2026-10-16T12:00:00Z',
+    updated_at: '2026-10-21T11:00:00Z',
     options: ALL_PARTIES.map((party, index) => ({
       id: `opt-cm-${party.id}`,
       poll_id: 'poll-state-cm-2029',

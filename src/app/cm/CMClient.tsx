@@ -14,7 +14,7 @@ import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ShieldCheck, Vote, Loader2, BarChart3, Lock, ArrowRight, MapPin, Building2 } from 'lucide-react';
+import { ShieldCheck, Vote, Loader2, BarChart3, Lock, ArrowRight, MapPin, Building2, Calendar } from 'lucide-react';
 
 type FlowStep = 'RULES' | 'VERIFY' | 'VOTE' | 'SUCCESS' | 'DUPLICATE';
 
@@ -105,6 +105,10 @@ export function CMClient() {
           <GlassBadge variant="success">
             <span className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
             <span>{language === 'hi' ? 'राज्यवार लाइव सर्वेक्षण' : 'State-by-State Active Poll'}</span>
+          </GlassBadge>
+          <GlassBadge variant="accent">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{language === 'hi' ? 'अक्टूबर 2026 (वर्ष: 2026)' : 'October 2026 (Year: 2026)'}</span>
           </GlassBadge>
           <GlassBadge variant="neutral">
             <MapPin className="w-3 h-3 text-[var(--accent)]" />
@@ -221,15 +225,24 @@ export function CMClient() {
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block mb-0.5">
-                            {party.short_name}
-                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                            <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block">
+                              {party.short_name}
+                            </span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+                              {language === 'hi' ? 'CM प्रत्याशी' : 'CM Candidate'}
+                            </span>
+                          </div>
                           <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] leading-snug break-words">
                             {language === 'hi' ? party.name_hi : party.name_en}
                           </h3>
-                          <span className="text-xs text-[var(--text-tertiary)] block mt-0.5">
-                            {language === 'hi' ? party.symbol_alt_hi.split('-')[0] : party.symbol_alt_en.split('-')[0]}
-                          </span>
+                          {(party.candidate_name_en || party.candidate_name_hi) && (
+                            <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 block truncate pt-0.5">
+                              {language === 'hi'
+                                ? `प्रत्याशी: ${party.candidate_name_hi || party.candidate_name_en}`
+                                : `Candidate: ${party.candidate_name_en}`}
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}

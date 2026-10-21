@@ -13,7 +13,7 @@ import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ShieldCheck, Vote, Loader2, BarChart3, Lock, ArrowRight, Globe } from 'lucide-react';
+import { ShieldCheck, Vote, Loader2, BarChart3, Lock, ArrowRight, Globe, Calendar } from 'lucide-react';
 
 type FlowStep = 'RULES' | 'VERIFY' | 'VOTE' | 'SUCCESS' | 'DUPLICATE';
 
@@ -67,6 +67,10 @@ export function PMClient() {
           <GlassBadge variant="success">
             <span className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
             <span>{language === 'hi' ? 'सक्रिय राष्ट्रीय सर्वेक्षण' : 'Live National Poll'}</span>
+          </GlassBadge>
+          <GlassBadge variant="accent">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>{language === 'hi' ? 'अक्टूबर 2026 (वर्ष: 2026)' : 'October 2026 (Year: 2026)'}</span>
           </GlassBadge>
           <GlassBadge variant="neutral">
             <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
@@ -144,12 +148,24 @@ export function PMClient() {
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
-                          <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block mb-0.5">
-                            {party.short_name}
-                          </span>
+                          <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                            <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] inline-block">
+                              {party.short_name}
+                            </span>
+                            <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30">
+                              {language === 'hi' ? 'PM प्रत्याशी' : 'PM Candidate'}
+                            </span>
+                          </div>
                           <h3 className="text-xs sm:text-sm font-bold text-[var(--text-primary)] leading-snug break-words">
                             {language === 'hi' ? party.name_hi : party.name_en}
                           </h3>
+                          {(party.candidate_name_en || party.candidate_name_hi) && (
+                            <span className="text-[11px] font-semibold text-[var(--accent)] block truncate pt-0.5">
+                              {language === 'hi'
+                                ? `प्रत्याशी: ${party.candidate_name_hi || party.candidate_name_en}`
+                                : `Candidate: ${party.candidate_name_en}`}
+                            </span>
+                          )}
                         </div>
                       </div>
                     ))}

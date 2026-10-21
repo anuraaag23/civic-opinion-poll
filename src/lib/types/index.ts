@@ -11,6 +11,10 @@ export interface Party {
   symbol_svg: string; // Clean, legally permitted SVG or asset path
   logo_url?: string;  // High-res authentic SVG logo path in public/parties/
   color?: string;     // Primary brand color
+  candidate_name_en?: string; // Leader / PM Candidate / CM Candidate
+  candidate_name_hi?: string;
+  candidate_role_en?: string; // e.g. "PM Candidate" or "CM Candidate"
+  candidate_role_hi?: string; // e.g. "प्रधानमंत्री प्रत्याशी" or "मुख्यमंत्री प्रत्याशी"
   symbol_alt_en: string;
   symbol_alt_hi: string;
   description_en: string;
@@ -43,6 +47,8 @@ export interface Poll {
   voting_policy?: 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES';
   max_votes_per_citizen?: number;
   total_votes: number;
+  poll_month?: string;
+  poll_year?: number;
   options: PollOption[];
   created_at: string;
   updated_at: string;
@@ -86,6 +92,10 @@ export interface OptionResult {
   symbol_svg: string;
   logo_url?: string;
   color?: string;
+  candidate_name_en?: string;
+  candidate_name_hi?: string;
+  candidate_role_en?: string;
+  candidate_role_hi?: string;
   count: number;
   percentage: number;
 }
@@ -97,6 +107,11 @@ export interface PollResults {
   status: PollStatus;
   total_responses: number;
   updated_at: string;
+  timeframe?: '7d' | 'month' | 'year' | 'all';
+  timeframe_label_en?: string;
+  timeframe_label_hi?: string;
+  poll_month?: string;
+  poll_year?: number;
   results: OptionResult[];
 }
 

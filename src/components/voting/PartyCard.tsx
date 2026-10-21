@@ -75,15 +75,32 @@ export function PartyCard({
         </div>
 
         {/* Text Metadata */}
-        <div className="space-y-0.5 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
+        <div className="space-y-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-[var(--border-glass)] text-[var(--text-secondary)]">
               {party.short_name}
             </span>
+            {party.candidate_role_en && (
+              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30">
+                {language === 'hi' ? party.candidate_role_hi || party.candidate_role_en : party.candidate_role_en}
+              </span>
+            )}
           </div>
           <h3 className="text-sm sm:text-base font-bold text-[var(--text-primary)] leading-snug">
             {partyName}
           </h3>
+          {(party.candidate_name_en || party.candidate_name_hi) && (
+            <div className="text-xs font-semibold text-[var(--accent)] flex items-center gap-1.5 pt-0.5">
+              <span className="text-[11px] text-[var(--text-secondary)] font-normal">
+                {language === 'hi' ? 'उम्मीदवार:' : 'Candidate:'}
+              </span>
+              <span className="truncate font-bold">
+                {language === 'hi'
+                  ? party.candidate_name_hi || party.candidate_name_en
+                  : party.candidate_name_en}
+              </span>
+            </div>
+          )}
         </div>
       </div>
 

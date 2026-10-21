@@ -1,4 +1,4 @@
-﻿import { Party } from '../types';
+import { Party } from '../types';
 export type { Party };
 
 export const NATIONAL_PARTIES: Party[] = [
@@ -7,8 +7,12 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Bharatiya Janata Party',
     name_hi: 'भारतीय जनता पार्टी',
     short_name: 'BJP',
-    logo_url: '/parties/bjp.svg',
+    logo_url: '/parties/bjp.png',
     color: '#FF9933',
+    candidate_name_en: 'Narendra Modi',
+    candidate_name_hi: 'नरेंद्र मोदी',
+    candidate_role_en: 'PM Candidate',
+    candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Lotus - Official Election Symbol of Bharatiya Janata Party (BJP)',
     symbol_alt_hi: 'कमल - भारतीय जनता पार्टी (भाजपा) का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-orange-600">
@@ -29,8 +33,12 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Indian National Congress',
     name_hi: 'भारतीय राष्ट्रीय कांग्रेस',
     short_name: 'INC',
-    logo_url: '/parties/inc.svg',
+    logo_url: '/parties/inc.png',
     color: '#0EA5E9',
+    candidate_name_en: 'Rahul Gandhi / Mallikarjun Kharge',
+    candidate_name_hi: 'राहुल गांधी / मल्लिकार्जुन खरगे',
+    candidate_role_en: 'PM Candidate',
+    candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Hand - Official Election Symbol of Indian National Congress (INC)',
     symbol_alt_hi: 'हाथ का पंजा - भारतीय राष्ट्रीय कांग्रेस का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-cyan-700">
@@ -47,8 +55,12 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Samajwadi Party',
     name_hi: 'समाजवादी पार्टी',
     short_name: 'SP',
-    logo_url: '/parties/sp.svg',
+    logo_url: '/parties/sp.png',
     color: '#E11D48',
+    candidate_name_en: 'Akhilesh Yadav',
+    candidate_name_hi: 'अखिलेश यादव',
+    candidate_role_en: 'PM Candidate',
+    candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Bicycle - Official Election Symbol of Samajwadi Party (SP)',
     symbol_alt_hi: 'साइकिल - समाजवादी पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
@@ -67,8 +79,12 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Aam Aadmi Party',
     name_hi: 'आम आदमी पार्टी',
     short_name: 'AAP',
-    logo_url: '/parties/aap.svg',
+    logo_url: '/parties/aap.jpg',
     color: '#0284C7',
+    candidate_name_en: 'Arvind Kejriwal',
+    candidate_name_hi: 'अरविंद केजरीवाल',
+    candidate_role_en: 'PM Candidate',
+    candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Broom - Official Election Symbol of Aam Aadmi Party (AAP)',
     symbol_alt_hi: 'झाड़ू - आम आदमी पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-amber-700">
@@ -86,8 +102,12 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Bahujan Samaj Party',
     name_hi: 'बहुजन समाज पार्टी',
     short_name: 'BSP',
-    logo_url: '/parties/bsp.svg',
+    logo_url: '/parties/bsp.jpg',
     color: '#1D4ED8',
+    candidate_name_en: 'Mayawati',
+    candidate_name_hi: 'मायावती',
+    candidate_role_en: 'PM Candidate',
+    candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Elephant - Official Election Symbol of Bahujan Samaj Party (BSP)',
     symbol_alt_hi: 'हाथी - बहुजन समाज पार्टी का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-700">
@@ -105,8 +125,12 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'Communist Party of India (Marxist)',
     name_hi: 'भारत की कम्युनिस्ट पार्टी (मार्क्सवादी)',
     short_name: 'CPI(M)',
-    logo_url: '/parties/cpim.svg',
+    logo_url: '/parties/cpim.jpg',
     color: '#DC2626',
+    candidate_name_en: 'Left Front Leadership',
+    candidate_name_hi: 'वाम मोर्चा नेतृत्व',
+    candidate_role_en: 'PM Candidate',
+    candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Hammer, Sickle and Star - Official Symbol of CPI(M)',
     symbol_alt_hi: 'हथौड़ा, हंसिया और सितारा - माकपा का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
@@ -124,8 +148,12 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'All India Trinamool Congress',
     name_hi: 'सर्वभारतीय तृणमूल कांग्रेस',
     short_name: 'AITC',
-    logo_url: '/parties/tmc.svg',
+    logo_url: '/parties/tmc.png',
     color: '#10B981',
+    candidate_name_en: 'Mamata Banerjee',
+    candidate_name_hi: 'ममता बनर्जी',
+    candidate_role_en: 'PM Candidate',
+    candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Twin Flowers and Grass - Official Symbol of AITC',
     symbol_alt_hi: 'जोड़ा फूल और घास - तृणमूल कांग्रेस का आधिकारिक चुनाव चिह्न',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-emerald-600">
@@ -146,6 +174,10 @@ export const NATIONAL_PARTIES: Party[] = [
     short_name: 'Others',
     logo_url: '/parties/others.svg',
     color: '#64748B',
+    candidate_name_en: 'Independent / Other PM Nominee',
+    candidate_name_hi: 'निर्दलीय / अन्य प्रधानमंत्री प्रत्याशी',
+    candidate_role_en: 'PM Candidate',
+    candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Civic Scale - Other Parties and Independent Candidates',
     symbol_alt_hi: 'संतुलन तराजू - अन्य दल एवं निर्दलीय उम्मीदवार',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-slate-600">
@@ -163,8 +195,12 @@ export const NATIONAL_PARTIES: Party[] = [
     name_en: 'None of the Above (NOTA)',
     name_hi: 'इनमें से कोई नहीं (नोटा)',
     short_name: 'NOTA',
-    logo_url: '/parties/nota.svg',
+    logo_url: '/parties/nota.png',
     color: '#525252',
+    candidate_name_en: 'None of the Above',
+    candidate_name_hi: 'इनमें से कोई नहीं',
+    candidate_role_en: 'Rejection Choice',
+    candidate_role_hi: 'अस्वीकृति विकल्प',
     symbol_alt_en: 'Ballot stamp with cross - NOTA Civic Expression',
     symbol_alt_hi: 'मतपत्र पर क्रॉस - नोटा नागरिक अभिव्यक्ति',
     symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-stone-600">
@@ -841,6 +877,130 @@ export const INDIAN_STATES: IndianState[] = [
   },
 ];
 
+export const STATE_CM_CANDIDATES: Record<string, Record<string, { en: string; hi: string }>> = {
+  'uttar-pradesh': {
+    'party-bjp': { en: 'Yogi Adityanath', hi: 'योगी आदित्यनाथ' },
+    'party-sp': { en: 'Akhilesh Yadav', hi: 'अखिलेश यादव' },
+    'party-bsp': { en: 'Mayawati', hi: 'मायावती' },
+    'party-inc': { en: 'Ajay Rai', hi: 'अजय राय' },
+  },
+  'maharashtra': {
+    'party-bjp': { en: 'Devendra Fadnavis', hi: 'देवेंद्र फडणवीस' },
+    'party-shivsena': { en: 'Eknath Shinde', hi: 'एकनाथ शिंदे' },
+    'party-shivsena_ubt': { en: 'Uddhav Thackeray', hi: 'उद्धव ठाकरे' },
+    'party-ncp': { en: 'Ajit Pawar', hi: 'अजित पवार' },
+    'party-ncp_sp': { en: 'Sharad Pawar Choice', hi: 'शरद पवार समर्थित प्रत्याशी' },
+    'party-inc': { en: 'Nana Patole', hi: 'नाना पटोले' },
+  },
+  'west-bengal': {
+    'party-tmc': { en: 'Mamata Banerjee', hi: 'ममता बनर्जी' },
+    'party-bjp': { en: 'Suvendu Adhikari', hi: 'शुभेंदु अधिकारी' },
+    'party-cpim': { en: 'Mohammed Salim', hi: 'मोहम्मद सलीम' },
+    'party-inc': { en: 'Adhir Ranjan Chowdhury', hi: 'अधीर रंजन चौधरी' },
+  },
+  'bihar': {
+    'party-jdu': { en: 'Nitish Kumar', hi: 'नीतीश कुमार' },
+    'party-rjd': { en: 'Tejashwi Yadav', hi: 'तेजस्वी यादव' },
+    'party-bjp': { en: 'Samrat Choudhary', hi: 'सम्राट चौधरी' },
+    'party-ljp': { en: 'Chirag Paswan', hi: 'चिराग पासवान' },
+    'party-inc': { en: 'Akhilesh Prasad Singh', hi: 'अखिलेश प्रसाद सिंह' },
+  },
+  'delhi': {
+    'party-aap': { en: 'Arvind Kejriwal / Atishi', hi: 'अरविंद केजरीवाल / आतिशी' },
+    'party-bjp': { en: 'Virendra Sachdeva', hi: 'वीरेंद्र सचदेवा' },
+    'party-inc': { en: 'Devender Yadav', hi: 'देवेंद्र यादव' },
+  },
+  'tamil-nadu': {
+    'party-dmk': { en: 'M. K. Stalin', hi: 'एम. के. स्टालिन' },
+    'party-aiadmk': { en: 'Edappadi K. Palaniswami', hi: 'एडप्पाडी के. पलानीस्वामी' },
+    'party-bjp': { en: 'K. Annamalai', hi: 'के. अन्नामलाई' },
+    'party-inc': { en: 'K. Selvaperunthagai', hi: 'के. सेल्वापेरुन्थगई' },
+  },
+  'karnataka': {
+    'party-inc': { en: 'Siddaramaiah / D. K. Shivakumar', hi: 'सिद्धारमैया / डी. के. शिवकुमार' },
+    'party-bjp': { en: 'B. Y. Vijayendra', hi: 'बी. वाई. विजयेंद्र' },
+    'party-jds': { en: 'H. D. Kumaraswamy', hi: 'एच. डी. कुमारस्वामी' },
+  },
+  'andhra-pradesh': {
+    'party-tdp': { en: 'N. Chandrababu Naidu', hi: 'एन. चंद्रबाबू नायडू' },
+    'party-ysrcp': { en: 'Y. S. Jagan Mohan Reddy', hi: 'वाई. एस. जगन मोहन रेड्डी' },
+    'party-jsp': { en: 'Pawan Kalyan', hi: 'पवन कल्याण' },
+  },
+  'telangana': {
+    'party-inc': { en: 'A. Revanth Reddy', hi: 'ए. रेवंत रेड्डी' },
+    'party-brs': { en: 'K. Chandrashekar Rao (KCR)', hi: 'के. चंद्रशेखर राव' },
+    'party-bjp': { en: 'G. Kishan Reddy', hi: 'जी. किशन रेड्डी' },
+    'party-aimim': { en: 'Asaduddin Owaisi Choice', hi: 'असदुद्दीन ओवैसी समर्थित' },
+  },
+  'gujarat': {
+    'party-bjp': { en: 'Bhupendra Patel', hi: 'भूपेंद्र पटेल' },
+    'party-inc': { en: 'Shaktisinh Gohil', hi: 'शक्तिसिंह गोहिल' },
+    'party-aap': { en: 'Isudan Gadhvi', hi: 'ईसुदान गढ़वी' },
+  },
+  'rajasthan': {
+    'party-bjp': { en: 'Bhajan Lal Sharma', hi: 'भजन लाल शर्मा' },
+    'party-inc': { en: 'Ashok Gehlot / Sachin Pilot', hi: 'अशोक गहलोत / सचिन पायलट' },
+  },
+  'madhya-pradesh': {
+    'party-bjp': { en: 'Mohan Yadav', hi: 'मोहन यादव' },
+    'party-inc': { en: 'Jitu Patwari / Kamal Nath', hi: 'जीतू पटवारी / कमल नाथ' },
+  },
+  'punjab': {
+    'party-aap': { en: 'Bhagwant Mann', hi: 'भगवंत मान' },
+    'party-inc': { en: 'Amarinder Singh Raja Warring', hi: 'अमरिंदर सिंह राजा वड़िंग' },
+    'party-sad': { en: 'Sukhbir Singh Badal', hi: 'सुखबीर सिंह बादल' },
+    'party-bjp': { en: 'Sunil Jakhar', hi: 'सुनील जाखड़' },
+  },
+  'odisha': {
+    'party-bjp': { en: 'Mohan Charan Majhi', hi: 'मोहन चरण माझी' },
+    'party-bjd': { en: 'Naveen Patnaik', hi: 'नवीन पटनायक' },
+    'party-inc': { en: 'Sarat Pattanayak', hi: 'सरत पटनायक' },
+  },
+  'jharkhand': {
+    'party-jmm': { en: 'Hemant Soren', hi: 'हेमंत सोरेन' },
+    'party-bjp': { en: 'Babulal Marandi', hi: 'बाबूलाल मरांडी' },
+    'party-inc': { en: 'Rajesh Thakur', hi: 'राजेश ठाकुर' },
+  },
+  'assam': {
+    'party-bjp': { en: 'Himanta Biswa Sarma', hi: 'हिमंत बिस्वा सरमा' },
+    'party-inc': { en: 'Bhupen Kumar Borah', hi: 'भूपेन कुमार बोरा' },
+  },
+  'kerala': {
+    'party-cpim': { en: 'Pinarayi Vijayan', hi: 'पिनाराई विजयन' },
+    'party-inc': { en: 'V. D. Satheesan / K. Sudhakaran', hi: 'वी. डी. सतीसन / के. सुधाकरन' },
+    'party-bjp': { en: 'K. Surendran', hi: 'के. सुरेंद्रन' },
+  },
+  'haryana': {
+    'party-bjp': { en: 'Nayab Singh Saini', hi: 'नायब सिंह सैनी' },
+    'party-inc': { en: 'Bhupinder Singh Hooda', hi: 'भूपेंद्र सिंह हुड्डा' },
+    'party-aap': { en: 'Sushil Gupta', hi: 'सुशील गुप्ता' },
+  },
+};
+
+export const getCmCandidate = (
+  partyId: string,
+  stateId: string,
+  partyNameEn?: string,
+  partyNameHi?: string
+): { en: string; hi: string } => {
+  if (partyId === 'party-nota') {
+    return { en: 'None of the Above', hi: 'इनमें से कोई नहीं' };
+  }
+  if (partyId === 'party-others') {
+    return { en: 'Independent / Other CM Nominee', hi: 'निर्दलीय / अन्य मुख्यमंत्री प्रत्याशी' };
+  }
+  const stateCandidates = STATE_CM_CANDIDATES[stateId];
+  if (stateCandidates && stateCandidates[partyId]) {
+    return stateCandidates[partyId];
+  }
+  const cleanNameEn = (partyNameEn || partyId.replace('party-', '')).replace(/\(.*?\)/g, '').trim();
+  const cleanNameHi = (partyNameHi || partyId.replace('party-', '')).replace(/\(.*?\)/g, '').trim();
+  return {
+    en: `${cleanNameEn} State Assembly CM Nominee`,
+    hi: `${cleanNameHi} मुख्यमंत्री प्रत्याशी`,
+  };
+};
+
 export const getPartyById = (id: string): Party | undefined => {
   return ALL_PARTIES.find((p) => p.id === id);
 };
@@ -850,17 +1010,32 @@ export const getStateById = (stateId: string): IndianState | undefined => {
 };
 
 export const getPartiesForPM = (): Party[] => {
-  return NATIONAL_PARTIES;
+  return NATIONAL_PARTIES.map((party) => ({
+    ...party,
+    candidate_role_en: party.id === 'party-nota' ? 'Rejection Choice' : 'PM Candidate',
+    candidate_role_hi: party.id === 'party-nota' ? 'अस्वीकृति विकल्प' : 'प्रधानमंत्री प्रत्याशी',
+  }));
 };
 
 export const getPartiesForState = (stateId: string): Party[] => {
   const state = getStateById(stateId);
-  if (!state) return NATIONAL_PARTIES;
+  const baseParties = state
+    ? state.party_ids
+        .map((pid) => getPartyById(pid))
+        .filter((p): p is Party => Boolean(p))
+    : NATIONAL_PARTIES;
 
-  const parties = state.party_ids
-    .map((pid) => getPartyById(pid))
-    .filter((p): p is Party => Boolean(p));
+  const list = baseParties.length > 0 ? baseParties : NATIONAL_PARTIES;
 
-  return parties.length > 0 ? parties : NATIONAL_PARTIES;
+  return list.map((party) => {
+    const cmCandidate = getCmCandidate(party.id, stateId, party.name_en, party.name_hi);
+    return {
+      ...party,
+      candidate_name_en: cmCandidate.en,
+      candidate_name_hi: cmCandidate.hi,
+      candidate_role_en: party.id === 'party-nota' ? 'Rejection Choice' : 'CM Candidate',
+      candidate_role_hi: party.id === 'party-nota' ? 'अस्वीकृति विकल्प' : 'मुख्यमंत्री प्रत्याशी',
+    };
+  });
 };
 

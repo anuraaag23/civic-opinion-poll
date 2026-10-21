@@ -38,12 +38,21 @@ export function ResultBar({ result, maxPercentage }: ResultBarProps) {
             )}
           </div>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)]">
+            <span className="text-xs font-bold px-1.5 py-0.5 rounded bg-[var(--border-glass)] text-[var(--text-secondary)] shrink-0">
               {result.party_short_name}
             </span>
-            <span className="text-sm font-bold text-[var(--text-primary)] truncate">
-              {partyName}
-            </span>
+            <div className="min-w-0">
+              <span className="text-sm font-bold text-[var(--text-primary)] block truncate">
+                {partyName}
+              </span>
+              {(result.candidate_name_en || result.candidate_name_hi) && (
+                <span className="text-[11px] font-semibold text-[var(--accent)] block truncate">
+                  {language === 'hi'
+                    ? `${result.candidate_role_hi || 'प्रत्याशी'}: ${result.candidate_name_hi || result.candidate_name_en}`
+                    : `${result.candidate_role_en || 'Candidate'}: ${result.candidate_name_en}`}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
