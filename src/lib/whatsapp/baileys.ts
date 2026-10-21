@@ -214,14 +214,17 @@ https://mera-vote.vercel.app/`;
     }
   }
 
-  // 5. Local / Development Simulator Mode
-  console.log('----------------------------------------------------');
-  console.log(`[WhatsApp Server OTP Dispatch] To: +91 ${cleanPhone} (${jid})`);
-  console.log(`[WhatsApp Server OTP Code] => ${otpCode}`);
-  console.log('----------------------------------------------------');
+  // 5. Local / Development Simulator Mode (Strictly for dev/testing)
+  const isDevOrTest = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+
+  if (isDevOrTest) {
+    console.log('----------------------------------------------------');
+    console.log(`[WhatsApp Server OTP Dispatch] To: +91 ${cleanPhone} (${jid})`);
+    console.log(`[WhatsApp Server OTP Code] => ${otpCode}`);
+    console.log('----------------------------------------------------');
+  }
 
   const isConfigured = Boolean(gatewayUrl || (metaToken && metaPhoneId) || (ultraInstance && ultraToken));
-  const isDevOrTest = process.env.NODE_ENV !== 'production' || !isConfigured;
 
   return {
     success: true,

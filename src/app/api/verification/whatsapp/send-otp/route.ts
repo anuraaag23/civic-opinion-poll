@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
       message: 'Verification OTP sent to your WhatsApp number.',
       expiresAt: new Date(expiresAt).toISOString(),
       deliveredVia: dispatchResult.deliveredVia,
-      devOtp: dispatchResult.devOtp, // Only in development/test
+      devOtp: process.env.NODE_ENV === 'production' ? undefined : dispatchResult.devOtp,
     });
   } catch (err) {
     console.error('WhatsApp send-otp error:', err);

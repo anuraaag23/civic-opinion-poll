@@ -7,10 +7,11 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassDropdown } from '@/components/ui/GlassDropdown';
 import { OFFICIAL_PARTIES, INDIAN_STATES, IndianState, Party } from '@/lib/data/parties';
-import { Poll, OptionResult, SiteSettings, AuditEvent, DbSupporter } from '@/lib/types';
+import { Poll, OptionResult, SiteSettings, AuditEvent, DbSupporter, AdminUser } from '@/lib/types';
 import {
   ShieldCheck,
   Users,
+  UserPlus,
   Vote,
   AlertTriangle,
   Lock,
@@ -84,6 +85,16 @@ export function AdminClient() {
   const [isUpdatingAccount, setIsUpdatingAccount] = useState(false);
   const [accountUpdateSuccess, setAccountUpdateSuccess] = useState<string | null>(null);
   const [accountUpdateError, setAccountUpdateError] = useState<string | null>(null);
+
+  // Multi-Admin Management State
+  const [adminUsers, setAdminUsers] = useState<AdminUser[]>([]);
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const [showAddUserForm, setShowAddUserForm] = useState(false);
+  const [newUserLoginId, setNewUserLoginId] = useState('');
+  const [newUserPassword, setNewUserPassword] = useState('');
+  const [newUserName, setNewUserName] = useState('');
+  const [newUserRole, setNewUserRole] = useState<'super_admin' | 'poll_manager' | 'moderator'>('super_admin');
+  const [isSubmittingUser, setIsSubmittingUser] = useState(false);
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<
@@ -186,7 +197,7 @@ export function AdminClient() {
   const fetchAllData = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      const [statsRes, pollsRes, settingsRes, supportersRes, auditRes, partiesRes, accountRes] = await Promise.all([
+      const [statsRes, pollsRes, settingsRes, supportersRes, auditRes, partiesRes, accountRes, usersRes] = await Promise.all([
         fetch('/api/admin/stats').catch(() => null),
         fetch('/api/admin/polls').catch(() => null),
         fetch('/api/admin/settings').catch(() => null),
@@ -194,6 +205,7 @@ export function AdminClient() {
         fetch('/api/admin/audit?limit=40').catch(() => null),
         fetch('/api/admin/parties').catch(() => null),
         fetch('/api/admin/account').catch(() => null),
+        fetch('/api/admin/users').catch(() => null),
       ]);
 
       if (statsRes?.status === 401) {
@@ -220,6 +232,13 @@ export function AdminClient() {
         if (d.success && d.data) {
           setAccountInfo(d.data);
           setNewAdminLoginId(d.data.loginId);
+        }
+      }
+
+      if (usersRes?.ok) {
+        const d = await usersRes.json();
+        if (d.success && Array.isArray(d.users)) {
+          setAdminUsers(d.users);
         }
       }
 
@@ -389,6 +408,87 @@ export function AdminClient() {
       setAccountUpdateError('Server error updating credentials');
     } finally {
       setIsUpdatingAccount(false);
+    }
+  };
+
+  const fetchAdminUsers = async () => {
+    setIsLoadingUsers(true);
+    try {
+      const res = await fetch('/api/admin/users');
+      const data = await res.json();
+      if (data.success && Array.isArray(data.users)) {
+        setAdminUsers(data.users);
+      }
+    } catch {} finally {
+      setIsLoadingUsers(false);
+    }
+  };
+
+  const handleCreateAdminUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserLoginId || !newUserPassword) return;
+    setIsSubmittingUser(true);
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          loginId: newUserLoginId,
+          password: newUserPassword,
+          displayName: newUserName,
+          role: newUserRole,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(
+          language === 'hi'
+            ? 'नया प्रशासक खाता सफलतापूर्वक बनाया गया'
+            : 'Admin user created successfully'
+        );
+        setNewUserLoginId('');
+        setNewUserPassword('');
+        setNewUserName('');
+        setShowAddUserForm(false);
+        fetchAdminUsers();
+      } else {
+        showToast(data.error || 'Failed to create admin user', true);
+      }
+    } catch {
+      showToast('Error creating admin user', true);
+    } finally {
+      setIsSubmittingUser(false);
+    }
+  };
+
+  const handleDeleteAdminUser = async (id: string, loginId: string) => {
+    if (
+      !confirm(
+        language === 'hi'
+          ? `क्या आप प्रशासक ${loginId} को हटाना चाहते हैं?`
+          : `Remove administrator ${loginId}?`
+      )
+    )
+      return;
+    try {
+      const res = await fetch('/api/admin/users', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(
+          language === 'hi'
+            ? 'प्रशासक सफलतापूर्वक हटाया गया'
+            : 'Admin user removed'
+        );
+        fetchAdminUsers();
+      } else {
+        showToast(data.error || 'Failed to delete admin user', true);
+      }
+    } catch {
+      showToast('Error deleting admin user', true);
     }
   };
 
@@ -1780,6 +1880,197 @@ export function AdminClient() {
                     </button>
                   </div>
                 </form>
+              </GlassCard>
+
+              {/* Multi-Admin & Team Management Card */}
+              <GlassCard elevated className="space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-[var(--border-glass)]">
+                  <div className="space-y-0.5">
+                    <h3 className="text-base font-bold text-[var(--text-primary)] flex items-center gap-2">
+                      <Users className="w-4 h-4 text-[var(--accent)]" />
+                      <span>{language === 'hi' ? 'प्रशासक दल एवं अतिरिक्त एडमिन' : 'Admin Team & Additional Administrators'}</span>
+                    </h3>
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      {language === 'hi'
+                        ? 'डेटाबेस (admin_users) में अन्य व्यवस्थापकों को जोड़ें, देखें या हटाएं'
+                        : 'Grant administrative access to team members stored in Supabase admin_users table'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddUserForm(!showAddUserForm)}
+                    className="py-1.5 px-3 rounded-xl bg-[var(--accent)] hover:opacity-90 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 self-start sm:self-auto"
+                  >
+                    <UserPlus className="w-3.5 h-3.5" />
+                    <span>
+                      {showAddUserForm
+                        ? language === 'hi'
+                          ? 'रद्द करें'
+                          : 'Close Form'
+                        : language === 'hi'
+                        ? '+ नया एडमिन जोड़ें'
+                        : '+ Add Admin'}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Add Admin Form */}
+                {showAddUserForm && (
+                  <form
+                    onSubmit={handleCreateAdminUser}
+                    className="p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--accent)]/30 space-y-3"
+                  >
+                    <span className="text-xs font-bold text-[var(--accent)] block">
+                      {language === 'hi'
+                        ? 'नया प्रशासक खाता जोड़ें:'
+                        : 'Create New Administrator Account:'}
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase">
+                          Login ID (Username)
+                        </label>
+                        <input
+                          type="text"
+                          value={newUserLoginId}
+                          onChange={(e) => setNewUserLoginId(e.target.value)}
+                          placeholder="e.g. rahul_admin"
+                          className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase">
+                          Display Name
+                        </label>
+                        <input
+                          type="text"
+                          value={newUserName}
+                          onChange={(e) => setNewUserName(e.target.value)}
+                          placeholder="e.g. Rahul Sharma"
+                          className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                        />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase">
+                          Password (Min 8 chars)
+                        </label>
+                        <input
+                          type="password"
+                          value={newUserPassword}
+                          onChange={(e) => setNewUserPassword(e.target.value)}
+                          placeholder="Secure password"
+                          className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-bold text-[var(--text-secondary)] uppercase">
+                          Role
+                        </label>
+                        <select
+                          value={newUserRole}
+                          onChange={(e) => setNewUserRole(e.target.value as any)}
+                          className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
+                        >
+                          <option value="super_admin">Super Admin (Full Access)</option>
+                          <option value="poll_manager">Poll Manager (Create/Edit Polls)</option>
+                          <option value="moderator">Moderator (Chai Reviews Only)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex justify-end pt-1">
+                      <button
+                        type="submit"
+                        disabled={isSubmittingUser}
+                        className="py-2 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
+                      >
+                        <Save className="w-3.5 h-3.5" />
+                        <span>{isSubmittingUser ? 'Saving...' : 'Save Administrator'}</span>
+                      </button>
+                    </div>
+                  </form>
+                )}
+
+                {/* Admin Users List */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs font-bold text-[var(--text-tertiary)] uppercase tracking-wider px-1">
+                    <span>Authorized Administrators ({adminUsers.length + 1})</span>
+                    <button
+                      type="button"
+                      onClick={fetchAdminUsers}
+                      className="text-[11px] text-[var(--accent)] hover:underline flex items-center gap-1 cursor-pointer"
+                    >
+                      <RefreshCw className={`w-3 h-3 ${isLoadingUsers ? 'animate-spin' : ''}`} />
+                      <span>Refresh</span>
+                    </button>
+                  </div>
+
+                  {/* Primary Default Admin */}
+                  <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center shrink-0">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-xs text-[var(--text-primary)] font-mono">
+                            {accountInfo?.loginId || 'admin'}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                            Primary Super Admin
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-[var(--text-tertiary)] block">
+                          Master Root Account (site_settings)
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-emerald-500 font-bold px-2 py-0.5 rounded-md bg-emerald-500/10">
+                      Active
+                    </span>
+                  </div>
+
+                  {/* Additional Database Admin Users */}
+                  {adminUsers.map((u) => (
+                    <div
+                      key={u.id}
+                      className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center justify-between gap-3"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-8 h-8 rounded-lg bg-[var(--border-glass)] text-[var(--text-secondary)] flex items-center justify-center shrink-0">
+                          <User className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-xs text-[var(--text-primary)] font-mono">
+                              {u.loginId}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30">
+                              {u.role}
+                            </span>
+                          </div>
+                          <span className="text-[11px] text-[var(--text-tertiary)] block truncate">
+                            {u.displayName}{' '}
+                            {u.lastLoginAt
+                              ? `• Last login: ${new Date(u.lastLoginAt).toLocaleDateString()}`
+                              : '• Never logged in'}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteAdminUser(u.id, u.loginId)}
+                        className="p-1.5 rounded-lg text-red-400 hover:text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                        title="Delete administrator"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </GlassCard>
             </div>
           </div>

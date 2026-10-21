@@ -238,6 +238,19 @@ CREATE TABLE IF NOT EXISTS site_settings (
     last_updated TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- 10. ADMIN USERS TABLE (Multi-Admin & Team Access Control)
+CREATE TABLE IF NOT EXISTS admin_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    login_id VARCHAR(100) UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    password_salt TEXT NOT NULL,
+    display_name VARCHAR(100) NOT NULL DEFAULT 'Administrator',
+    role VARCHAR(50) NOT NULL DEFAULT 'super_admin',
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    last_login_at TIMESTAMPTZ
+);
+
 ALTER TABLE polls ENABLE ROW LEVEL SECURITY;
 ALTER TABLE parties ENABLE ROW LEVEL SECURITY;
 ALTER TABLE poll_options ENABLE ROW LEVEL SECURITY;
@@ -247,6 +260,7 @@ ALTER TABLE vote_counts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE audit_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE supporters ENABLE ROW LEVEL SECURITY;
 ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
 
 -- Idempotent Policies: Drop old policy if exists before recreating
 DROP POLICY IF EXISTS "Public Read Polls" ON polls;

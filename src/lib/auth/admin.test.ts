@@ -82,6 +82,36 @@ describe('Admin Authentication & Security', () => {
     });
   });
 
+  describe('Multi-Admin Management & Database Verification', () => {
+    it('should create, list, authenticate, and delete additional admin users', async () => {
+      const newUser = await db.createAdminUser({
+        loginId: 'election_officer_2',
+        password: 'SecurePass@2026',
+        displayName: 'Officer Sharma',
+        role: 'poll_manager',
+      });
+
+      expect(newUser.loginId).toBe('election_officer_2');
+      expect(newUser.role).toBe('poll_manager');
+
+      // Verify authentication for the new admin
+      const validLogin = await verifyAdminCredentials('election_officer_2', 'SecurePass@2026');
+      expect(validLogin).toBe(true);
+
+      const invalidLogin = await verifyAdminCredentials('election_officer_2', 'WrongPassword123');
+      expect(invalidLogin).toBe(false);
+
+      // Verify listing
+      const list = await db.listAdminUsers();
+      expect(list.some((u) => u.loginId === 'election_officer_2')).toBe(true);
+
+      // Verify deletion
+      await db.deleteAdminUser(newUser.id);
+      const listAfterDelete = await db.listAdminUsers();
+      expect(listAfterDelete.some((u) => u.loginId === 'election_officer_2')).toBe(false);
+    });
+  });
+
   describe('Request Authorization Verification', () => {
     it('should authorize requests with valid Bearer token', () => {
       const token = createAdminSessionToken();

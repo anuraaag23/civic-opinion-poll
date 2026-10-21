@@ -153,7 +153,9 @@ export interface AuditEvent {
     | 'admin_credentials_updated'
     | 'admin_votes_reset'
     | 'admin_poll_create'
-    | 'admin_poll_delete';
+    | 'admin_poll_delete'
+    | 'admin_user_created'
+    | 'admin_user_deleted';
   poll_id?: string;
   timestamp: string;
   metadata_sanitized: Record<string, unknown>; // STRICTLY NO EPIC, NO PII, NO VOTE CHOICE
@@ -192,4 +194,14 @@ export interface DbSupporter {
   payment_id?: string | null;
   verified?: boolean;
   created_at?: string;
+}
+
+export interface AdminUser {
+  id: string;
+  loginId: string;
+  displayName: string;
+  role: 'super_admin' | 'poll_manager' | 'moderator';
+  isActive: boolean;
+  createdAt: string;
+  lastLoginAt?: string;
 }

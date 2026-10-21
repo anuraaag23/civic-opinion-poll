@@ -1,4 +1,4 @@
-import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings, AdminAccount } from '../types';
+import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings, AdminAccount, AdminUser } from '../types';
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
 import { OFFICIAL_PARTIES, ALL_PARTIES } from '../data/parties';
 import { supabaseAdmin } from '../supabase';
@@ -28,6 +28,20 @@ class StorageStore {
   tokens: Map<string, { pollId: string; expiresAt: string; usedAt?: string }> = new Map();
   // Admin credentials (Login ID, salt, hash, secret path slug)
   adminAccount: AdminAccount | null = null;
+  adminUsers: Map<
+    string,
+    {
+      id: string;
+      loginId: string;
+      passwordHash: string;
+      passwordSalt: string;
+      displayName: string;
+      role: 'super_admin' | 'poll_manager' | 'moderator';
+      isActive: boolean;
+      createdAt: string;
+      lastLoginAt?: string;
+    }
+  > = new Map();
   // Site & Emergency Configuration
   siteSettings: SiteSettings = {
     maintenanceMode: false,
@@ -727,19 +741,215 @@ export const db = {
     if (!loginId || !password || typeof loginId !== 'string' || typeof password !== 'string') {
       return false;
     }
-    const account = await this.getAdminAccount();
-    if (account.loginId.trim().toLowerCase() !== loginId.trim().toLowerCase()) {
-      return false;
+    const cleanId = loginId.trim().toLowerCase();
+
+    // 1. Check dedicated admin_users table in Supabase
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        const { data: dbUser, error } = await supabaseAdmin
+          .from('admin_users')
+          .select('*')
+          .ilike('login_id', cleanId)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (dbUser && !error) {
+          let matches = false;
+
+          // Check scrypt password hash with salt
+          if (dbUser.password_salt && dbUser.password_salt !== 'direct_sql') {
+            try {
+              const computedHash = hashAdminPassword(password, dbUser.password_salt);
+              const bufA = Buffer.from(computedHash, 'hex');
+              const bufB = Buffer.from(dbUser.password_hash, 'hex');
+              if (bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)) {
+                matches = true;
+              }
+            } catch {}
+          }
+
+          // Check direct SHA-256 fallback (e.g. if user set via direct SQL query in Supabase)
+          if (!matches) {
+            try {
+              const shaHash = crypto.createHash('sha256').update(password.trim()).digest('hex');
+              const bufA = Buffer.from(shaHash, 'hex');
+              const bufB = Buffer.from(dbUser.password_hash, 'hex');
+              if (bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)) {
+                matches = true;
+              }
+            } catch {}
+          }
+
+          if (matches) {
+            // Update last_login_at
+            await supabaseAdmin
+              .from('admin_users')
+              .update({ last_login_at: new Date().toISOString() })
+              .eq('id', dbUser.id);
+            return true;
+          }
+        }
+      } catch (err) {
+        console.warn('Supabase admin_users check encountered non-fatal error:', err);
+      }
     }
-    try {
-      const computedHash = hashAdminPassword(password, account.passwordSalt);
+
+    // 2. Check local in-memory adminUsers
+    const localUser = Array.from(civicStore.adminUsers.values()).find(
+      (u) => u.loginId.toLowerCase() === cleanId && u.isActive
+    );
+    if (localUser) {
+      const computedHash = hashAdminPassword(password, localUser.passwordSalt);
       const bufA = Buffer.from(computedHash, 'hex');
-      const bufB = Buffer.from(account.passwordHash, 'hex');
-      if (bufA.length !== bufB.length) return false;
-      return crypto.timingSafeEqual(bufA, bufB);
-    } catch {
-      return false;
+      const bufB = Buffer.from(localUser.passwordHash, 'hex');
+      if (bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)) {
+        return true;
+      }
     }
+
+    // 3. Fallback to primary admin account (from site_settings or ledger)
+    const account = await this.getAdminAccount();
+    if (account.loginId.trim().toLowerCase() === cleanId) {
+      try {
+        const computedHash = hashAdminPassword(password, account.passwordSalt);
+        const bufA = Buffer.from(computedHash, 'hex');
+        const bufB = Buffer.from(account.passwordHash, 'hex');
+        if (bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)) {
+          return true;
+        }
+      } catch {}
+
+      // Support direct SHA-256 update in site_settings
+      try {
+        const shaHash = crypto.createHash('sha256').update(password.trim()).digest('hex');
+        const bufA = Buffer.from(shaHash, 'hex');
+        const bufB = Buffer.from(account.passwordHash, 'hex');
+        if (bufA.length === bufB.length && crypto.timingSafeEqual(bufA, bufB)) {
+          return true;
+        }
+      } catch {}
+    }
+
+    // 4. Fallback to ADMIN_PASSWORD / ADMIN_PASSCODE environment variable
+    const envPass = process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSCODE;
+    if (envPass && cleanId === 'admin') {
+      const envBuf = Buffer.from(envPass.trim());
+      const provBuf = Buffer.from(password.trim());
+      if (envBuf.length === provBuf.length && crypto.timingSafeEqual(envBuf, provBuf)) {
+        return true;
+      }
+    }
+
+    return false;
+  },
+
+  async listAdminUsers(): Promise<AdminUser[]> {
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        const { data, error } = await supabaseAdmin
+          .from('admin_users')
+          .select('id, login_id, display_name, role, is_active, created_at, last_login_at')
+          .order('created_at', { ascending: true });
+        if (data && !error && data.length > 0) {
+          return data.map((u: any) => ({
+            id: u.id,
+            loginId: u.login_id,
+            displayName: u.display_name,
+            role: u.role || 'super_admin',
+            isActive: u.is_active,
+            createdAt: u.created_at,
+            lastLoginAt: u.last_login_at,
+          }));
+        }
+      } catch (err) {
+        console.warn('Failed to query admin_users from Supabase:', err);
+      }
+    }
+
+    return Array.from(civicStore.adminUsers.values()).map((u) => ({
+      id: u.id,
+      loginId: u.loginId,
+      displayName: u.displayName,
+      role: u.role,
+      isActive: u.isActive,
+      createdAt: u.createdAt,
+      lastLoginAt: u.lastLoginAt,
+    }));
+  },
+
+  async createAdminUser(params: {
+    loginId: string;
+    password: string;
+    displayName?: string;
+    role?: 'super_admin' | 'poll_manager' | 'moderator';
+  }): Promise<AdminUser> {
+    const cleanLoginId = params.loginId.trim().toLowerCase();
+    const salt = generateAdminSalt();
+    const hash = hashAdminPassword(params.password, salt);
+    const displayName = params.displayName?.trim() || cleanLoginId;
+    const role = params.role || 'super_admin';
+    const id = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
+
+    const newRecord = {
+      id,
+      loginId: cleanLoginId,
+      passwordHash: hash,
+      passwordSalt: salt,
+      displayName,
+      role,
+      isActive: true,
+      createdAt,
+    };
+
+    civicStore.adminUsers.set(id, newRecord);
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('admin_users').upsert({
+          id,
+          login_id: cleanLoginId,
+          password_hash: hash,
+          password_salt: salt,
+          display_name: displayName,
+          role,
+          is_active: true,
+          created_at: createdAt,
+        });
+      } catch (err) {
+        console.error('Failed to create admin user in Supabase:', err);
+      }
+    }
+
+    await this.recordAuditEvent('admin_user_created', undefined, {
+      loginId: cleanLoginId,
+      role,
+      displayName,
+    });
+
+    return {
+      id,
+      loginId: cleanLoginId,
+      displayName,
+      role,
+      isActive: true,
+      createdAt,
+    };
+  },
+
+  async deleteAdminUser(id: string): Promise<boolean> {
+    civicStore.adminUsers.delete(id);
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('admin_users').delete().eq('id', id);
+      } catch (err) {
+        console.error('Failed to delete admin user in Supabase:', err);
+      }
+    }
+
+    await this.recordAuditEvent('admin_user_deleted', undefined, { id });
+    return true;
   },
 
   async updateAdminAccount(updates: {
