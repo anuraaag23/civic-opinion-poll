@@ -448,5 +448,22 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`Web Portal & QR Code: http://localhost:${PORT}`);
   console.log(`Send Endpoint: http://localhost:${PORT}/send-message`);
   console.log(`========================================================`);
+
+  // Cloud Keep-Alive (Prevents free tier spin-down on Render, Koyeb, etc.)
+  const externalUrl = process.env.RENDER_EXTERNAL_URL || process.env.PUBLIC_URL || process.env.KEEP_ALIVE_URL;
+  if (externalUrl) {
+    console.log(`[Cloud Keep-Alive] Initialized for ${externalUrl} (every 9 minutes)`);
+    setInterval(async () => {
+      try {
+        const pingRes = await fetch(`${externalUrl.replace(/\/$/, '')}/health`);
+        if (pingRes.ok) {
+          console.log(`[Cloud Keep-Alive] Health ping succeeded at ${new Date().toLocaleTimeString('en-IN')}`);
+        }
+      } catch (pingErr) {
+        console.warn(`[Cloud Keep-Alive] Ping attempt:`, pingErr.message);
+      }
+    }, 9 * 60 * 1000);
+  }
+
   startWhatsApp();
 });
