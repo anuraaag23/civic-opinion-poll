@@ -42,6 +42,22 @@ export function GlassNavbar() {
   ];
 
   const isActive = (href: string) => {
+    // 1. If currently on a results page, ONLY the Results link is active
+    if (pathname.includes('/results')) {
+      return href.includes('/results');
+    }
+
+    // Results link is never active when not on a results page
+    if (href.includes('/results')) {
+      return false;
+    }
+
+    // 2. 'All Polls' is active when on /polls or on a single poll voting page (/polls/[id])
+    if (href === '/polls') {
+      return pathname === '/polls' || (pathname.startsWith('/polls/') && !pathname.includes('/results'));
+    }
+
+    // 3. For other sections: exact match or child route match
     if (href === pathname) return true;
     if (href !== '/' && pathname.startsWith(href)) return true;
     return false;
