@@ -4,12 +4,12 @@ import { SafetyClient } from './SafetyClient';
 export const metadata: Metadata = {
   title: 'Safety, Privacy & Voter Protection Guarantees | Mera Vote',
   description:
-    'Detailed, organized breakdown of Mera Vote safety architecture: zero personal data recording, real ECI verifier monitoring, decoupled 256-bit cryptographic tokens, and bot defense.',
+    'Detailed breakdown of Mera Vote safety architecture: zero personal data recording, WhatsApp OTP verification, decoupled 256-bit cryptographic tokens, and bot defense.',
   keywords: [
     'Mera Vote Safety Guarantees',
     'Voter Protection India',
     'Zero Data Storage',
-    'ECI Real Verifier Monitor',
+    'WhatsApp OTP Verification',
     'Anonymous Civic Polling',
     'नागरिक सुरक्षा गारंटी',
   ],

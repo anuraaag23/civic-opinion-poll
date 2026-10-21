@@ -18,9 +18,15 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
-export function AboutCreatorSection() {
+interface AboutCreatorSectionProps {
+  alwaysExpanded?: boolean;
+}
+
+export function AboutCreatorSection({ alwaysExpanded = false }: AboutCreatorSectionProps) {
   const { language } = useI18n();
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(alwaysExpanded);
+
+  const effectiveExpanded = alwaysExpanded || isExpanded;
 
   return (
     <section id="about" className="pt-0 pb-8 sm:pb-12 -mt-4 sm:-mt-8 relative">
@@ -29,7 +35,7 @@ export function AboutCreatorSection() {
           elevated
           className="relative overflow-hidden border-t-4 border-t-[var(--accent)] transition-all duration-300"
         >
-          {/* ── ALWAYS VISIBLE COMPACT BAR (Default 1-line state) ── */}
+          {/* ── ALWAYS VISIBLE COMPACT BAR ── */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-1">
             <div className="flex items-center gap-3 min-w-0 flex-1">
               <Link
@@ -63,29 +69,32 @@ export function AboutCreatorSection() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-              <button
-                type="button"
-                onClick={() => setIsExpanded(!isExpanded)}
-                className="py-1.5 px-3.5 rounded-xl bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)]/80 text-[var(--accent)] font-bold text-xs flex items-center gap-2 shrink-0 transition-all cursor-pointer border border-[var(--accent)]/30 active:scale-95 shadow-xs min-h-[32px]"
-                aria-expanded={isExpanded}
-              >
-                <span>
-                  {isExpanded
-                    ? language === 'hi'
-                      ? 'संक्षिप्त करें'
-                      : 'Show Less'
-                    : language === 'hi'
-                    ? 'पूरी कहानी पढ़ें'
-                    : 'Read Full Story'}
-                </span>
-                {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-              </button>
-            </div>
+            {/* Toggle button only rendered when not in alwaysExpanded mode */}
+            {!alwaysExpanded && (
+              <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setIsExpanded(!isExpanded)}
+                  className="py-1.5 px-3.5 rounded-xl bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)]/80 text-[var(--accent)] font-bold text-xs flex items-center gap-2 shrink-0 transition-all cursor-pointer border border-[var(--accent)]/30 active:scale-95 shadow-xs min-h-[32px]"
+                  aria-expanded={effectiveExpanded}
+                >
+                  <span>
+                    {effectiveExpanded
+                      ? language === 'hi'
+                        ? 'संक्षिप्त करें'
+                        : 'Show Less'
+                      : language === 'hi'
+                      ? 'पूरी कहानी पढ़ें'
+                      : 'Read Full Story'}
+                  </span>
+                  {effectiveExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                </button>
+              </div>
+            )}
           </div>
 
           {/* ── EXPANDABLE CONTENT: THE WHOLE STORY, PROMISE & CHAI SUPPORT ── */}
-          {isExpanded && (
+          {effectiveExpanded && (
             <div className="pt-6 mt-4 border-t border-[var(--border-glass)] space-y-6 animate-in fade-in slide-in-from-top-2 duration-200">
               {/* Creator Metadata Bar */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[var(--border-glass)]">
@@ -102,12 +111,12 @@ export function AboutCreatorSection() {
                   <span>•</span>
                   {/* Clickable Email */}
                   <a
-                    href="mailto:contact@meravote.in"
+                    href="mailto:itsryperhere@gmail.com"
                     className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] font-semibold border border-[var(--accent)]/25 hover:bg-[var(--accent-soft)]/40 transition-colors"
                     title="Email Anurag"
                   >
                     <Mail className="w-3 h-3" />
-                    <span>contact@meravote.in</span>
+                    <span>itsryperhere@gmail.com</span>
                   </a>
                 </div>
               </div>
@@ -147,7 +156,7 @@ export function AboutCreatorSection() {
                       आज की राजनीति में आम नागरिक केवल एक &quot;वोट बैंक&quot; बनकर रह गया है। मुख्यधारा के मीडिया सर्वे अक्सर पहले से तय राजनीतिक एजेंडे को सच बताकर जनता पर थोपते हैं। नागरिकों के पास ऐसा कोई पारदर्शी, निष्पक्ष और सुरक्षित मंच नहीं था जहाँ वे बिना किसी डर या निगरानी के अपनी सच्ची राय दर्ज कर सकें।
                     </p>
                     <p>
-                      इसलिए मैंने अपने कोडिंग ज्ञान का उपयोग करके <strong>&quot;मेरा वोट&quot; (Mera Vote)</strong> खड़ा किया। यहाँ मतदाता पंजीकरण की जांच सीधे आधिकारिक ECI पोर्टल पर होती है, आपका कोई भी पहचान पत्र (EPIC) हमारे पास कभी सेव नहीं होता, और आपकी राय 100% अपरिवर्तनीय और गुमनाम रहती है। यह मंच किसी पार्टी के लिए नहीं, बल्कि <strong>आपकी वास्तविक नागरिक राय</strong> के लिए है।
+                      इसलिए मैंने अपने कोडिंग ज्ञान का उपयोग करके <strong>&quot;मेरा वोट&quot; (Mera Vote)</strong> खड़ा किया। यहाँ मतदाता की निष्पक्षता सुनिश्चित करने के लिए त्वरित व्हाट्सएप ओटीपी (WhatsApp OTP) से सत्यापन होता है, आपका मोबाइल नंबर कभी भी डेटाबेस में सेव नहीं होता (एकतरफ़ा HMAC-SHA256 हैश द्वारा पूर्णतः सुरक्षित), और आपका वोट 100% अपरिवर्तनीय और गुमनाम रहता है। यह मंच किसी पार्टी के लिए नहीं, बल्कि <strong>आपकी वास्तविक नागरिक राय</strong> के लिए है।
                     </p>
                   </>
                 ) : (
@@ -159,7 +168,7 @@ export function AboutCreatorSection() {
                       In modern political discourse, everyday citizens are treated as mere statistics and vote banks. People are afraid to voice their true opinions because of tracking, social stigma, or surveillance. I wanted to prove that modern web engineering and cryptography can solve this problem once and for all.
                     </p>
                     <p>
-                      That is why I created <strong>Mera Vote</strong>. Electoral registration checks are performed directly by you on the official ECI portal, and our database never receives or stores your EPIC. I built this independent platform to give India a real, uncorrupted, untampered citizen mirror.
+                      That is why I created <strong>Mera Vote</strong>. To ensure genuine 1-person-1-vote fairness, citizens verify instantly via WhatsApp OTP. Your mobile number is never stored in plain text—it is cryptographically converted into a one-way anonymous hash (HMAC-SHA256) and immediately decoupled from your vote. I built this independent platform to give India a real, uncorrupted, untampered citizen mirror.
                     </p>
                   </>
                 )}

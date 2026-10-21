@@ -10,10 +10,8 @@ import {
   Globe,
   Building2,
   BarChart3,
-  ExternalLink,
   HelpCircle,
 } from 'lucide-react';
-import { ECI_ELECTORAL_SEARCH_URL } from '@/lib/types';
 
 export function HowToUseClient() {
   const { language } = useI18n();

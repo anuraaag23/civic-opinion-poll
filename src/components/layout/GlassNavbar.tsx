@@ -164,12 +164,12 @@ export function GlassNavbar() {
             {/* Clickable Mobile Email Contact (Zero Phone Numbers) */}
             <div className="pt-3 border-t border-[var(--border-glass)]">
               <a
-                href="mailto:contact@meravote.in"
+                href="mailto:itsryperhere@gmail.com"
                 className="flex items-center justify-center gap-2 p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--accent)] min-h-[44px] transition-colors"
-                title="Email contact@meravote.in"
+                title="Email itsryperhere@gmail.com"
               >
                 <Mail className="w-4 h-4 text-[var(--accent)]" />
-                <span className="font-semibold text-xs">contact@meravote.in</span>
+                <span className="font-semibold text-xs">itsryperhere@gmail.com</span>
               </a>
             </div>
 

@@ -145,10 +145,10 @@ export const translations = {
       subtitle: 'How this platform strictly decouples eligibility verification from vote storage.',
       architectureTitle: 'Identity Separation Guarantee',
       architectureDesc:
-        'The verification service and the voting database operate with absolute cryptographic isolation. The voting database never stores your name, address, date of birth, gender, or raw EPIC number alongside your chosen party.',
+        'The verification service and the voting database operate with absolute cryptographic isolation. The voting database never stores your name, mobile number, WhatsApp identity, or IP address alongside your chosen vote selection.',
       fingerprintTitle: 'Keyed Participation Fingerprints',
       fingerprintDesc:
-        'To prevent duplicate responses without storing your identity, we compute HMAC-SHA256(server_secret, EPIC + ":" + poll_id). The secret key never enters the database, preventing rainbow-table dictionary attacks on constrained EPIC strings.',
+        'To prevent duplicate votes without storing your phone number, we compute a one-way HMAC-SHA256(server_secret, phone + ":" + poll_id) fingerprint. The raw phone number is discarded immediately from volatile memory and never saved in persistent storage.',
       noClaimAbsolute:
         'We do not claim cryptographic hashing makes data unconditionally anonymous in all threat models. Instead, this platform is engineered with data minimization, short retention schedules, and strict authorization to minimize identity exposure.',
       retentionTitle: 'Data Retention Policy',
@@ -310,10 +310,10 @@ export const translations = {
       subtitle: 'यह मंच पात्रता सत्यापन को वोट भंडारण से कैसे पूरी तरह अलग रखता है।',
       architectureTitle: 'पहचान पृथक्करण गारंटी',
       architectureDesc:
-        'सत्यापन सेवा और वोटिंग डेटाबेस पूर्ण क्रिप्टोग्राफिक अलगाव के साथ काम करते हैं। वोटिंग डेटाबेस कभी भी आपके नाम, पते, जन्म तिथि, लिंग या मूल EPIC नंबर को चयनित पार्टी के साथ संग्रहीत नहीं करता है।',
+        'सत्यापन सेवा और वोटिंग डेटाबेस पूर्ण क्रिप्टोग्राफिक अलगाव के साथ काम करते हैं। वोटिंग डेटाबेस कभी भी आपके मोबाइल नंबर, व्हाट्सएप पहचान, नाम या आईपी एड्रेस को चयनित मत के साथ संग्रहीत नहीं करता है।',
       fingerprintTitle: 'कीड (Keyed) भागीदारी फिंगरप्रिंट',
       fingerprintDesc:
-        'आपकी पहचान संग्रहीत किए बिना दोहरे मतदान को रोकने के लिए, हम HMAC-SHA256(server_secret, EPIC + ":" + poll_id) उत्पन्न करते हैं। गुप्त कुंजी कभी भी डेटाबेस में नहीं जाती है, जिससे शब्दकोश हमलों की रोकथाम होती है।',
+        'आपकी पहचान या मोबाइल नंबर सुरक्षित रखे बिना दोहरे मतदान को रोकने के लिए, हम HMAC-SHA256(server_secret, phone + ":" + poll_id) एकतरफ़ा फिंगरप्रिंट तैयार करते हैं। कच्चा फ़ोन नंबर तुरंत मेमोरी से हटा दिया जाता है और कभी भी डेटाबेस में सुरक्षित नहीं किया जाता।',
       noClaimAbsolute:
         'हम दावा नहीं करते कि हैशिंग किसी भी स्थिति में डेटा को 100% अभेद्य बनाती है। इसके बजाय, यह प्रणाली पहचान के जोखिम को कम करने के लिए न्यूनतम डेटा और सीमित प्रतिधारण के सिद्धांतों पर बनाई गई है।',
       retentionTitle: 'डेटा प्रतिधारण नीति',

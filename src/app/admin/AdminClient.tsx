@@ -943,7 +943,7 @@ export function AdminClient() {
             <div className="space-y-0.5">
               <strong className="block text-sm">Zero-PII Sovereign Architecture Guarantee:</strong>
               <p className="text-[var(--text-secondary)]">
-                This administration dashboard operates on aggregate cryptographic tallies. Zero voter names, zero mobile numbers, zero EPIC voter IDs, and zero traceable vote selections are ever recorded or accessible.
+                This administration dashboard operates on aggregate cryptographic tallies. Zero voter names, zero mobile numbers, zero WhatsApp identities, and zero traceable vote selections are ever recorded or accessible.
               </p>
             </div>
           </div>
@@ -1549,7 +1549,7 @@ export function AdminClient() {
                 {language === 'hi' ? 'मान्यता प्राप्त राजनीतिक दल एवं प्रतीक' : 'Political Parties & Custom Candidates'}
               </h2>
               <p className="text-xs text-[var(--text-secondary)]">
-                ECI recognized parties directory and custom political parties with logos saved in the database
+                Recognized political parties directory and custom political parties with logos saved in the database
               </p>
             </div>
             <button

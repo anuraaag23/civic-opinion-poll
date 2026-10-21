@@ -154,9 +154,9 @@ export function TermsClient() {
             Legal inquiries, methodology reviews, or compliance:
           </span>
           <div className="flex items-center gap-3">
-            <a href="mailto:contact@meravote.in" className="inline-flex items-center gap-1.5 font-bold text-[var(--accent)] hover:underline" title="Email contact@meravote.in">
+            <a href="mailto:itsryperhere@gmail.com" className="inline-flex items-center gap-1.5 font-bold text-[var(--accent)] hover:underline" title="Email itsryperhere@gmail.com">
               <Mail className="w-3.5 h-3.5" />
-              <span>contact@meravote.in</span>
+              <span>itsryperhere@gmail.com</span>
             </a>
           </div>
         </div>

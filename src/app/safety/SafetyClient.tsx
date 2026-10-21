@@ -59,8 +59,8 @@ export function SafetyClient() {
 
         <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
           {language === 'hi'
-            ? 'मेरा वोट कभी भी आपका EPIC (मतदाता पहचान पत्र) नंबर, नाम, पिता का नाम, जन्म तिथि, मोबाइल नंबर या आवासीय पता न तो मांगता है और न ही हमारे सर्वर पर सहेजता है।'
-            : 'Mera Vote never requests, accepts, or stores your EPIC voter card number, full name, father’s name, date of birth, mobile number, or residential address.'}
+            ? 'मेरा वोट कभी भी आपका मोबाइल नंबर, व्हाट्सएप पहचान, व्यक्तिगत नाम, ईमेल या आवासीय पता डेटाबेस में नहीं सहेजता है।'
+            : 'Mera Vote never stores your mobile number, WhatsApp identity, personal name, email address, or residential location in our voting database.'}
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs">
@@ -69,10 +69,10 @@ export function SafetyClient() {
               <span>✕</span> {language === 'hi' ? 'जो हम कभी एकत्र नहीं करते:' : 'What We NEVER Collect:'}
             </span>
             <ul className="text-[var(--text-tertiary)] space-y-1 list-disc list-inside">
-              <li>{language === 'hi' ? 'EPIC नंबर या मतदाता पहचान पत्र' : 'Raw EPIC or Voter ID number'}</li>
-              <li>{language === 'hi' ? 'नागरिक का नाम या पिता का नाम' : 'Citizen or father\'s name'}</li>
-              <li>{language === 'hi' ? 'फोन नंबर या ईमेल पता' : 'Phone numbers or email addresses'}</li>
-              <li>{language === 'hi' ? 'मतदान केंद्र या बूथ विवरण' : 'Polling station or booth details'}</li>
+              <li>{language === 'hi' ? 'मोबाइल नंबर या व्हाट्सएप प्रोफाइल' : 'Raw mobile number or WhatsApp profile'}</li>
+              <li>{language === 'hi' ? 'नागरिक का नाम या पहचान पत्र' : 'Citizen name or national identity documents'}</li>
+              <li>{language === 'hi' ? 'ईमेल पता या आईपी एड्रेस' : 'Email addresses or static IP identifiers'}</li>
+              <li>{language === 'hi' ? 'स्थान, जीपीएस या बूथ विवरण' : 'Location, GPS coordinates, or booth details'}</li>
               <li>{language === 'hi' ? 'पहचान और मत के बीच कोई भी संबंध' : 'Any link between identity and chosen vote'}</li>
             </ul>
           </div>

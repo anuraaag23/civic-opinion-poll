@@ -181,8 +181,8 @@ export function PMClient() {
                     </strong>
                     <p className="text-[var(--text-secondary)]">
                       {language === 'hi'
-                        ? 'आधिकारिक ECI पोर्टल पर स्व-सत्यापन के बाद, आपके पहचान टोकन को हमेशा के लिए नष्ट कर दिया जाता है। आपके और आपके वोट के बीच कोई संबंध कभी दर्ज नहीं होता।'
-                        : 'After in-browser eligibility confirmation, an ephemeral cryptographic token is generated. No link exists between your identity and your party preference.'}
+                        ? 'व्हाट्सएप ओटीपी द्वारा सुरक्षित सत्यापन के बाद, आपका मोबाइल नंबर कभी दर्ज नहीं होता और पहचान टोकन तुरंत नष्ट कर दिया जाता है। आपके और आपके वोट के बीच कोई संबंध कभी दर्ज नहीं होता।'
+                        : 'After secure WhatsApp OTP verification, an ephemeral cryptographic token is generated. No link exists between your phone number and your party preference.'}
                     </p>
                   </div>
                 </div>

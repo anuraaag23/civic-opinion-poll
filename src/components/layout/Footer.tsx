@@ -127,11 +127,6 @@ export function Footer() {
                   {language === 'hi' ? 'सर्वेक्षण कार्यप्रणाली' : 'Polling Methodology'}
                 </Link>
               </li>
-              <li>
-                <Link href="/admin" className="hover:text-[var(--accent)] transition-colors inline-block py-1 touch-manipulation cursor-pointer">
-                  {t.nav.admin}
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -153,11 +148,11 @@ export function Footer() {
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-[var(--accent)] shrink-0" />
                 <a
-                  href="mailto:contact@meravote.in"
+                  href="mailto:itsryperhere@gmail.com"
                   className="font-medium hover:text-[var(--accent)] hover:underline transition-colors"
                   title="Send email to Mera Vote"
                 >
-                  contact@meravote.in
+                  itsryperhere@gmail.com
                 </a>
               </div>
 

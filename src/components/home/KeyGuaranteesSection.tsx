@@ -14,16 +14,16 @@ export function KeyGuaranteesSection() {
       title: language === 'hi' ? 'पूर्ण पहचान पृथक्करण' : 'Absolute Identity Separation',
       desc:
         language === 'hi'
-          ? 'सत्यापन सेवा केवल पात्रता की पुष्टि करती है। डेटाबेस में आपका नाम, पता या EPIC कभी भी आपके वोट के साथ नहीं जुड़ता।'
-          : 'Verification confirms eligibility in memory. The voting database never records names, addresses, or EPIC numbers alongside vote choices.',
+          ? 'व्हाट्सएप सत्यापन केवल पात्रता की पुष्टि करता है। डेटाबेस में आपका फ़ोन नंबर कभी भी आपके वोट के साथ नहीं जुड़ता।'
+          : 'WhatsApp OTP confirms participant eligibility. The voting database never records phone numbers or contact details alongside vote choices.',
     },
     {
       icon: KeyRound,
       title: language === 'hi' ? 'कीड क्रिप्टोग्राफिक फिंगरप्रिंट' : 'Keyed Cryptographic Fingerprinting',
       desc:
         language === 'hi'
-          ? 'दोहरे मतदान को रोकने के लिए गुप्त कुंजी युक्त HMAC-SHA256 का उपयोग होता है, जिससे डिक्शनरी अटैक से पूर्ण सुरक्षा मिलती है।'
-          : 'Duplicate submissions are prevented via server-keyed HMAC-SHA256 fingerprints, protecting constrained EPIC strings against dictionary attacks.',
+          ? 'दोहरे मतदान को रोकने के लिए गुप्त कुंजी युक्त HMAC-SHA256 एकतरफ़ा हैश का उपयोग होता है, जिससे कच्चा फ़ोन नंबर कभी सेव नहीं होता।'
+          : 'Duplicate submissions are prevented via server-keyed HMAC-SHA256 fingerprints, discarding raw phone numbers immediately from memory.',
     },
     {
       icon: Cpu,

@@ -17,8 +17,8 @@ export function AboutClient() {
     <div className="space-y-8 sm:space-y-12 py-4 max-w-4xl mx-auto">
       <DisclaimerBanner />
 
-      {/* Creator Story Narrative */}
-      <AboutCreatorSection />
+      {/* Creator Story Narrative (Always Fully Expanded on About Page) */}
+      <AboutCreatorSection alwaysExpanded />
 
       {/* Direct Contact Card with Clickable Email & Phone */}
       <GlassCard elevated className="p-6 sm:p-8 space-y-5 border-l-4 border-l-[var(--accent)]">
@@ -41,7 +41,7 @@ export function AboutClient() {
         <div className="pt-1">
           {/* Clickable Official Email Box */}
           <a
-            href="mailto:contact@meravote.in"
+            href="mailto:itsryperhere@gmail.com"
             className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] hover:border-[var(--accent)] transition-all flex items-center gap-3.5 group cursor-pointer active:scale-98 shadow-xs max-w-md mx-auto"
           >
             <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
@@ -52,7 +52,7 @@ export function AboutClient() {
                 {language === 'hi' ? 'आधिकारिक नागरिक ईमेल' : 'Official Citizen Email'}
               </span>
               <span className="text-sm font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors truncate block">
-                contact@meravote.in
+                itsryperhere@gmail.com
               </span>
             </div>
           </a>

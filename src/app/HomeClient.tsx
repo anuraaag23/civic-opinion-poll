@@ -168,7 +168,7 @@ export function HomeClient() {
                 <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1 leading-relaxed">
                   {language === 'hi'
                     ? 'संपूर्ण भारत के लिए एक राष्ट्रीय सर्वेक्षण। इसमें सभी राष्ट्रीय मान्यता प्राप्त दल अपने आधिकारिक चुनाव चिह्नों के साथ उपस्थित हैं।'
-                    : 'Covers all 28 states and 8 union territories at the national level. Features national parties with their official ECI election symbols.'}
+                    : 'Covers all 28 states and 8 union territories at the national level. Features national parties with their official election symbols.'}
                 </p>
               </div>
 
@@ -375,13 +375,13 @@ export function HomeClient() {
               <div className="flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center shrink-0">1</span>
                 <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                  {language === 'hi' ? '1. ECI पोर्टल पर पंजीकरण जांचें' : '1. Check Registration on ECI'}
+                  {language === 'hi' ? '1. व्हाट्सएप ओटीपी सत्यापन' : '1. Verify via WhatsApp OTP'}
                 </h3>
               </div>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11 pt-1">
                 {language === 'hi'
-                  ? 'आधिकारिक ECI पोर्टल पर सीधे अपनी स्थिति जांचें और स्व-सत्यापन पूरा करें। 100% शून्य आईडी भंडारण।'
-                  : 'Check registration directly on official ECI portal and confirm. Zero personal ID stored.'}
+                  ? 'व्हाट्सएप पर 6-अंकों का त्वरित ओटीपी प्राप्त करें। मोबाइल नंबर कभी स्टोर नहीं होता (एकतरफ़ा हैश सुरक्षा)।'
+                  : 'Receive a quick 6-digit OTP on WhatsApp. Mobile numbers are never saved (one-way HMAC hash).'}
               </p>
             </div>
           </GlassCard>

@@ -48,6 +48,18 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ["lucide-react"],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/@admin-ctrl-pnl',
+        destination: '/admin-ctrl-pnl',
+      },
+      {
+        source: '/%40admin-ctrl-pnl',
+        destination: '/admin-ctrl-pnl',
+      },
+    ];
+  },
   async headers() {
     return [
       {

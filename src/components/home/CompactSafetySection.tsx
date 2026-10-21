@@ -49,8 +49,8 @@ export function CompactSafetySection() {
               </span>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                 {language === 'hi'
-                  ? 'हम कभी भी आपका नाम, पहचान पत्र या निजी विवरण सहेजते नहीं हैं। मतदान 100% गोपनीय है।'
-                  : 'We never store your personal identity, name, or voter card. Voting is 100% anonymous.'}
+                  ? 'हम कभी भी आपका नाम, मोबाइल नंबर या निजी विवरण सहेजते नहीं हैं। मतदान 100% गोपनीय है।'
+                  : 'We never store your personal identity, name, or phone number. Voting is 100% anonymous.'}
               </p>
             </div>
           </div>

@@ -75,7 +75,7 @@ export function PrivacyClient() {
                 <li>Voter Name or Father&apos;s Name</li>
                 <li>Residential Address / Polling Booth</li>
                 <li>Date of Birth or Gender</li>
-                <li>Raw EPIC number in the voting database</li>
+                <li>Mobile number or WhatsApp identity in the voting database</li>
                 <li>Any link between identity and chosen party</li>
               </ul>
             </div>
@@ -157,9 +157,9 @@ export function PrivacyClient() {
             Questions regarding cryptographic privacy or architecture?
           </span>
           <div className="flex items-center gap-3">
-            <a href="mailto:contact@meravote.in" className="inline-flex items-center gap-1.5 font-bold text-[var(--accent)] hover:underline" title="Email contact@meravote.in">
+            <a href="mailto:itsryperhere@gmail.com" className="inline-flex items-center gap-1.5 font-bold text-[var(--accent)] hover:underline" title="Email itsryperhere@gmail.com">
               <Mail className="w-3.5 h-3.5" />
-              <span>contact@meravote.in</span>
+              <span>itsryperhere@gmail.com</span>
             </a>
           </div>
         </div>
