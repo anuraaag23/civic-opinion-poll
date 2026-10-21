@@ -98,7 +98,7 @@ export function StateSelector({
               onClick={() => setIsOpen(false)}
               aria-hidden="true"
             />
-            <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-[var(--bg-surface)] p-3.5 sm:p-4 rounded-2xl shadow-2xl border border-[var(--border-glass)] space-y-3 animate-in fade-in slide-in-from-top-2 duration-150 max-h-[380px] flex flex-col w-full max-w-full overflow-hidden">
+            <div className="absolute top-full left-0 right-0 mt-2 z-50 bg-[var(--bg-surface)] dark:bg-[#131720] backdrop-blur-xl p-3.5 sm:p-4 rounded-2xl shadow-2xl border border-[var(--border-glass)] space-y-3 animate-in fade-in slide-in-from-top-2 duration-150 max-h-[380px] flex flex-col w-full max-w-full overflow-hidden">
               {/* Search Field */}
               <div className="relative shrink-0">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-tertiary)]" />

@@ -12,6 +12,7 @@ import { VoterAssuranceCard } from '@/components/verification/VoterAssuranceCard
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
+import { GlassDropdown } from '@/components/ui/GlassDropdown';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import {
   BarChart3,
@@ -353,24 +354,26 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
           })}
         </div>
 
-        {/* Dedicated Monthly Filter Dropdown when viewing Monthly breakdown */}
+        {/* Dedicated Monthly Filter Dropdown with Custom App Glass Theme */}
         {timeframe === 'month' && (
-          <div className="pt-2 border-t border-[var(--border-glass)] flex flex-col sm:flex-row sm:items-center justify-between gap-2 animate-in fade-in duration-200">
+          <div className="pt-2.5 border-t border-[var(--border-glass)] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 animate-in fade-in duration-200">
             <span className="text-xs font-bold text-[var(--text-secondary)] flex items-center gap-1.5">
               <Calendar className="w-3.5 h-3.5 text-blue-500 shrink-0" />
               <span>{language === 'hi' ? 'विशिष्ट माह का परिणाम देखें:' : 'Inspect Month Separately:'}</span>
             </span>
-            <select
+            <GlassDropdown
               value={selectedMonth}
-              onChange={(e) => setSelectedMonth(e.target.value)}
-              className="glass-select text-xs font-bold rounded-xl py-1.5 px-3 w-full sm:max-w-xs cursor-pointer"
-            >
-              {MONTH_OPTIONS.map((m) => (
-                <option key={m.key} value={m.key}>
-                  {language === 'hi' ? m.nameHi : m.nameEn}
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedMonth}
+              options={MONTH_OPTIONS.map((m) => ({
+                value: m.key,
+                label: language === 'hi' ? m.nameHi : m.nameEn,
+                sublabel: language === 'hi' ? '2026 जनमत रिकॉर्ड' : '2026 Monthly Poll Standings',
+                icon: Calendar,
+              }))}
+              icon={Calendar}
+              size="sm"
+              className="w-full sm:w-64"
+            />
           </div>
         )}
       </div>

@@ -3,6 +3,9 @@
 import React, { forwardRef, SelectHTMLAttributes } from 'react';
 import { ChevronDown } from 'lucide-react';
 
+export { GlassDropdown } from './GlassDropdown';
+export type { GlassDropdownOption, GlassDropdownProps } from './GlassDropdown';
+
 export interface GlassSelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   label?: string;
   error?: string;
@@ -39,7 +42,7 @@ export const GlassSelect = forwardRef<HTMLSelectElement, GlassSelectProps>(
         {error ? (
           <p className="text-xs text-red-500 font-medium">{error}</p>
         ) : helperText ? (
-          <p className="text-xs text-[var(--text-tertiary)]">{helperText}</p>
+          <p className="text-[11px] text-[var(--text-tertiary)]">{helperText}</p>
         ) : null}
       </div>
     );

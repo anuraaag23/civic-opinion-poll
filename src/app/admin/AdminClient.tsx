@@ -5,6 +5,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
+import { GlassDropdown } from '@/components/ui/GlassDropdown';
 import { OFFICIAL_PARTIES, INDIAN_STATES, IndianState, Party } from '@/lib/data/parties';
 import { Poll, OptionResult, SiteSettings, AuditEvent, DbSupporter } from '@/lib/types';
 import {
@@ -43,6 +44,7 @@ import {
   Languages,
   Sparkles,
   Search,
+  Calendar,
 } from 'lucide-react';
 import { translateEnToHi, translateHiToEn } from '@/lib/utils/translation';
 
@@ -1222,29 +1224,46 @@ export function AdminClient() {
 
                       {/* Voting Restriction Policy Controls */}
                       <div className="flex items-center gap-2 flex-wrap pt-1">
-                        <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)] shadow-2xs">
-                          <ShieldCheck className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+                        <div className="flex items-center gap-1.5">
                           <span className="text-[11px] font-bold text-[var(--text-secondary)]">Voting Policy:</span>
-                          <select
+                          <GlassDropdown
                             value={poll.voting_policy || 'STRICT_SINGLE_VOTE'}
-                            onChange={(e) =>
+                            onChange={(val) =>
                               handleUpdatePollVotingPolicy(
                                 poll.id,
-                                e.target.value as 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES'
+                                val as 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES'
                               )
                             }
-                            className="glass-select text-[11px] font-bold rounded-lg py-1 px-2.5 cursor-pointer"
-                          >
-                            <option value="STRICT_SINGLE_VOTE">
-                              Strict 1-Vote (User Never Votes Again)
-                            </option>
-                            <option value="ALLOW_ONE_REVOTE">
-                              Allow 1 Revote (Max 2 Votes)
-                            </option>
-                            <option value="ALLOW_MULTIPLE_VOTES">
-                              Allow Multiple Votes
-                            </option>
-                          </select>
+                            options={[
+                              {
+                                value: 'STRICT_SINGLE_VOTE',
+                                label: 'Strict 1-Vote Only',
+                                sublabel: 'User can NEVER vote again in this poll',
+                                icon: ShieldCheck,
+                                badge: 'Strict',
+                                badgeVariant: 'success',
+                              },
+                              {
+                                value: 'ALLOW_ONE_REVOTE',
+                                label: 'Allow 1 Revote',
+                                sublabel: 'User can change vote once (max 2 submissions)',
+                                icon: RotateCcw,
+                                badge: '1 Revote',
+                                badgeVariant: 'warning',
+                              },
+                              {
+                                value: 'ALLOW_MULTIPLE_VOTES',
+                                label: 'Allow Multiple Votes',
+                                sublabel: 'Multiple submissions permitted for continuous pulse',
+                                icon: Layers,
+                                badge: 'Multiple',
+                                badgeVariant: 'neutral',
+                              },
+                            ]}
+                            icon={ShieldCheck}
+                            size="sm"
+                            className="w-52"
+                          />
                         </div>
                         {poll.voting_policy === 'STRICT_SINGLE_VOTE' && (
                           <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold inline-flex items-center gap-1">
@@ -2125,73 +2144,81 @@ export function AdminClient() {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                    Status
-                  </label>
-                  <select
-                    value={editingPoll.status}
-                    onChange={(e) => setEditingPoll({ ...editingPoll, status: e.target.value as Poll['status'] })}
-                    className="w-full glass-select rounded-xl text-xs font-bold"
-                  >
-                    <option value="LIVE">LIVE (सक्रिय)</option>
-                    <option value="PAUSED">PAUSED (स्थगित)</option>
-                    <option value="CLOSED">CLOSED (बंद)</option>
-                    <option value="DRAFT">DRAFT (प्रारूप)</option>
-                  </select>
-                </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <GlassDropdown
+                  label="Status"
+                  value={editingPoll.status}
+                  onChange={(val) => setEditingPoll({ ...editingPoll, status: val as Poll['status'] })}
+                  options={[
+                    { value: 'LIVE', label: 'LIVE (सक्रिय - मतदान खुला)', icon: Radio, badge: 'Live', badgeVariant: 'success' },
+                    { value: 'PAUSED', label: 'PAUSED (स्थगित - रुका हुआ)', icon: AlertTriangle, badge: 'Paused', badgeVariant: 'warning' },
+                    { value: 'CLOSED', label: 'CLOSED (समाप्त / बंद)', icon: Lock, badge: 'Closed', badgeVariant: 'neutral' },
+                    { value: 'DRAFT', label: 'DRAFT (प्रारूप / अप्रकाशित)', icon: Sparkles, badge: 'Draft', badgeVariant: 'neutral' },
+                  ]}
+                  icon={Radio}
+                />
 
-                <div className="space-y-1">
-                  <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                    Results Visibility
-                  </label>
-                  <select
-                    value={editingPoll.results_visibility}
-                    onChange={(e) =>
-                      setEditingPoll({
-                        ...editingPoll,
-                        results_visibility: e.target.value as Poll['results_visibility'],
-                      })
-                    }
-                    className="w-full glass-select rounded-xl text-xs font-bold"
-                  >
-                    <option value="PUBLIC">PUBLIC (सार्वजनिक)</option>
-                    <option value="ADMIN_ONLY">ADMIN_ONLY (केवल एडमिन)</option>
-                    <option value="AFTER_CLOSE">AFTER_CLOSE (समाप्ति के बाद)</option>
-                  </select>
-                </div>
+                <GlassDropdown
+                  label="Results Visibility"
+                  value={editingPoll.results_visibility}
+                  onChange={(val) =>
+                    setEditingPoll({
+                      ...editingPoll,
+                      results_visibility: val as Poll['results_visibility'],
+                    })
+                  }
+                  options={[
+                    { value: 'PUBLIC', label: 'PUBLIC (सार्वजनिक - सभी को दिखे)', icon: Users, badge: 'Public', badgeVariant: 'accent' },
+                    { value: 'ADMIN_ONLY', label: 'ADMIN_ONLY (केवल व्यवस्थापक)', icon: Lock, badge: 'Private', badgeVariant: 'warning' },
+                    { value: 'AFTER_CLOSE', label: 'AFTER_CLOSE (समाप्ति के बाद)', icon: CheckCircle2, badge: 'Timed', badgeVariant: 'neutral' },
+                  ]}
+                  icon={Users}
+                />
 
-                <div className="space-y-1 sm:col-span-2">
-                  <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                    Voting Limit Policy (मतदान प्रतिबंध एवं सीमा)
-                  </label>
-                  <select
+                <div className="sm:col-span-2">
+                  <GlassDropdown
+                    label="Voting Limit Policy (मतदान प्रतिबंध एवं सीमा)"
                     value={editingPoll.voting_policy || 'STRICT_SINGLE_VOTE'}
-                    onChange={(e) =>
+                    onChange={(val) =>
                       setEditingPoll({
                         ...editingPoll,
-                        voting_policy: e.target.value as 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES',
+                        voting_policy: val as 'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES',
                         max_votes_per_citizen:
-                          e.target.value === 'ALLOW_ONE_REVOTE'
+                          val === 'ALLOW_ONE_REVOTE'
                             ? 2
-                            : e.target.value === 'ALLOW_MULTIPLE_VOTES'
+                            : val === 'ALLOW_MULTIPLE_VOTES'
                             ? 999999
                             : 1,
                       })
                     }
-                    className="w-full glass-select rounded-xl text-xs font-bold"
-                  >
-                    <option value="STRICT_SINGLE_VOTE">
-                      Strict 1-Vote Limit (User can NEVER vote again in this poll)
-                    </option>
-                    <option value="ALLOW_ONE_REVOTE">
-                      Allow 1 Revote (User can change/re-cast vote once, max 2 votes)
-                    </option>
-                    <option value="ALLOW_MULTIPLE_VOTES">
-                      Allow Multiple Votes (Multiple submissions permitted)
-                    </option>
-                  </select>
+                    options={[
+                      {
+                        value: 'STRICT_SINGLE_VOTE',
+                        label: 'Strict 1-Vote Limit (User can NEVER vote again in this poll)',
+                        sublabel: 'Permanent cryptographic hardware & cookie lock',
+                        icon: ShieldCheck,
+                        badge: 'Recommended',
+                        badgeVariant: 'success',
+                      },
+                      {
+                        value: 'ALLOW_ONE_REVOTE',
+                        label: 'Allow 1 Revote (User can change/re-cast vote once, max 2 votes)',
+                        sublabel: 'Permits single vote correction',
+                        icon: RotateCcw,
+                        badge: '1 Revote',
+                        badgeVariant: 'warning',
+                      },
+                      {
+                        value: 'ALLOW_MULTIPLE_VOTES',
+                        label: 'Allow Multiple Votes (Multiple submissions permitted)',
+                        sublabel: 'Continuous public sentiment tracking',
+                        icon: Layers,
+                        badge: 'Pulse',
+                        badgeVariant: 'neutral',
+                      },
+                    ]}
+                    icon={ShieldCheck}
+                  />
                 </div>
               </div>
             </div>
@@ -2390,36 +2417,30 @@ export function AdminClient() {
 
               {/* SECTION: STATUS & RESULTS VISIBILITY */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)]">
-                <div className="space-y-1.5">
-                  <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                    {language === 'hi' ? 'पोल स्थिति (Status)' : 'Poll Status'}
-                  </label>
-                  <select
-                    value={newPollStatus}
-                    onChange={(e) => setNewPollStatus(e.target.value as Poll['status'])}
-                    className="w-full glass-select rounded-xl text-xs font-bold"
-                  >
-                    <option value="LIVE">LIVE (सक्रिय - मतदान खुला)</option>
-                    <option value="DRAFT">DRAFT (प्रारूप / आगामी)</option>
-                    <option value="SCHEDULED">SCHEDULED (अनुसूचित)</option>
-                    <option value="CLOSED">CLOSED (समाप्त / बंद)</option>
-                  </select>
-                </div>
+                <GlassDropdown
+                  label={language === 'hi' ? 'पोल स्थिति (Status)' : 'Poll Status'}
+                  value={newPollStatus}
+                  onChange={(val) => setNewPollStatus(val as Poll['status'])}
+                  options={[
+                    { value: 'LIVE', label: 'LIVE (सक्रिय - मतदान खुला)', icon: Radio, badge: 'Live', badgeVariant: 'success' },
+                    { value: 'DRAFT', label: 'DRAFT (प्रारूप / आगामी)', icon: Sparkles, badge: 'Draft', badgeVariant: 'neutral' },
+                    { value: 'SCHEDULED', label: 'SCHEDULED (अनुसूचित)', icon: Calendar, badge: 'Scheduled', badgeVariant: 'warning' },
+                    { value: 'CLOSED', label: 'CLOSED (समाप्त / बंद)', icon: Lock, badge: 'Closed', badgeVariant: 'neutral' },
+                  ]}
+                  icon={Radio}
+                />
 
-                <div className="space-y-1.5">
-                  <label className="font-bold text-[var(--text-secondary)] uppercase tracking-wider block">
-                    {language === 'hi' ? 'परिणाम दृश्यता (Visibility)' : 'Results Visibility'}
-                  </label>
-                  <select
-                    value={newPollVisibility}
-                    onChange={(e) => setNewPollVisibility(e.target.value as Poll['results_visibility'])}
-                    className="w-full glass-select rounded-xl text-xs font-bold"
-                  >
-                    <option value="PUBLIC">PUBLIC (सार्वजनिक - सभी को दिखे)</option>
-                    <option value="ADMIN_ONLY">ADMIN_ONLY (केवल व्यवस्थापक)</option>
-                    <option value="AFTER_CLOSE">AFTER_CLOSE (समाप्ति के बाद)</option>
-                  </select>
-                </div>
+                <GlassDropdown
+                  label={language === 'hi' ? 'परिणाम दृश्यता (Visibility)' : 'Results Visibility'}
+                  value={newPollVisibility}
+                  onChange={(val) => setNewPollVisibility(val as Poll['results_visibility'])}
+                  options={[
+                    { value: 'PUBLIC', label: 'PUBLIC (सार्वजनिक - सभी को दिखे)', icon: Users, badge: 'Public', badgeVariant: 'accent' },
+                    { value: 'ADMIN_ONLY', label: 'ADMIN_ONLY (केवल व्यवस्थापक)', icon: Lock, badge: 'Private', badgeVariant: 'warning' },
+                    { value: 'AFTER_CLOSE', label: 'AFTER_CLOSE (समाप्ति के बाद)', icon: CheckCircle2, badge: 'Timed', badgeVariant: 'neutral' },
+                  ]}
+                  icon={Users}
+                />
               </div>
 
               {/* SECTION: VOTING RESTRICTION / LIMIT POLICY */}
