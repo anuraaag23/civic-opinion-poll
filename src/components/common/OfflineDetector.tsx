@@ -6,7 +6,7 @@ import { useI18n } from '@/lib/i18n/context';
 
 export function OfflineDetector() {
   const { language } = useI18n();
-  const [isOffline, setIsOffline] = useState(false);
+  const [isOffline, setIsOffline] = useState(() => (typeof navigator !== 'undefined' ? !navigator.onLine : false));
   const [isRetrying, setIsRetrying] = useState(false);
   const [wasOffline, setWasOffline] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
@@ -51,11 +51,6 @@ export function OfflineDetector() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    // Initial check
-    if (!navigator.onLine) {
-      setIsOffline(true);
-    }
 
     const onOnline = async () => {
       const isActuallyOnline = await checkRealConnection();

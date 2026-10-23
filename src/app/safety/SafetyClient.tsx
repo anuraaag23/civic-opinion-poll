@@ -34,8 +34,8 @@ export function SafetyClient() {
         </h1>
         <p className="text-base text-[var(--text-secondary)] leading-relaxed max-w-2xl">
           {language === 'hi'
-            ? 'मेरा वोट मंच पर आपकी भागीदारी 100% सुरक्षित और पूरी तरह से गुमनाम है। यहां हमारे सुरक्षा सिद्धांतों और तकनीकों का विस्तृत बिंदुवार विवरण है।'
-            : 'Your participation on Mera Vote is 100% protected and strictly anonymous. Here is an organized, point-by-point breakdown of our security guarantees.'}
+            ? 'मेरा वोट मंच पर आपकी भागीदारी क्रिप्टोग्राफ़िक रूप से सुरक्षित और पूर्णतः गुमनाम है। यहां हमारे सुरक्षा सिद्धांतों और तकनीकों का विस्तृत बिंदुवार विवरण है।'
+            : 'Your participation on Mera Vote is cryptographically protected and strictly anonymous. Here is an organized, point-by-point breakdown of our security guarantees.'}
         </p>
       </div>
 

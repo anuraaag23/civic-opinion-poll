@@ -14,7 +14,6 @@ import {
   Phone,
   MessageSquare,
   Lock,
-  ArrowRight,
   Loader2,
   Clock,
   Sparkles,
@@ -55,8 +54,8 @@ export function VerificationForm({
   // Resend cooldown timer (60 seconds)
   const [resendCooldown, setResendCooldown] = useState(0);
 
-  // Device hardware fingerprint
-  const [deviceFingerprint, setDeviceFingerprint] = useState('');
+  // Device hardware fingerprint ref
+  const deviceFingerprintRef = useRef('');
 
   // Status and error handling
   const [isLoading, setIsLoading] = useState(false);
@@ -81,9 +80,9 @@ export function VerificationForm({
         hash = (hash << 5) - hash + rawEntropy.charCodeAt(i);
         hash |= 0;
       }
-      setDeviceFingerprint(`DEV_${Math.abs(hash).toString(16)}`);
+      deviceFingerprintRef.current = `DEV_${Math.abs(hash).toString(16)}`;
     } catch {
-      setDeviceFingerprint(`DEV_${Date.now().toString(16)}`);
+      deviceFingerprintRef.current = `DEV_${Date.now().toString(16)}`;
     }
   }, []);
 
@@ -104,10 +103,6 @@ export function VerificationForm({
     setNum2(n2);
     setMathAnswer('');
   }, []);
-
-  useEffect(() => {
-    generateNewMathChallenge();
-  }, [generateNewMathChallenge]);
 
   // Handle phone number input with formatting
   const handlePhoneChange = (val: string) => {
@@ -236,7 +231,7 @@ export function VerificationForm({
           phoneNumber: cleanPhone,
           otpCode: cleanOtp,
           selfVerificationConfirmed: true,
-          deviceFingerprint,
+          deviceFingerprint: deviceFingerprintRef.current || 'BROWSER_DEFAULT',
         }),
       });
 

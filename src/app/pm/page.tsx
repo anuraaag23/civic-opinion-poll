@@ -4,7 +4,7 @@ import { PMClient } from './PMClient';
 export const metadata: Metadata = {
   title: 'PM Poll — Mera Vote',
   description:
-    'Independent national opinion inquiry for Prime Minister of India on Mera Vote across all 28 States and 8 Union Territories for Lok Sabha 2029. 100% anonymous, privacy-preserving, zero ID storage.',
+    'Independent national opinion inquiry for Prime Minister of India on Mera Vote across all 28 States and 8 Union Territories for Lok Sabha 2029. Fully privacy-preserving with cryptographic decoupling and zero ID storage.',
   keywords: [
     'PM Opinion Poll',
     'Lok Sabha 2029 Poll',

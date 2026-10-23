@@ -6,10 +6,10 @@ import { useI18n } from '@/lib/i18n/context';
 
 interface ResultBarProps {
   result: OptionResult;
-  maxPercentage: number;
+  maxPercentage?: number;
 }
 
-export function ResultBar({ result, maxPercentage }: ResultBarProps) {
+export function ResultBar({ result }: ResultBarProps) {
   const { language } = useI18n();
 
   const partyName = language === 'hi' ? result.party_name_hi : result.party_name_en;

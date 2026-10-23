@@ -3,7 +3,7 @@
 import React from 'react';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
-import { ShieldCheck, Lock, AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Lock, CheckCircle2 } from 'lucide-react';
 
 export function VoterAssuranceCard() {
   const { language } = useI18n();

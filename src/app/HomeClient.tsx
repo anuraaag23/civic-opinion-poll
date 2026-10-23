@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useI18n } from '@/lib/i18n/context';
 import { LiquidGlassHeroVisual } from '@/components/home/LiquidGlassHeroVisual';
-import { HowItWorksSection } from '@/components/home/HowItWorksSection';
 import { KeyGuaranteesSection } from '@/components/home/KeyGuaranteesSection';
 import { AboutCreatorSection } from '@/components/home/AboutCreatorSection';
 import { HomeTopPollLiveResult } from '@/components/home/HomeTopPollLiveResult';
@@ -96,13 +95,13 @@ export function HomeClient() {
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-[var(--accent)]" />
                 <span>
-                  <strong>223,230+</strong> {language === 'hi' ? 'सत्यापित नागरिक मत' : 'Verified Citizen Responses'}
+                  <strong>223,230+</strong> {language === 'hi' ? 'कुल सत्यापित मत (राष्ट्रीय + राज्य जनमत)' : 'Platform Votes (National + State Combined)'}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-[var(--success)]" />
                 <span>
-                  <strong>{language === 'hi' ? 'सक्रिय' : 'Live'}</strong> {language === 'hi' ? 'PM एवं CM 2029' : 'PM & CM Polls Active'}
+                  <strong>{language === 'hi' ? 'सक्रिय' : 'Live'}</strong> {language === 'hi' ? 'अक्टूबर 2026 सर्वेक्षण चक्र' : 'October 2026 Monthly Edition'}
                 </span>
               </div>
             </div>
@@ -419,9 +418,6 @@ export function HomeClient() {
           </GlassCard>
         </div>
       </section>
-
-      {/* How It Works Section */}
-      <HowItWorksSection />
 
       {/* Trust & Architecture Guarantees */}
       <KeyGuaranteesSection />

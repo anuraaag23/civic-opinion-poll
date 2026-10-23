@@ -106,7 +106,7 @@ export function GlassNavbar() {
                   key={link.href}
                   href={link.href}
                   aria-current={active ? 'page' : undefined}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition-all ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs sm:text-sm transition-all inline-flex items-center justify-center ${
                     active
                       ? 'bg-[var(--accent)] text-white font-bold shadow-xs'
                       : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-glass-elevated)] font-medium'

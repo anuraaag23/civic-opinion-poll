@@ -329,18 +329,18 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
 
         {/* Real Icons (No Emojis) */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {[
+          {([
             { id: '7d', labelEn: 'Last 7 Days', labelHi: 'पिछले 7 दिन', icon: Zap, iconColor: 'text-amber-500' },
             { id: 'month', labelEn: 'Monthly', labelHi: 'मासिक परिणाम', icon: Calendar, iconColor: 'text-blue-500' },
             { id: 'year', labelEn: 'Yearly (2026)', labelHi: 'वर्ष 2026', icon: Landmark, iconColor: 'text-emerald-500' },
             { id: 'all', labelEn: 'All Time', labelHi: 'कुल परिणाम', icon: BarChart3, iconColor: 'text-[var(--accent)]' },
-          ].map((tab) => {
+          ] as const).map((tab) => {
             const Icon = tab.icon;
             return (
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setTimeframe(tab.id as any)}
+                onClick={() => setTimeframe(tab.id)}
                 className={`py-2.5 px-3 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
                   timeframe === tab.id
                     ? 'bg-[var(--accent)] text-white shadow-sm ring-1 ring-[var(--accent)] scale-[1.02]'

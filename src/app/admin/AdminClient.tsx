@@ -112,7 +112,6 @@ export function AdminClient() {
   const [errorToast, setErrorToast] = useState<string | null>(null);
 
   // Poll Editing & Inspection State
-  const [selectedPollId, setSelectedPollId] = useState<string | null>(null);
   const [expandedPollTallyId, setExpandedPollTallyId] = useState<string | null>(null);
   const [editingPoll, setEditingPoll] = useState<DetailedPoll | null>(null);
   const [isSavingPoll, setIsSavingPoll] = useState(false);
@@ -1424,10 +1423,20 @@ export function AdminClient() {
 
                       <button
                         type="button"
+                        onClick={() => handleDeletePoll(poll.id)}
+                        className="py-1.5 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-xs font-semibold text-red-500 transition-all flex items-center gap-1.5 cursor-pointer"
+                        title="Delete Poll"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete</span>
+                      </button>
+
+                      <button
+                        type="button"
                         onClick={() => setExpandedPollTallyId(isExpanded ? null : poll.id)}
                         className="py-1.5 px-3 rounded-lg bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-bold transition-all flex items-center gap-1 cursor-pointer"
                       >
-                        <span>{isExpanded ? 'Hide Tallies' : 'Inspect Tallies'}</span>
+                        <span>{isExpanded ? 'Hide Results' : 'Inspect Results'}</span>
                         {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                       </button>
                     </div>
@@ -1972,7 +1981,7 @@ export function AdminClient() {
                         </label>
                         <select
                           value={newUserRole}
-                          onChange={(e) => setNewUserRole(e.target.value as any)}
+                          onChange={(e) => setNewUserRole(e.target.value as 'super_admin' | 'poll_manager' | 'moderator')}
                           className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)]"
                         >
                           <option value="super_admin">Super Admin (Full Access)</option>
@@ -2959,6 +2968,17 @@ export function AdminClient() {
                           <span>Optional (auto monogram if none)</span>
                         </div>
                       )}
+
+                      {/* Color Picker */}
+                      <div className="flex items-center gap-1.5" title="Party Theme Color">
+                        <input
+                          type="color"
+                          value={newPartyColor}
+                          onChange={(e) => setNewPartyColor(e.target.value)}
+                          className="w-7 h-7 rounded-lg border border-[var(--border-glass)] cursor-pointer bg-transparent"
+                          aria-label="Party color"
+                        />
+                      </div>
 
                       <button
                         type="button"

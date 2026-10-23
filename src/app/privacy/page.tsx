@@ -4,7 +4,7 @@ import { PrivacyClient } from './PrivacyClient';
 export const metadata: Metadata = {
   title: 'Privacy Architecture & Data Guarantees',
   description:
-    'Our unbreakable pledge: zero phone number or personal identity storage, keyed HMAC participation fingerprints, and complete cryptographic identity separation. 100% anonymous.',
+    'Our unbreakable pledge: zero phone number or personal identity storage, keyed HMAC participation fingerprints, and complete cryptographic identity separation with aggregate-only counters.',
   keywords: [
     'Privacy Policy Mera Vote',
     'Zero Data Storage Guarantee',

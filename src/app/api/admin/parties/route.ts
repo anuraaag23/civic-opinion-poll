@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { verifyAdminRequest } from '@/lib/auth/admin';
-import { supabaseAdmin } from '@/lib/supabase';
-import { ALL_PARTIES, Party } from '@/lib/data/parties';
+import { Party } from '@/lib/data/parties';
 
 export async function GET(request: Request) {
   try {

@@ -33,8 +33,8 @@ export function HowToUseClient() {
         </h1>
         <p className="text-base text-[var(--text-secondary)] leading-relaxed max-w-2xl">
           {language === 'hi'
-            ? 'केवल 4 आसान और पारदर्शी चरणों में "मेरा वोट" जनमत सर्वेक्षण में भाग लें। 100% सुरक्षित, कोई डेटा रिकॉर्ड नहीं।'
-            : 'Participate in Mera Vote public opinion polls in 4 clear, transparent steps with 100% privacy and zero personal data stored.'}
+            ? 'केवल 4 आसान और पारदर्शी चरणों में "मेरा वोट" जनमत सर्वेक्षण में भाग लें। पूर्ण गोपनीयता, शून्य व्यक्तिगत डेटा भंडारण।'
+            : 'Participate in Mera Vote public opinion polls in 4 clear, transparent steps with verifiable cryptographic privacy and zero personal data stored.'}
         </p>
       </div>
 
@@ -102,7 +102,7 @@ export function HowToUseClient() {
           </p>
           <div className="pl-12 pt-1 flex items-center gap-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>{language === 'hi' ? '100% सुरक्षित एवं निःशुल्क व्हाट्सएप सत्यापन' : '100% Safe & Free • Instant WhatsApp OTP Delivery'}</span>
+            <span>{language === 'hi' ? 'निःशुल्क एवं सुरक्षित त्वरित व्हाट्सएप सत्यापन' : 'Free & Private • Instant WhatsApp OTP Delivery'}</span>
           </div>
         </GlassCard>
 
@@ -179,8 +179,8 @@ export function HowToUseClient() {
             </strong>
             <p className="text-[var(--text-secondary)] leading-relaxed">
               {language === 'hi'
-                ? 'हाँ, 100%। मतदान के समय आपकी पहचान और आपके द्वारा चुने गए दल के बीच कोई भी लिंक सर्वर पर मौजूद नहीं होता। यह एकतरफा क्रिप्टोग्राफिक हैश द्वारा सुरक्षित है।'
-                : 'Yes, 100%. We employ decoupled cryptographic tokens. There is zero link between your identity and your chosen candidate on our servers.'}
+                ? 'हाँ, पूर्ण रूप से। मतदान के समय आपकी पहचान और आपके द्वारा चुने गए दल के बीच कोई भी लिंक सर्वर पर मौजूद नहीं होता। यह एकतरफा क्रिप्टोग्राफिक हैश द्वारा सुरक्षित है।'
+                : 'Yes, completely. We employ decoupled cryptographic tokens. There is zero link between your identity and your chosen candidate on our servers.'}
             </p>
           </div>
 

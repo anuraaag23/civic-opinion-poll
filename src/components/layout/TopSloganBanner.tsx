@@ -33,7 +33,7 @@ export function TopSloganBanner() {
           </span>
           <span className="hidden sm:inline opacity-60">•</span>
           <span className="hidden sm:inline text-amber-200">
-            {language === 'hi' ? '100% वास्तविक नागरिक' : '100% Real Citizens'}
+            {language === 'hi' ? 'सत्यापित वास्तविक नागरिक' : 'Verified Real Citizens'}
           </span>
         </div>
       </div>

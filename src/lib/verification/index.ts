@@ -1,12 +1,9 @@
 import { VerificationResult, ECI_ELECTORAL_SEARCH_URL } from '../types';
 import {
   normalizeEpic,
-  normalizePhone,
   generateParticipationFingerprint,
-  generatePhoneFingerprint,
   generateAnonymousToken,
 } from '../crypto';
-import { verifyOtp } from './otp';
 import { db } from '../db';
 
 export { ECI_ELECTORAL_SEARCH_URL };

@@ -1,12 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { normalizePhone, generatePhoneFingerprint, generateAnonymousToken } from '../crypto';
+import { normalizePhone, generatePhoneFingerprint } from '../crypto';
 import { generateOtp, verifyOtp } from './otp';
 import { sendWhatsAppOtp, formatWhatsAppJid, cleanIndianPhone } from '../whatsapp/baileys';
 import { db } from '../db';
 
 describe('WhatsApp OTP Verification & Baileys Dispatch', () => {
   const pollId = 'poll-national-2029';
-  const validMobile = '9876543210';
   const cleanPhone = '9876543210';
 
   it('correctly normalizes Indian phone numbers and JID formats', () => {

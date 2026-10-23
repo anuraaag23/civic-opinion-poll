@@ -103,7 +103,7 @@ export function verifyAdminPasscode(provided: string): boolean {
   }
 
   // Fallback to checking active store credentials if already loaded in memory
-  const account = (db as any).civicStore?.adminAccount;
+  const account = (db as unknown as { civicStore?: { adminAccount?: { passwordSalt: string; passwordHash: string } } }).civicStore?.adminAccount;
   if (account) {
     const computed = crypto.scryptSync(provided.trim(), account.passwordSalt, 64).toString('hex');
     const a = Buffer.from(computed, 'hex');

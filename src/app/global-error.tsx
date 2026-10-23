@@ -112,6 +112,7 @@ export default function GlobalError({
             <button
               type="button"
               onClick={() => {
+                // eslint-disable-next-line @next/next/no-location-assign-relative-destination
                 if (typeof window !== 'undefined') window.location.href = '/';
               }}
               style={{

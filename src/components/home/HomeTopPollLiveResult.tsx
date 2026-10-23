@@ -125,15 +125,15 @@ export function HomeTopPollLiveResult() {
           <Flame className="w-3.5 h-3.5 text-amber-500" />
           <span>
             {language === 'hi'
-              ? 'सर्वाधिक लोकप्रिय जनमत • 128,420+ नागरिक मत'
-              : 'Most Active Civic Poll • 128,420+ Citizen Votes'}
+              ? 'अक्टूबर 2026 मासिक चक्र • 128,420+ राष्ट्रीय जनमत'
+              : 'October 2026 Monthly Edition • 128,420+ National Poll Votes'}
           </span>
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
           {language === 'hi'
-            ? 'लाइव परिणाम: प्रधानमंत्री (PM) राष्ट्रीय जनमत 2029'
-            : 'Live Standings: Prime Minister (PM) All-India Poll'}
+            ? 'लाइव परिणाम: प्रधानमंत्री (PM) राष्ट्रीय जनमत (2029 अधिदेश)'
+            : 'Live Standings: Prime Minister (PM) All-India Poll (2029 Mandate)'}
         </h2>
 
         <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
@@ -175,7 +175,7 @@ export function HomeTopPollLiveResult() {
               <strong suppressHydrationWarning className="text-[var(--text-primary)]">
                 {totalVotes.toLocaleString('en-IN')}
               </strong>{' '}
-              {language === 'hi' ? 'कुल मत' : 'Total Votes'}
+              {language === 'hi' ? 'राष्ट्रीय मत' : 'National Poll Votes'}
             </span>
           </div>
         </div>

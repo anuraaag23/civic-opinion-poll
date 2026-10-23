@@ -127,7 +127,7 @@ export async function verifyUploadedEciSlip(
         const pdf = require('pdf-parse');
         const pdfData = await pdf(pdfBufferOrText);
         extractedText = pdfData.text || '';
-      } catch (parseErr) {
+      } catch {
         return {
           verified: false,
           reason: 'INVALID_ECI_SLIP',
@@ -211,7 +211,7 @@ export async function verifyUploadedEciSlip(
       anonymous_token: token,
       expires_at: expiresAt,
     };
-  } catch (err) {
+  } catch {
     return {
       verified: false,
       reason: 'SERVICE_UNAVAILABLE',

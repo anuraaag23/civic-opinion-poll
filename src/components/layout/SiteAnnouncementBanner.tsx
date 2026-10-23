@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useI18n } from '@/lib/i18n/context';
 import { AlertCircle, AlertTriangle, Info, X } from 'lucide-react';
 import { SiteSettings } from '@/lib/types';
@@ -10,22 +10,24 @@ export function SiteAnnouncementBanner() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [dismissed, setDismissed] = useState(false);
 
-  const fetchSettings = useCallback(async () => {
-    try {
-      const res = await fetch('/api/site-status', {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache' },
-      });
-      const data = await res.json();
-      if (data.success && data.data) {
-        setSettings(data.data);
-      }
-    } catch {
-      // ignore background fetch error
-    }
-  }, []);
-
   useEffect(() => {
+    let active = true;
+
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch('/api/site-status', {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' },
+        });
+        const data = await res.json();
+        if (active && data.success && data.data) {
+          setSettings(data.data);
+        }
+      } catch {
+        // ignore background fetch error
+      }
+    };
+
     fetchSettings();
 
     // 1. Polling interval to ensure real-time alerts appear within 3 seconds
@@ -44,10 +46,11 @@ export function SiteAnnouncementBanner() {
     window.addEventListener('site_settings_updated', handleUpdate);
 
     return () => {
+      active = false;
       clearInterval(interval);
       window.removeEventListener('site_settings_updated', handleUpdate);
     };
-  }, [fetchSettings]);
+  }, []);
 
   if (!settings || !settings.emergencyBannerEnabled || dismissed) {
     return null;

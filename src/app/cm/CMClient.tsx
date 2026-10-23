@@ -116,7 +116,7 @@ export function CMClient() {
           </GlassBadge>
           <GlassBadge variant="neutral">
             <Lock className="w-3 h-3 text-[var(--accent)]" />
-            <span>{language === 'hi' ? '100% शून्य आईडी भंडारण' : 'Zero ID Storage'}</span>
+            <span>{language === 'hi' ? 'शून्य व्यक्तिगत आईडी भंडारण' : 'Zero Personal ID Stored'}</span>
           </GlassBadge>
         </div>
       </div>

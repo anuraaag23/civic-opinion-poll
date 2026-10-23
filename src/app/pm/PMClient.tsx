@@ -58,8 +58,8 @@ export function PMClient() {
 
         <p className="text-base sm:text-lg text-[var(--text-secondary)] max-w-2xl mx-auto leading-relaxed">
           {language === 'hi'
-            ? 'संपूर्ण भारत स्तर पर 2029 लोकसभा चुनाव के लिए स्वतंत्र नागरिक सर्वेक्षण। 100% गुमनाम, शून्य आईडी भंडारण।'
-            : 'Independent national civic inquiry for Prime Minister of India across all 28 States and 8 Union Territories. Cryptographically decoupled, 100% anonymous.'}
+            ? 'संपूर्ण भारत स्तर पर 2029 लोकसभा चुनाव के लिए स्वतंत्र नागरिक सर्वेक्षण। पूर्णतः गुमनाम, शून्य व्यक्तिगत आईडी भंडारण।'
+            : 'Independent national civic inquiry for Prime Minister of India across all 28 States and 8 Union Territories. Cryptographically decoupled, zero ID storage.'}
         </p>
 
         {/* Live India Only Badge Banner */}
@@ -177,7 +177,7 @@ export function PMClient() {
                   <ShieldCheck className="w-5 h-5 text-[var(--success)] shrink-0 mt-0.5" />
                   <div className="space-y-1">
                     <strong className="text-[var(--text-primary)] block">
-                      {language === 'hi' ? 'एक नागरिक, एक मत — 100% गुमनाम:' : 'One Citizen, One Response — 100% Decoupled:'}
+                      {language === 'hi' ? 'एक नागरिक, एक मत — पूर्णतः पृथक पहचान:' : 'One Citizen, One Response — Cryptographically Decoupled:'}
                     </strong>
                     <p className="text-[var(--text-secondary)]">
                       {language === 'hi'

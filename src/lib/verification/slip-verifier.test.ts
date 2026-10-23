@@ -1,6 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { extractEciSlipMarkers, verifyUploadedEciSlip } from './slip-verifier';
-import { db } from '../db';
 
 describe('ECI Voter Slip Verifier', () => {
   const validPollId = 'poll-national-2029';

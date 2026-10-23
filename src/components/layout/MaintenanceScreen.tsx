@@ -13,9 +13,7 @@ import {
   ShieldCheck,
   RefreshCw,
   Mail,
-  Lock,
   Clock,
-  Sparkles,
 } from 'lucide-react';
 
 interface MaintenanceScreenProps {

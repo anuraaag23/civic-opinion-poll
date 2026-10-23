@@ -1,4 +1,4 @@
-import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings, AdminAccount, AdminUser } from '../types';
+import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings, AdminAccount, AdminUser, PollStatus } from '../types';
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
 import { OFFICIAL_PARTIES, ALL_PARTIES } from '../data/parties';
 import { supabaseAdmin } from '../supabase';
@@ -153,11 +153,35 @@ const globalForStore = globalThis as unknown as { civicStore: StorageStore | und
 export const civicStore = globalForStore.civicStore ?? new StorageStore();
 if (process.env.NODE_ENV !== 'production') globalForStore.civicStore = civicStore;
 
+interface SupabasePollRow {
+  id: string;
+  slug: string;
+  title_en: string;
+  title_hi: string;
+  description_en?: string;
+  description_hi?: string;
+  status: PollStatus;
+  start_at: string;
+  end_at: string;
+  results_visibility: Poll['results_visibility'];
+  voting_policy?: Poll['voting_policy'];
+  max_votes_per_citizen?: number;
+  created_at: string;
+  updated_at: string;
+  poll_options?: Array<{
+    id: string;
+    party_id: string;
+    display_order?: number;
+    is_active?: boolean;
+    parties?: Party;
+  }>;
+}
+
 export const db = {
   async getAllParties(): Promise<Party[]> {
     if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
       try {
-        const { data, error } = await supabaseAdmin
+        const { data } = await supabaseAdmin
           .from('parties')
           .select('*')
           .eq('is_active', true)
@@ -222,19 +246,20 @@ export const db = {
   async getPolls(): Promise<Poll[]> {
     if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
       try {
-        const { data, error } = await supabaseAdmin
+        const { data } = await supabaseAdmin
           .from('polls')
           .select('*, poll_options!poll_options_poll_id_fkey(*, parties(*))')
           .order('created_at', { ascending: false });
 
         if (data && data.length > 0) {
-          data.forEach((row: any) => {
-            const mappedOptions: PollOption[] = (row.poll_options || []).map((po: any) => ({
-              id: po.id,
-              poll_id: row.id,
-              party_id: po.party_id,
+          (data as unknown as SupabasePollRow[]).forEach((row) => {
+            const rawOptions = row.poll_options || [];
+            const mappedOptions: PollOption[] = rawOptions.map((po) => ({
+              id: String(po.id),
+              poll_id: String(row.id),
+              party_id: String(po.party_id),
               party: po.parties || {
-                id: po.party_id,
+                id: String(po.party_id),
                 name_en: 'Option',
                 name_hi: 'विकल्प',
                 symbol_svg: '',
@@ -468,8 +493,8 @@ export const db = {
       created_at: existing?.created_at || new Date().toISOString(),
       voted_at: null,
     });
-    if (typeof (civicStore as any).saveLedger === 'function') {
-      (civicStore as any).saveLedger();
+    if (typeof (civicStore as unknown as { saveLedger?: () => void }).saveLedger === 'function') {
+      (civicStore as unknown as { saveLedger: () => void }).saveLedger();
     }
 
     if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
@@ -636,7 +661,7 @@ export const db = {
             emergencyBannerEnabled: Boolean(data.emergency_banner_enabled),
             emergencyBannerTextEn: data.emergency_banner_text_en || '',
             emergencyBannerTextHi: data.emergency_banner_text_hi || '',
-            emergencyBannerType: (data.emergency_banner_type as any) || 'info',
+            emergencyBannerType: (data.emergency_banner_type as SiteSettings['emergencyBannerType']) || 'info',
             allowVoting: data.allow_voting !== false,
             rateLimitPerHour: data.rate_limit_per_hour || 60,
             lastUpdated: data.last_updated || new Date().toISOString(),
@@ -846,19 +871,19 @@ export const db = {
   async listAdminUsers(): Promise<AdminUser[]> {
     if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
       try {
-        const { data, error } = await supabaseAdmin
+        const { data } = await supabaseAdmin
           .from('admin_users')
           .select('id, login_id, display_name, role, is_active, created_at, last_login_at')
           .order('created_at', { ascending: true });
-        if (data && !error && data.length > 0) {
-          return data.map((u: any) => ({
-            id: u.id,
-            loginId: u.login_id,
-            displayName: u.display_name,
-            role: u.role || 'super_admin',
-            isActive: u.is_active,
-            createdAt: u.created_at,
-            lastLoginAt: u.last_login_at,
+        if (data && data.length > 0) {
+          return (data as Array<Record<string, unknown>>).map((u) => ({
+            id: String(u.id),
+            loginId: String(u.login_id),
+            displayName: String(u.display_name),
+            role: (u.role as AdminUser['role']) || 'super_admin',
+            isActive: Boolean(u.is_active),
+            createdAt: String(u.created_at),
+            lastLoginAt: u.last_login_at ? String(u.last_login_at) : undefined,
           }));
         }
       } catch (err) {
