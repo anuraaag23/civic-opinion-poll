@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import './globals.css';
 import { I18nProvider } from '@/lib/i18n/context';
 import { ThemeProvider } from '@/lib/theme/context';
@@ -10,6 +9,9 @@ import { MaintenanceGuard } from '@/components/layout/MaintenanceGuard';
 import { Footer } from '@/components/layout/Footer';
 import { FloatingSupportWidget } from '@/components/support/FloatingSupportWidget';
 import { OfflineDetector } from '@/components/common/OfflineDetector';
+import { PwaRegister } from '@/components/pwa/PwaRegister';
+import { InstallAppPrompt } from '@/components/pwa/InstallAppPrompt';
+import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -69,10 +71,16 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="en" className="dark" data-theme="dark" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="application-name" content="Mera Vote" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Mera Vote" />
+        <meta name="mobile-web-app-capable" content="yes" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
@@ -80,23 +88,24 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700;800;900&display=swap"
           rel="stylesheet"
         />
-        <Script
-          id="sw-cache-cleaner"
-          strategy="afterInteractive"
+        <script
           dangerouslySetInnerHTML={{
             __html: `
-              if (typeof window !== 'undefined') {
-                if ('serviceWorker' in navigator) {
-                  navigator.serviceWorker.getRegistrations().then(function(regs) {
-                    for (var i = 0; i < regs.length; i++) { regs[i].unregister(); }
-                  }).catch(function() {});
-                }
-                if ('caches' in window) {
-                  caches.keys().then(function(names) {
-                    for (var i = 0; i < names.length; i++) { caches.delete(names[i]); }
-                  }).catch(function() {});
-                }
-              }
+              (function() {
+                try {
+                  var stored = localStorage.getItem('civic_poll_theme');
+                  var isDark = stored === 'dark' || (!stored || stored === 'system') && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  if (stored === 'light') { isDark = false; }
+                  var root = document.documentElement;
+                  if (isDark) {
+                    root.classList.add('dark');
+                    root.setAttribute('data-theme', 'dark');
+                  } else {
+                    root.classList.remove('dark');
+                    root.setAttribute('data-theme', 'light');
+                  }
+                } catch(e) {}
+              })();
             `,
           }}
         />
@@ -118,12 +127,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <GlassNavbar />
 
               {/* Main Application Content */}
-              <main className="flex-1 w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 relative z-10 overflow-x-hidden">
+              <main className="flex-1 w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 pb-20 lg:pb-8 relative z-10 overflow-x-hidden">
                 {children}
               </main>
 
               {/* Footer */}
               <Footer />
+
+              {/* Native Mobile Bottom Navigation Bar */}
+              <MobileBottomNav />
+
+              {/* Native PWA Installation Prompt */}
+              <InstallAppPrompt />
+
+              {/* PWA Service Worker Registration */}
+              <PwaRegister />
 
               {/* Persistent Floating Support Widget (homepage only) */}
               <FloatingSupportWidget />

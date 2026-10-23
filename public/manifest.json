@@ -1,0 +1,63 @@
+{
+  "id": "/",
+  "name": "Mera Vote — Independent Indian Public Opinion Poll",
+  "short_name": "Mera Vote",
+  "description": "Independent, privacy-preserving public opinion polling platform for India. Participate with verified eligibility and cryptographically anonymous votes.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#0B0E14",
+  "theme_color": "#0B0E14",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["news", "politics", "utilities"],
+  "shortcuts": [
+    {
+      "name": "PM Opinion Poll",
+      "short_name": "PM Poll",
+      "description": "Vote in the All-India Prime Minister Opinion Poll",
+      "url": "/pm",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "CM State Polls",
+      "short_name": "CM Polls",
+      "description": "Vote in state Chief Minister opinion polls",
+      "url": "/cm",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Live Poll Results",
+      "short_name": "Results",
+      "description": "Explore transparent live voting results",
+      "url": "/polls/national-opinion-poll-2029/results",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

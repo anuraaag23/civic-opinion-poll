@@ -41,6 +41,10 @@ export interface Poll {
   description_en: string;
   description_hi: string;
   status: PollStatus;
+  poll_type?: 'NATIONAL' | 'STATE' | 'CUSTOM';
+  requires_verification?: boolean; // When false, users vote with zero verification / no phone number required!
+  verification_mode?: 'WHATSAPP_OTP' | 'NONE';
+  category?: string;
   start_at: string;
   end_at: string;
   results_visibility: 'PUBLIC' | 'ADMIN_ONLY' | 'AFTER_CLOSE';
@@ -144,6 +148,7 @@ export interface AuditEvent {
     | 'self_verification_failure'
     | 'verification_otp_dispatched'
     | 'vote_submission_success'
+    | 'open_vote_submission_success'
     | 'vote_submission_failure'
     | 'duplicate_vote_blocked'
     | 'admin_login'

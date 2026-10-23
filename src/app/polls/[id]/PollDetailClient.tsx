@@ -105,35 +105,61 @@ export function PollDetailClient({ idOrSlug }: PollDetailClientProps) {
               </div>
             </div>
 
-            {/* Core Privacy Rules */}
+            {/* Core Privacy & Participation Rules */}
             <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3">
               <h2 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] flex items-center gap-1.5">
                 <ShieldCheck className="w-4 h-4 text-[var(--success)]" />
-                <span>{t.polls.rulesTitle}</span>
+                <span>{language === 'hi' ? 'सर्वेक्षण भागीदारी नियम' : 'Participation & Privacy Rules'}</span>
               </h2>
-              <ul className="text-xs text-[var(--text-secondary)] space-y-2 leading-relaxed">
-                <li className="flex items-start gap-2">
-                  <span className="text-[var(--accent)] font-bold">•</span>
-                  <span>{t.polls.rule1}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[var(--accent)] font-bold">•</span>
-                  <span>{t.polls.rule2}</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-[var(--accent)] font-bold">•</span>
-                  <span>{t.polls.rule3}</span>
-                </li>
-              </ul>
+              {poll.requires_verification === false ? (
+                <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-300 space-y-1.5">
+                  <div className="font-bold flex items-center gap-1.5">
+                    <span className="text-sm">⚡</span>
+                    <span>{language === 'hi' ? 'ओपन जनमत (शून्य सत्यापन)' : 'Open Opinion Poll (Zero Verification Required)'}</span>
+                  </div>
+                  <p className="leading-relaxed text-[11px] text-[var(--text-secondary)]">
+                    {language === 'hi'
+                      ? 'इस पोल में भाग लेने के लिए किसी भी मोबाइल नंबर या ओटीपी सत्यापन की आवश्यकता नहीं है। अपना विकल्प चुनें और तुरंत मत दर्ज करें।'
+                      : 'No mobile number or OTP verification is required to participate in this poll. Select your preferred choice and cast your opinion instantly.'}
+                  </p>
+                </div>
+              ) : (
+                <ul className="text-xs text-[var(--text-secondary)] space-y-2 leading-relaxed">
+                  <li className="flex items-start gap-2">
+                    <span className="text-[var(--accent)] font-bold">•</span>
+                    <span>{t.polls.rule1}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[var(--accent)] font-bold">•</span>
+                    <span>{t.polls.rule2}</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-[var(--accent)] font-bold">•</span>
+                    <span>{t.polls.rule3}</span>
+                  </li>
+                </ul>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
               <GlassButton
                 size="lg"
                 className="flex-1 gap-2 shadow-md font-bold"
-                onClick={() => setStep('VERIFY')}
+                onClick={() => {
+                  if (poll.requires_verification === false) {
+                    setStep('VOTE');
+                  } else {
+                    setStep('VERIFY');
+                  }
+                }}
               >
-                <span>{t.polls.continueToVerification}</span>
+                <span>
+                  {poll.requires_verification === false
+                    ? language === 'hi'
+                      ? 'तुरंत मतदान करें (बिना किसी नंबर के)'
+                      : 'Cast Your Vote (No Phone Required)'
+                    : t.polls.continueToVerification}
+                </span>
                 <ArrowRight className="w-4 h-4" />
               </GlassButton>
               <Link href={`/polls/${poll.slug}/results`} className="w-full sm:w-auto">
@@ -164,10 +190,10 @@ export function PollDetailClient({ idOrSlug }: PollDetailClientProps) {
       )}
 
       {/* Step 3: Voting View */}
-      {step === 'VOTE' && anonymousToken && (
+      {step === 'VOTE' && (anonymousToken || poll.requires_verification === false) && (
         <VotingView
           poll={poll}
-          anonymousToken={anonymousToken}
+          anonymousToken={anonymousToken || 'anonymous-open'}
           onVoteSuccess={() => setStep('SUCCESS')}
         />
       )}

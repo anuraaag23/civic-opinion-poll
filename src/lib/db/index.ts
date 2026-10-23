@@ -1,6 +1,6 @@
 import { Poll, PollOption, Party, PollResults, OptionResult, AuditEvent, ParticipationRecord, SiteSettings, AdminAccount, AdminUser, PollStatus } from '../types';
 import { INITIAL_POLLS, INITIAL_VOTE_COUNTS } from '../data/polls';
-import { OFFICIAL_PARTIES, ALL_PARTIES } from '../data/parties';
+import { OFFICIAL_PARTIES, ALL_PARTIES, getPartyById } from '../data/parties';
 import { supabaseAdmin } from '../supabase';
 
 import fs from 'fs';
@@ -254,27 +254,41 @@ export const db = {
         if (data && data.length > 0) {
           (data as unknown as SupabasePollRow[]).forEach((row) => {
             const rawOptions = row.poll_options || [];
-            const mappedOptions: PollOption[] = rawOptions.map((po) => ({
-              id: String(po.id),
-              poll_id: String(row.id),
-              party_id: String(po.party_id),
-              party: po.parties || {
-                id: String(po.party_id),
-                name_en: 'Option',
-                name_hi: 'विकल्प',
+            const mappedOptions: PollOption[] = rawOptions.map((po) => {
+              const partyIdStr = String(po.party_id);
+              const staticParty = getPartyById(partyIdStr);
+              const mergedParty: Party = {
+                id: partyIdStr,
+                name_en: po.parties?.name_en || staticParty?.name_en || 'Option',
+                name_hi: po.parties?.name_hi || staticParty?.name_hi || 'विकल्प',
+                short_name: po.parties?.short_name || staticParty?.short_name || partyIdStr.replace('party-', '').toUpperCase(),
                 symbol_svg: '',
-                symbol_alt_en: '',
-                symbol_alt_hi: '',
-                description_en: '',
-                description_hi: '',
-                source_ref: '',
-                is_active: true,
-                display_order: po.display_order || 0,
-              },
-              display_order: po.display_order || 0,
-              is_active: po.is_active !== false,
-            }));
+                symbol_alt_en: po.parties?.symbol_alt_en || staticParty?.symbol_alt_en || '',
+                symbol_alt_hi: po.parties?.symbol_alt_hi || staticParty?.symbol_alt_hi || '',
+                logo_url: po.parties?.logo_url || staticParty?.logo_url || `/parties/${partyIdStr.replace('party-', '')}.png`,
+                color: po.parties?.color || staticParty?.color || '#2563EB',
+                candidate_name_en: po.parties?.candidate_name_en || staticParty?.candidate_name_en,
+                candidate_name_hi: po.parties?.candidate_name_hi || staticParty?.candidate_name_hi,
+                candidate_role_en: po.parties?.candidate_role_en || staticParty?.candidate_role_en,
+                candidate_role_hi: po.parties?.candidate_role_hi || staticParty?.candidate_role_hi,
+                description_en: po.parties?.description_en || staticParty?.description_en || '',
+                description_hi: po.parties?.description_hi || staticParty?.description_hi || '',
+                source_ref: po.parties?.source_ref || staticParty?.source_ref || '',
+                is_active: po.parties?.is_active ?? staticParty?.is_active ?? true,
+                display_order: po.parties?.display_order ?? staticParty?.display_order ?? po.display_order ?? 0,
+              };
 
+              return {
+                id: String(po.id),
+                poll_id: String(row.id),
+                party_id: partyIdStr,
+                party: mergedParty,
+                display_order: po.display_order || 0,
+                is_active: po.is_active !== false,
+              };
+            });
+
+            const existingPoll = civicStore.polls.get(row.id);
             const pollItem: Poll = {
               id: row.id,
               slug: row.slug,
@@ -283,13 +297,19 @@ export const db = {
               description_en: row.description_en || '',
               description_hi: row.description_hi || '',
               status: row.status,
+              poll_type: ((row as unknown as { poll_type?: Poll['poll_type'] }).poll_type) || existingPoll?.poll_type || 'CUSTOM',
+              requires_verification: ((row as unknown as { requires_verification?: boolean }).requires_verification !== undefined)
+                ? (row as unknown as { requires_verification?: boolean }).requires_verification
+                : (existingPoll?.requires_verification ?? true),
+              verification_mode: ((row as unknown as { verification_mode?: Poll['verification_mode'] }).verification_mode) || existingPoll?.verification_mode || 'WHATSAPP_OTP',
+              category: ((row as unknown as { category?: string }).category) || existingPoll?.category || 'Civic Inquiry',
               start_at: row.start_at,
               end_at: row.end_at,
               results_visibility: row.results_visibility,
-              voting_policy: row.voting_policy || civicStore.polls.get(row.id)?.voting_policy || 'STRICT_SINGLE_VOTE',
-              max_votes_per_citizen: row.max_votes_per_citizen || civicStore.polls.get(row.id)?.max_votes_per_citizen || 1,
-              total_votes: civicStore.polls.get(row.id)?.total_votes || 0,
-              options: mappedOptions.length > 0 ? mappedOptions : civicStore.polls.get(row.id)?.options || [],
+              voting_policy: row.voting_policy || existingPoll?.voting_policy || 'STRICT_SINGLE_VOTE',
+              max_votes_per_citizen: row.max_votes_per_citizen || existingPoll?.max_votes_per_citizen || 1,
+              total_votes: existingPoll?.total_votes || 0,
+              options: mappedOptions.length > 0 ? mappedOptions : existingPoll?.options || [],
               created_at: row.created_at,
               updated_at: row.updated_at,
             };
@@ -389,23 +409,33 @@ export const db = {
     const results: OptionResult[] = poll.options.map((opt) => {
       const count = optionCounts.get(opt.id) || 0;
       const percentage = totalVotes > 0 ? Number(((count / totalVotes) * 100).toFixed(1)) : 0;
+      const staticParty = getPartyById(opt.party_id);
+      const party = opt.party || staticParty;
+      const logoUrl =
+        party?.logo_url ||
+        staticParty?.logo_url ||
+        `/parties/${opt.party_id.replace('party-', '')}.png`;
+
       return {
         option_id: opt.id,
         party_id: opt.party_id,
-        party_name_en: opt.party.name_en,
-        party_name_hi: opt.party.name_hi,
-        party_short_name: opt.party.short_name || opt.party.name_en,
-        symbol_svg: opt.party.symbol_svg,
-        logo_url: opt.party.logo_url,
-        color: opt.party.color,
-        candidate_name_en: opt.party.candidate_name_en,
-        candidate_name_hi: opt.party.candidate_name_hi,
-        candidate_role_en: opt.party.candidate_role_en,
-        candidate_role_hi: opt.party.candidate_role_hi,
+        party_name_en: party?.name_en || staticParty?.name_en || 'Party',
+        party_name_hi: party?.name_hi || staticParty?.name_hi || 'दल',
+        party_short_name: party?.short_name || staticParty?.short_name || opt.party_id.replace('party-', '').toUpperCase(),
+        symbol_svg: '',
+        logo_url: logoUrl,
+        color: party?.color || staticParty?.color || '#2563EB',
+        candidate_name_en: party?.candidate_name_en || staticParty?.candidate_name_en,
+        candidate_name_hi: party?.candidate_name_hi || staticParty?.candidate_name_hi,
+        candidate_role_en: party?.candidate_role_en || staticParty?.candidate_role_en,
+        candidate_role_hi: party?.candidate_role_hi || staticParty?.candidate_role_hi,
         count,
         percentage,
       };
     });
+
+    // Sort descending by vote count so highest percentage is always #1
+    results.sort((a, b) => b.count - a.count);
 
     const timeframeLabels = {
       '7d': {
@@ -609,6 +639,66 @@ export const db = {
 
     // Record audit event
     this.recordAuditEvent('vote_submission_success', pollId, { option_id: optionId });
+
+    return { success: true };
+  },
+
+  /**
+   * Direct open vote submission for custom polls that don't require phone verification:
+   * 1. Confirms poll is active.
+   * 2. Confirms option belongs to poll.
+   * 3. Atomically increments counter.
+   */
+  async incrementVoteOpen(
+    pollId: string,
+    optionId: string,
+    voterFingerprint?: string
+  ): Promise<{ success: boolean; error?: string }> {
+    let poll = civicStore.polls.get(pollId);
+    if (!poll) {
+      await this.getPolls();
+      poll = civicStore.polls.get(pollId);
+    }
+    if (!poll) return { success: false, error: 'POLL_NOT_FOUND' };
+    if (poll.status !== 'LIVE') return { success: false, error: 'POLL_NOT_ACTIVE' };
+
+    const validOption = poll.options.find((o) => o.id === optionId && o.is_active);
+    if (!validOption) return { success: false, error: 'INVALID_POLL_OPTION' };
+
+    let countsMap = civicStore.voteCounts.get(pollId);
+    if (!countsMap) {
+      countsMap = new Map<string, number>();
+      civicStore.voteCounts.set(pollId, countsMap);
+    }
+    const current = countsMap.get(optionId) || 0;
+    countsMap.set(optionId, current + 1);
+
+    civicStore.timestampedVotes.push({
+      pollId,
+      optionId,
+      timestamp: new Date().toISOString(),
+    });
+
+    poll.total_votes = (poll.total_votes || 0) + 1;
+    poll.updated_at = new Date().toISOString();
+
+    civicStore.saveLedger();
+
+    if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {
+      try {
+        await supabaseAdmin.from('vote_counts').upsert({
+          poll_id: pollId,
+          option_id: optionId,
+          vote_count: current + 1,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'poll_id,option_id' });
+      } catch {}
+    }
+
+    this.recordAuditEvent('open_vote_submission_success', pollId, {
+      option_id: optionId,
+      fingerprint: voterFingerprint ? 'hashed' : 'anonymous',
+    });
 
     return { success: true };
   },
@@ -1055,6 +1145,10 @@ export const db = {
     description_en?: string;
     description_hi?: string;
     status?: Poll['status'];
+    poll_type?: 'NATIONAL' | 'STATE' | 'CUSTOM';
+    requires_verification?: boolean;
+    verification_mode?: 'WHATSAPP_OTP' | 'NONE';
+    category?: string;
     start_at?: string;
     end_at?: string;
     party_ids?: string[];
@@ -1157,6 +1251,10 @@ export const db = {
       description_en: pollData.description_en || '',
       description_hi: pollData.description_hi || '',
       status: pollData.status || 'LIVE',
+      poll_type: pollData.poll_type || 'CUSTOM',
+      requires_verification: pollData.requires_verification !== undefined ? pollData.requires_verification : true,
+      verification_mode: pollData.verification_mode || (pollData.requires_verification === false ? 'NONE' : 'WHATSAPP_OTP'),
+      category: pollData.category || 'Civic Inquiry',
       start_at: pollData.start_at || now,
       end_at: pollData.end_at || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
       results_visibility: pollData.results_visibility || 'PUBLIC',
@@ -1227,6 +1325,13 @@ export const db = {
     if (updates.results_visibility !== undefined) poll.results_visibility = updates.results_visibility;
     if (updates.voting_policy !== undefined) poll.voting_policy = updates.voting_policy;
     if (updates.max_votes_per_citizen !== undefined) poll.max_votes_per_citizen = updates.max_votes_per_citizen;
+    if (updates.poll_type !== undefined) poll.poll_type = updates.poll_type;
+    if (updates.requires_verification !== undefined) {
+      poll.requires_verification = updates.requires_verification;
+      poll.verification_mode = updates.requires_verification ? 'WHATSAPP_OTP' : 'NONE';
+    }
+    if (updates.verification_mode !== undefined) poll.verification_mode = updates.verification_mode;
+    if (updates.category !== undefined) poll.category = updates.category;
     poll.updated_at = new Date().toISOString();
 
     if (process.env.NODE_ENV !== 'test' && supabaseAdmin) {

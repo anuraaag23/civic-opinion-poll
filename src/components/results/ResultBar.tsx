@@ -3,6 +3,7 @@
 import React from 'react';
 import { OptionResult } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
+import { Vote } from 'lucide-react';
 
 interface ResultBarProps {
   result: OptionResult;
@@ -13,8 +14,11 @@ export function ResultBar({ result }: ResultBarProps) {
   const { language } = useI18n();
 
   const partyName = language === 'hi' ? result.party_name_hi : result.party_name_en;
-
   const [imgError, setImgError] = React.useState(false);
+
+  const resolvedLogoUrl =
+    result.logo_url ||
+    (result.party_id ? `/parties/${result.party_id.replace('party-', '')}.png` : undefined);
 
   return (
     <div className="space-y-2 p-3 sm:p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] shadow-xs transition-all hover:border-[var(--accent)]/40">
@@ -22,19 +26,18 @@ export function ResultBar({ result }: ResultBarProps) {
         {/* Party Identity */}
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl p-1 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden shadow-xs hover:scale-105 transition-transform">
-            {result.logo_url && !imgError ? (
+            {resolvedLogoUrl && !imgError ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
-                src={result.logo_url}
+                src={resolvedLogoUrl}
                 alt={result.party_short_name}
                 className="w-full h-full object-contain drop-shadow-2xs"
                 onError={() => setImgError(true)}
               />
             ) : (
-              <div
-                className="w-full h-full flex items-center justify-center p-0.5"
-                dangerouslySetInnerHTML={{ __html: result.symbol_svg }}
-              />
+              <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--bg-surface)] text-[var(--accent)]">
+                <Vote className="w-5 h-5 text-[var(--accent)]" />
+              </div>
             )}
           </div>
           <div className="flex items-center gap-2 min-w-0">

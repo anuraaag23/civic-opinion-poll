@@ -34,6 +34,8 @@ export async function GET(
           const sp = partyMap.get(r.party_id);
           return {
             ...r,
+            logo_url: sp?.logo_url || r.logo_url || `/parties/${r.party_id.replace('party-', '')}.png`,
+            symbol_svg: '',
             candidate_name_en: sp?.candidate_name_en || r.candidate_name_en,
             candidate_name_hi: sp?.candidate_name_hi || r.candidate_name_hi,
             candidate_role_en: sp?.candidate_role_en || 'CM Candidate',
@@ -46,6 +48,9 @@ export async function GET(
         ...r,
         percentage: stateTotal > 0 ? Number(((r.count / stateTotal) * 100).toFixed(1)) : 0,
       }));
+
+      // Sort descending by count
+      recalculated.sort((a, b) => b.count - a.count);
 
       const stateInfo = getStateById(stateParam);
 

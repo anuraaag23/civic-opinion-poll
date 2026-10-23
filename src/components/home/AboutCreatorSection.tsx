@@ -174,17 +174,17 @@ export function AboutCreatorSection({ alwaysExpanded = false }: AboutCreatorSect
                 )}
               </div>
 
-              {/* Core Personal Pledge */}
+              {/* Core Personal Principles */}
               <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-start gap-3 text-xs sm:text-sm">
-                <Shield className="w-5 h-5 text-[var(--success)] shrink-0 mt-0.5" />
+                <Shield className="w-5 h-5 text-[var(--accent)] shrink-0 mt-0.5" />
                 <div className="space-y-1">
                   <strong className="text-[var(--text-primary)] block">
-                    {language === 'hi' ? 'निर्माता का निष्पक्ष संकल्प:' : 'My Unbreakable Promise:'}
+                    {language === 'hi' ? 'निर्माता के स्वतंत्र सिद्धांत:' : 'Independent Creator Principles:'}
                   </strong>
                   <p className="text-[var(--text-secondary)] leading-relaxed">
                     {language === 'hi'
-                      ? 'यह मंच कभी भी किसी पार्टी को प्रमोट नहीं करेगा, न ही कभी आपका डेटा बेचेगा। आपका मत पूरी तरह अपरिवर्तनीय और गुमनाम रहेगा।'
-                      : 'This platform will NEVER promote any party, will NEVER sell user data, and will NEVER compromise on identity separation. Your opinion remains yours alone.'}
+                      ? 'यह मंच किसी राजनीतिक दल का समर्थन नहीं करता, व्यक्तिगत डेटा का मुद्रीकरण नहीं करता, और मतदाता पहचान को मत से पूर्णतः अलग रखता है।'
+                      : 'This platform does not endorse or promote any political party, does not monetize personal data, and strictly decouples voter identities from survey responses.'}
                   </p>
                 </div>
               </div>

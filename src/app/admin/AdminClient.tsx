@@ -46,6 +46,8 @@ import {
   Sparkles,
   Search,
   Calendar,
+  Globe,
+  Building2,
 } from 'lucide-react';
 import { translateEnToHi, translateHiToEn } from '@/lib/utils/translation';
 
@@ -128,6 +130,9 @@ export function AdminClient() {
   const [newPollVisibility, setNewPollVisibility] = useState<Poll['results_visibility']>('PUBLIC');
   const [newPollVotingPolicy, setNewPollVotingPolicy] = useState<'STRICT_SINGLE_VOTE' | 'ALLOW_ONE_REVOTE' | 'ALLOW_MULTIPLE_VOTES'>('STRICT_SINGLE_VOTE');
   const [newPollMaxVotes, setNewPollMaxVotes] = useState<number>(1);
+  const [newPollType, setNewPollType] = useState<'NATIONAL' | 'STATE' | 'CUSTOM'>('CUSTOM');
+  const [newPollRequiresVerification, setNewPollRequiresVerification] = useState<boolean>(true);
+  const [newPollCategory, setNewPollCategory] = useState<string>('Civic Opinion');
   const [newPollPartyIds, setNewPollPartyIds] = useState<string[]>(['party-bjp', 'party-inc', 'party-aap', 'party-sp']);
 
   // Parties directory & dedicated party creation state
@@ -736,6 +741,10 @@ export function AdminClient() {
           results_visibility: newPollVisibility,
           voting_policy: newPollVotingPolicy,
           max_votes_per_citizen: newPollMaxVotes,
+          poll_type: newPollType,
+          requires_verification: newPollRequiresVerification,
+          verification_mode: newPollRequiresVerification ? 'WHATSAPP_OTP' : 'NONE',
+          category: newPollCategory,
           party_ids: newPollPartyIds,
           custom_options: customParties.map((p) => ({
             name_en: p.name_en,
@@ -887,6 +896,35 @@ export function AdminClient() {
       }
     } catch {
       showToast('Error updating voting policy', true);
+    }
+  };
+
+  const handleTogglePollVerification = async (pollId: string, currentVal: boolean) => {
+    try {
+      const newVal = !currentVal;
+      const res = await fetch('/api/admin/polls', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'update_details',
+          pollId,
+          requires_verification: newVal,
+          verification_mode: newVal ? 'WHATSAPP_OTP' : 'NONE',
+        }),
+      });
+      const d = await res.json();
+      if (d.success) {
+        showToast(
+          newVal
+            ? 'Poll updated: WhatsApp OTP Required (1-Person-1-Vote Verified)'
+            : 'Poll updated: Zero Verification / Open Polling (No Phone Number Required)'
+        );
+        fetchAllData();
+      } else {
+        showToast(d.error || 'Failed to update verification setting', true);
+      }
+    } catch {
+      showToast('Error updating verification setting', true);
     }
   };
 
@@ -1319,6 +1357,19 @@ export function AdminClient() {
                         <span className="text-xs text-[var(--text-tertiary)]">
                           Total: <strong className="text-[var(--text-primary)]">{poll.total_votes.toLocaleString()}</strong> votes
                         </span>
+
+                        <button
+                          type="button"
+                          onClick={() => handleTogglePollVerification(poll.id, poll.requires_verification !== false)}
+                          className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border transition-all cursor-pointer active:scale-95 flex items-center gap-1 ${
+                            poll.requires_verification === false
+                              ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/25'
+                              : 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30 hover:bg-blue-500/25'
+                          }`}
+                          title="Click to toggle between WhatsApp OTP and Open Polling"
+                        >
+                          {poll.requires_verification === false ? '⚡ Open (Zero Verification)' : '✓ WhatsApp OTP'}
+                        </button>
                       </div>
 
                       {/* Voting Restriction Policy Controls */}
@@ -1463,10 +1514,16 @@ export function AdminClient() {
                               className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center justify-between gap-3"
                             >
                               <div className="flex items-center gap-2.5 min-w-0">
-                                <div
-                                  className="w-8 h-8 rounded-lg p-1 bg-[var(--bg-primary)] border border-[var(--border-glass)] flex items-center justify-center shrink-0"
-                                  dangerouslySetInnerHTML={{ __html: opt.symbol_svg }}
-                                />
+                                <div className="w-8 h-8 rounded-lg p-0.5 bg-white border border-[var(--border-glass)] flex items-center justify-center shrink-0 overflow-hidden">
+                                  {opt.logo_url ? (
+                                    /* eslint-disable-next-line @next/next/no-img-element */
+                                    <img src={opt.logo_url} alt={opt.party_short_name} className="w-full h-full object-contain" />
+                                  ) : (
+                                    <span className="font-bold text-[10px] text-[var(--accent)] font-mono">
+                                      {opt.party_short_name?.slice(0, 3) || 'P'}
+                                    </span>
+                                  )}
+                                </div>
                                 <div className="min-w-0">
                                   <div className="text-xs font-bold text-[var(--text-primary)] truncate">
                                     {language === 'hi' ? opt.party_name_hi : opt.party_name_en}
@@ -2254,11 +2311,6 @@ export function AdminClient() {
                           {party.logo_url ? (
                             /* eslint-disable-next-line @next/next/no-img-element */
                             <img src={party.logo_url} alt={party.name_en} className="w-full h-full object-contain" />
-                          ) : party.symbol_svg ? (
-                            <div
-                              className="w-full h-full flex items-center justify-center p-1"
-                              dangerouslySetInnerHTML={{ __html: party.symbol_svg }}
-                            />
                           ) : (
                             <span className="font-bold text-xs text-[var(--accent)] font-mono">
                               {party.short_name?.slice(0, 3) || 'P'}
@@ -2716,7 +2768,7 @@ export function AdminClient() {
               </div>
 
               {/* SECTION: STATUS & RESULTS VISIBILITY */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)]">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)]">
                 <GlassDropdown
                   label={language === 'hi' ? 'पोल स्थिति (Status)' : 'Poll Status'}
                   value={newPollStatus}
@@ -2731,6 +2783,18 @@ export function AdminClient() {
                 />
 
                 <GlassDropdown
+                  label={language === 'hi' ? 'पोल प्रकार (Poll Type)' : 'Poll Type'}
+                  value={newPollType}
+                  onChange={(val) => setNewPollType(val as 'NATIONAL' | 'STATE' | 'CUSTOM')}
+                  options={[
+                    { value: 'CUSTOM', label: 'कस्टम पोल (Custom Topic)', icon: Vote, badge: 'Custom', badgeVariant: 'success' },
+                    { value: 'NATIONAL', label: 'राष्ट्रीय (National PM)', icon: Globe, badge: 'National', badgeVariant: 'accent' },
+                    { value: 'STATE', label: 'राज्य (State CM)', icon: Building2, badge: 'State', badgeVariant: 'warning' },
+                  ]}
+                  icon={Vote}
+                />
+
+                <GlassDropdown
                   label={language === 'hi' ? 'परिणाम दृश्यता (Visibility)' : 'Results Visibility'}
                   value={newPollVisibility}
                   onChange={(val) => setNewPollVisibility(val as Poll['results_visibility'])}
@@ -2741,6 +2805,99 @@ export function AdminClient() {
                   ]}
                   icon={Users}
                 />
+              </div>
+
+              {/* Poll Category Input */}
+              <div className="p-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)]">
+                <label className="text-[11px] font-bold text-[var(--text-secondary)] block mb-1">
+                  {language === 'hi' ? 'पोल श्रेणी / टैग (Category / Tag)' : 'Poll Category / Tag'}
+                </label>
+                <input
+                  type="text"
+                  value={newPollCategory}
+                  onChange={(e) => setNewPollCategory(e.target.value)}
+                  placeholder="e.g. National Election, State Assembly, Public Policy, Economy"
+                  className="w-full px-3 py-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                />
+              </div>
+
+              {/* SECTION: VERIFICATION REQUIREMENT (PHONE OTP vs OPEN POLLING) */}
+              <div className="p-3.5 rounded-2xl bg-[var(--bg-primary)] border border-[var(--border-glass)] space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[var(--accent)] flex items-center gap-1.5 uppercase tracking-wider">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>{language === 'hi' ? 'सत्यापन आवश्यकता (Verification Mode)' : 'Verification Requirement'}</span>
+                  </span>
+                  <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                    newPollRequiresVerification
+                      ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30'
+                      : 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                  }`}>
+                    {newPollRequiresVerification ? 'WhatsApp OTP Required' : 'Open Polling (Zero Verification)'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label
+                    className={`p-3 rounded-xl border text-xs cursor-pointer transition-all flex flex-col justify-between ${
+                      newPollRequiresVerification
+                        ? 'bg-[var(--accent-soft)] border-[var(--accent)] ring-1 ring-[var(--accent)]'
+                        : 'bg-[var(--bg-surface)] border-[var(--border-glass)] hover:bg-[var(--bg-glass-elevated)]'
+                    }`}
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[var(--text-primary)]">WhatsApp OTP Verified</span>
+                        <input
+                          type="radio"
+                          name="newPollRequiresVerification"
+                          value="true"
+                          checked={newPollRequiresVerification === true}
+                          onChange={() => setNewPollRequiresVerification(true)}
+                          className="text-[var(--accent)]"
+                        />
+                      </div>
+                      <p className="text-[11px] text-[var(--text-secondary)] leading-tight">
+                        {language === 'hi'
+                          ? 'नागरिक को वोट देने से पहले व्हाट्सएप ओटीपी से सत्यापन करना होगा (1 व्यक्ति 1 वोट की गारंटी)'
+                          : 'Voters must verify their eligibility via WhatsApp OTP before submitting (1-Person-1-Vote).'}
+                      </p>
+                    </div>
+                    <span className="mt-2 text-[10px] font-bold text-blue-600 dark:text-blue-400 inline-flex items-center gap-1">
+                      ✓ 1-Person-1-Vote Verified
+                    </span>
+                  </label>
+
+                  <label
+                    className={`p-3 rounded-xl border text-xs cursor-pointer transition-all flex flex-col justify-between ${
+                      !newPollRequiresVerification
+                        ? 'bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500'
+                        : 'bg-[var(--bg-surface)] border-[var(--border-glass)] hover:bg-[var(--bg-glass-elevated)]'
+                    }`}
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-[var(--text-primary)]">Zero Verification / Open Polling</span>
+                        <input
+                          type="radio"
+                          name="newPollRequiresVerification"
+                          value="false"
+                          checked={newPollRequiresVerification === false}
+                          onChange={() => setNewPollRequiresVerification(false)}
+                          className="text-emerald-500"
+                        />
+                      </div>
+                      <p className="text-[11px] text-[var(--text-secondary)] leading-tight">
+                        {language === 'hi'
+                          ? 'नागरिक बिना कोई नंबर डाले या बिना किसी सत्यापन के तुरंत 1-क्लिक में वोट दे सकते हैं'
+                          : 'Users can vote instantly WITHOUT entering their phone number or any verification.'}
+                      </p>
+                    </div>
+                    <span className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-1">
+                      ⚡ Instant Voting (No Phone Required)
+                    </span>
+                  </label>
+                </div>
               </div>
 
               {/* SECTION: VOTING RESTRICTION / LIMIT POLICY */}
@@ -3119,11 +3276,6 @@ export function AdminClient() {
                                 {party.logo_url ? (
                                   /* eslint-disable-next-line @next/next/no-img-element */
                                   <img src={party.logo_url} alt={party.name_en} className="w-full h-full object-contain" />
-                                ) : party.symbol_svg ? (
-                                  <div
-                                    className="w-full h-full flex items-center justify-center"
-                                    dangerouslySetInnerHTML={{ __html: party.symbol_svg }}
-                                  />
                                 ) : (
                                   <span className="font-bold text-[9px] text-[var(--accent)]">{party.short_name?.slice(0, 2) || 'P'}</span>
                                 )}

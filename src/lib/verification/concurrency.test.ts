@@ -60,4 +60,25 @@ describe('Concurrency & Race-Condition Safeguards', () => {
     // Verify all 50 votes are counted with 0 lost updates
     expect(updatedAapCount).toBe(initialAapCount + concurrencyBatch);
   });
+
+  it('correctly increments vote count for zero-verification open polling', async () => {
+    const customPollId = 'poll-one-nation-one-election';
+    const optionId = 'opt-onoe-yes';
+
+    const initialResults = await db.getPollResults(customPollId);
+    const initialCount = initialResults?.results.find((r) => r.option_id === optionId)?.count || 0;
+
+    // Submit 10 open votes concurrently without tokens or phone numbers
+    const openVotes = Array.from({ length: 10 }).map((_, i) =>
+      db.incrementVoteOpen(customPollId, optionId, `fingerprint-${i}`)
+    );
+
+    const outcomes = await Promise.all(openVotes);
+    expect(outcomes.every((o) => o.success)).toBe(true);
+
+    const updatedResults = await db.getPollResults(customPollId);
+    const updatedCount = updatedResults?.results.find((r) => r.option_id === optionId)?.count || 0;
+
+    expect(updatedCount).toBe(initialCount + 10);
+  });
 });

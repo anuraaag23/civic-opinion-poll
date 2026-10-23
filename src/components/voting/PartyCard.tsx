@@ -3,7 +3,7 @@
 import React from 'react';
 import { Party } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
-import { Check } from 'lucide-react';
+import { Check, Vote } from 'lucide-react';
 
 interface PartyCardProps {
   party: Party;
@@ -67,10 +67,9 @@ export function PartyCard({
               onError={() => setImgError(true)}
             />
           ) : (
-            <div
-              className="w-full h-full flex items-center justify-center"
-              dangerouslySetInnerHTML={{ __html: party.symbol_svg }}
-            />
+            <div className="w-full h-full flex items-center justify-center bg-[var(--bg-surface)] text-[var(--accent)]">
+              <Vote className="w-6 h-6 text-[var(--accent)]" />
+            </div>
           )}
         </div>
 

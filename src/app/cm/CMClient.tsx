@@ -217,10 +217,9 @@ export function CMClient() {
                               loading="lazy"
                             />
                           ) : (
-                            <div
-                              className="w-full h-full flex items-center justify-center"
-                              dangerouslySetInnerHTML={{ __html: party.symbol_svg }}
-                            />
+                            <div className="w-full h-full flex items-center justify-center bg-[var(--bg-surface)] text-[var(--accent)]">
+                              <Vote className="w-6 h-6 text-[var(--accent)]" />
+                            </div>
                           )}
                         </div>
 

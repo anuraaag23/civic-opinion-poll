@@ -51,16 +51,6 @@ const DEFAULT_TOP_PARTIES: LeaderboardItem[] = [
     percentage: 14.4,
   },
   {
-    partyId: 'party-aap',
-    shortName: 'AAP',
-    nameEn: 'Aam Aadmi Party',
-    nameHi: 'आम आदमी पार्टी',
-    logoUrl: '/parties/aap.png',
-    color: '#0072B0',
-    count: 11890,
-    percentage: 9.3,
-  },
-  {
     partyId: 'party-others',
     shortName: 'Others',
     nameEn: 'Other Parties & NOTA',
@@ -69,6 +59,16 @@ const DEFAULT_TOP_PARTIES: LeaderboardItem[] = [
     color: '#64748B',
     count: 15220,
     percentage: 11.7,
+  },
+  {
+    partyId: 'party-aap',
+    shortName: 'AAP',
+    nameEn: 'Aam Aadmi Party',
+    nameHi: 'आम आदमी पार्टी',
+    logoUrl: '/parties/aap.png',
+    color: '#0072B0',
+    count: 11890,
+    percentage: 9.3,
   },
 ];
 
@@ -86,8 +86,10 @@ export function HomeTopPollLiveResult() {
         if (data.success && Array.isArray(data.results) && data.results.length > 0) {
           const total = data.totalResponses || 128420;
           setTotalVotes(total);
+          // Sort descending by count
+          const sorted = [...data.results].sort((a: { count: number }, b: { count: number }) => b.count - a.count);
           // Take top 5
-          const mapped: LeaderboardItem[] = data.results.slice(0, 5).map((r: {
+          const mapped: LeaderboardItem[] = sorted.slice(0, 5).map((r: {
             party_id: string;
             party_short_name?: string;
             party_name_en: string;
@@ -101,7 +103,7 @@ export function HomeTopPollLiveResult() {
             shortName: r.party_short_name || r.party_id.replace('party-', '').toUpperCase(),
             nameEn: r.party_name_en,
             nameHi: r.party_name_hi,
-            logoUrl: r.logo_url || `/parties/${r.party_id.replace('party-', '')}.svg`,
+            logoUrl: r.logo_url || `/parties/${r.party_id.replace('party-', '')}.png`,
             color: r.color || '#2457D6',
             count: r.count,
             percentage: r.percentage,
@@ -125,21 +127,21 @@ export function HomeTopPollLiveResult() {
           <Flame className="w-3.5 h-3.5 text-amber-500" />
           <span>
             {language === 'hi'
-              ? 'अक्टूबर 2026 मासिक चक्र • 128,420+ राष्ट्रीय जनमत'
-              : 'October 2026 Monthly Edition • 128,420+ National Poll Votes'}
+              ? 'अक्टूबर 2026 मासिक चक्र • 128,420+ राष्ट्रीय जनमत प्रतिक्रियाएं'
+              : 'October 2026 Monthly Edition • 128,420+ National Poll Responses'}
           </span>
         </div>
 
         <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
           {language === 'hi'
-            ? 'लाइव परिणाम: प्रधानमंत्री (PM) राष्ट्रीय जनमत (2029 अधिदेश)'
-            : 'Live Standings: Prime Minister (PM) All-India Poll (2029 Mandate)'}
+            ? 'लाइव परिणाम: प्रधानमंत्री (PM) राष्ट्रीय जनमत सर्वेक्षण'
+            : 'Live Standings: Prime Minister (PM) All-India Opinion Poll'}
         </h2>
 
         <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
           {language === 'hi'
-            ? 'संपूर्ण भारत के सत्यापित नागरिकों द्वारा दर्ज किए गए मतों का वास्तविक समय में रुझान। नीचे संपूर्ण परिणाम विस्तार से देखें।'
-            : 'Real-time cryptographic vote distribution from verified citizens across all 28 states and 8 UTs. Showing leading national parties.'}
+            ? 'आगामी आम चुनाव के संदर्भ में संपूर्ण भारत के नागरिकों की वास्तविक समय में जनमत प्राथमिकताओं का वितरण।'
+            : 'Real-time aggregate opinion distribution from verified citizens across all 28 states and 8 UTs towards national leadership.'}
         </p>
       </div>
 
@@ -258,7 +260,7 @@ export function HomeTopPollLiveResult() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
-            {/* Primary Action: Vote in PM Poll (Main conversion goal) */}
+            {/* Primary Action: Participate in PM Poll */}
             <Link href="/pm" className="w-full sm:w-auto">
               <GlassButton
                 variant="primary"
@@ -266,13 +268,13 @@ export function HomeTopPollLiveResult() {
                 className="w-full sm:w-auto gap-2 font-bold justify-center shadow-md"
               >
                 <Vote className="w-4 h-4" />
-                <span>{language === 'hi' ? 'PM जनमत में वोट करें' : 'Vote in PM Poll'}</span>
+                <span>{language === 'hi' ? 'PM जनमत में भाग लें' : 'Participate in PM Poll'}</span>
                 <ArrowRight className="w-4 h-4" />
               </GlassButton>
             </Link>
 
-            {/* Secondary Action: View full results in detail */}
-            <Link href="/polls" className="w-full sm:w-auto">
+            {/* Secondary Action: Explore Detailed Results */}
+            <Link href="/polls/national-opinion-poll-2029/results" className="w-full sm:w-auto">
               <GlassButton
                 variant="secondary"
                 size="md"
@@ -282,7 +284,7 @@ export function HomeTopPollLiveResult() {
                 <span>
                   {language === 'hi'
                     ? 'सभी परिणाम विस्तार से देखें'
-                    : 'View Results in Detail'}
+                    : 'Explore Detailed Results'}
                 </span>
               </GlassButton>
             </Link>

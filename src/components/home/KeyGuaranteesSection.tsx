@@ -11,35 +11,35 @@ export function KeyGuaranteesSection() {
   const guarantees = [
     {
       icon: Shield,
-      title: language === 'hi' ? 'पूर्ण पहचान पृथक्करण' : 'Absolute Identity Separation',
+      title: language === 'hi' ? 'पहचान और मत का पृथक्करण' : 'Strict Identity Separation',
       desc:
         language === 'hi'
-          ? 'व्हाट्सएप सत्यापन केवल पात्रता की पुष्टि करता है। डेटाबेस में आपका फ़ोन नंबर कभी भी आपके वोट के साथ नहीं जुड़ता।'
-          : 'WhatsApp OTP confirms participant eligibility. The voting database never records phone numbers or contact details alongside vote choices.',
+          ? 'व्हाट्सएप ओटीपी केवल नागरिक पात्रता की पुष्टि करता है। आपका फोन नंबर कभी भी आपके चुने गए मत के साथ संग्रहीत नहीं होता।'
+          : 'Eligibility is confirmed via WhatsApp OTP, but contact details are never attached to your ballot. The system tallies only anonymous choices.',
     },
     {
       icon: KeyRound,
-      title: language === 'hi' ? 'कीड क्रिप्टोग्राफिक फिंगरप्रिंट' : 'Keyed Cryptographic Fingerprinting',
+      title: language === 'hi' ? 'क्रिप्टोग्राफिक दोहराव रोकथाम' : 'Duplicate Prevention via Hashing',
       desc:
         language === 'hi'
-          ? 'दोहरे मतदान को रोकने के लिए गुप्त कुंजी युक्त HMAC-SHA256 एकतरफ़ा हैश का उपयोग होता है, जिससे कच्चा फ़ोन नंबर कभी सेव नहीं होता।'
-          : 'Duplicate submissions are prevented via server-keyed HMAC-SHA256 fingerprints, discarding raw phone numbers immediately from memory.',
+          ? 'एक व्यक्ति-एक मत लागू करने के लिए नंबर को एकतरफा क्रिप्टोग्राफिक हैश में बदला जाता है। कच्चा फोन नंबर मेमोरी से तुरंत मिटा दिया जाता है।'
+          : 'To enforce one submission per person, phone numbers are transformed into one-way cryptographic hashes. Raw numbers are immediately cleared from memory.',
     },
     {
       icon: Cpu,
-      title: language === 'hi' ? 'अखंड (Atomic) डेटाबेस लेनदेन' : 'Atomic Vote Increment',
+      title: language === 'hi' ? 'अखंड सुरक्षित डेटाबेस लेनदेन' : 'Atomic Response Processing',
       desc:
         language === 'hi'
-          ? 'सभी वोट डेटाबेस में अखंड (atomic) ट्रांजेक्शन से गिने जाते हैं। टोकन की केवल एक बार खपत होती है, जिससे रेस कंडीशन असंभव है।'
-          : 'Responses are tallied through strict atomic database operations. Credentials are consumed in the same transaction to eliminate race conditions.',
+          ? 'प्रत्येक मत एक ही सुरक्षित डेटाबेस लेनदेन में दर्ज होता है। उपयोग के तुरंत बाद सत्र टोकन समाप्त हो जाता है, जिससे दोहराव असंभव है।'
+          : 'Submissions are tallied through strict atomic database operations. Verification tokens expire immediately upon use to prevent race conditions.',
     },
     {
       icon: Scale,
-      title: language === 'hi' ? 'पूर्ण राजनीतिक तटस्थता' : 'Uncompromising Neutrality',
+      title: language === 'hi' ? 'निष्पक्ष और समान प्रस्तुति' : 'Strict Political Neutrality',
       desc:
         language === 'hi'
-          ? 'किसी भी दल की कोई सिफ़ारिश नहीं, कोई प्रायोजित कार्ड नहीं। सभी विकल्पों को समान दृश्य पदानुक्रम और तटस्थ क्रम में प्रस्तुत किया जाता है।'
-          : 'Zero recommendations, zero sponsored cards, and zero persuasive framing. Every party is rendered with identical visual hierarchy.',
+          ? 'कोई प्रायोजित प्रचार नहीं, कोई वरीयता नहीं। सभी राजनीतिक दलों और उम्मीदवारों को समान आकार, फ़ॉन्ट और तटस्थ पदानुक्रम में दिखाया जाता है।'
+          : 'Zero sponsored placements, zero algorithmic favoritism. All political parties receive uniform card dimensions, typography, and visual weight.',
     },
   ];
 

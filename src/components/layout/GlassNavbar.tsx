@@ -8,6 +8,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { SupportButton } from '@/components/support/SupportButton';
+import { InstallAppNavButton } from '@/components/pwa/InstallAppPrompt';
 import { BarChart3, HelpCircle, HeartHandshake, Globe, Building2, Vote, Mail } from 'lucide-react';
 
 export function GlassNavbar() {
@@ -118,10 +119,10 @@ export function GlassNavbar() {
             })}
           </div>
 
-          {/* Controls: Language, Theme, & Mobile Toggle (No SupportButton in header to preserve clean layout on phones) */}
+          {/* Controls: Language, Theme, & Mobile Toggle */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
             <LanguageSwitcher />
-            <ThemeSwitcher className="hidden sm:inline-flex" />
+            <ThemeSwitcher className="inline-flex" />
 
             {/* Mobile Menu Button with 44x44px minimum touch target */}
             <button
@@ -172,8 +173,13 @@ export function GlassNavbar() {
               })}
             </div>
 
-            {/* Support Developer CTA in Drawer */}
+            {/* Download App CTA */}
             <div className="pt-2">
+              <InstallAppNavButton className="w-full justify-center min-h-[44px]" />
+            </div>
+
+            {/* Support Developer CTA in Drawer */}
+            <div className="pt-1">
               <SupportButton variant="pill" className="w-full justify-center min-h-[48px]" />
             </div>
 

@@ -33,7 +33,7 @@ export function VotingView({ poll, anonymousToken, onVoteSuccess }: VotingViewPr
   };
 
   const handleConfirmVote = async () => {
-    if (!selectedOptionId || !anonymousToken) return;
+    if (!selectedOptionId) return;
 
     setIsSubmitting(true);
     setSubmitError(null);
@@ -47,7 +47,7 @@ export function VotingView({ poll, anonymousToken, onVoteSuccess }: VotingViewPr
         body: JSON.stringify({
           pollId: poll.id,
           optionId: selectedOptionId,
-          anonymousToken,
+          anonymousToken: anonymousToken || 'anonymous-open',
           idempotencyKey,
         }),
       });
@@ -72,13 +72,26 @@ export function VotingView({ poll, anonymousToken, onVoteSuccess }: VotingViewPr
       {/* Header & Progress Indicator */}
       <div className="text-center space-y-3">
         <div className="inline-flex flex-wrap items-center justify-center gap-2">
-          <GlassBadge variant="success">
-            <span>✓ {t.verification.selfVerificationConfirmed}</span>
-          </GlassBadge>
-          <GlassBadge variant="accent">
-            <Lock className="w-3 h-3 text-[var(--accent)]" />
-            <span>{t.voting.headerProgress}</span>
-          </GlassBadge>
+          {poll.requires_verification === false ? (
+            <>
+              <GlassBadge variant="success">
+                <span>⚡ {language === 'hi' ? 'ओपन पोल (बिना नंबर के)' : 'Open Poll (No Phone Required)'}</span>
+              </GlassBadge>
+              <GlassBadge variant="accent">
+                <span>{language === 'hi' ? 'तुरंत गुमनाम वोट' : 'Instant Anonymous Vote'}</span>
+              </GlassBadge>
+            </>
+          ) : (
+            <>
+              <GlassBadge variant="success">
+                <span>✓ {t.verification.selfVerificationConfirmed}</span>
+              </GlassBadge>
+              <GlassBadge variant="accent">
+                <Lock className="w-3 h-3 text-[var(--accent)]" />
+                <span>{t.voting.headerProgress}</span>
+              </GlassBadge>
+            </>
+          )}
           <GlassBadge variant="neutral">
             <span>{t.common.privacyGuaranteed}</span>
           </GlassBadge>

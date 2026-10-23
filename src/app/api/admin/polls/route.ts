@@ -41,6 +41,10 @@ export async function POST(request: Request) {
       results_visibility,
       voting_policy,
       max_votes_per_citizen,
+      requires_verification,
+      verification_mode,
+      poll_type,
+      category,
     } = body;
 
     if (!title_en || !title_hi) {
@@ -72,6 +76,10 @@ export async function POST(request: Request) {
       results_visibility,
       voting_policy,
       max_votes_per_citizen,
+      requires_verification: requires_verification !== undefined ? Boolean(requires_verification) : true,
+      verification_mode: verification_mode || (requires_verification === false ? 'NONE' : 'WHATSAPP_OTP'),
+      poll_type: poll_type || 'CUSTOM',
+      category: category ? sanitizeText(category, 50) : undefined,
     });
 
     return NextResponse.json({
@@ -159,6 +167,10 @@ export async function PATCH(request: Request) {
       results_visibility,
       voting_policy,
       max_votes_per_citizen,
+      requires_verification,
+      verification_mode,
+      poll_type,
+      category,
     } = body;
 
     const { sanitizeText } = await import('@/lib/utils/sanitize');
@@ -174,6 +186,10 @@ export async function PATCH(request: Request) {
       results_visibility,
       voting_policy,
       max_votes_per_citizen,
+      requires_verification: requires_verification !== undefined ? Boolean(requires_verification) : undefined,
+      verification_mode,
+      poll_type,
+      category: category ? sanitizeText(category, 50) : undefined,
     });
 
     if (!updated) {

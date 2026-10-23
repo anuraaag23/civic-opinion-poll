@@ -46,15 +46,15 @@ export function HomeClient() {
               <span className="text-[var(--accent)]">{language === 'hi' ? 'मेरा वोट' : 'Mera Vote'}</span>
               <span className="block text-2xl sm:text-4xl lg:text-5xl mt-1 text-[var(--text-primary)]">
                 {language === 'hi'
-                  ? 'जनमत सर्वेक्षण मंच'
-                  : 'Opinion Poll Platform'}
+                  ? 'आपकी आवाज़। आपका जनमत।'
+                  : 'Your Voice. Your Opinion.'}
               </span>
             </h1>
 
             <p className="text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-2xl font-normal">
               {language === 'hi'
-                ? 'प्रधानमंत्री (संपूर्ण भारत) और मुख्यमंत्री (राज्यवार) के लिए अलग-अलग जनमत सर्वेक्षण। आधिकारिक चुनाव चिह्नों के साथ 100% निष्पक्ष, सुरक्षित और गुमनाम।'
-                : 'Two dedicated polling sections: One for Prime Minister (All India) and one for Chief Minister (State-by-State). Cast your voice anonymously with authentic party logos.'}
+                ? 'राष्ट्रीय (प्रधानमंत्री) और राज्य-स्तरीय (मुख्यमंत्री) प्राथमिकताओं के लिए एक स्वतंत्र नागरिक जनमत मंच। आधिकारिक चुनाव चिह्नों के साथ अपनी राय गोपनीय रूप से दर्ज करें।'
+                : 'An independent public opinion platform for national and state-level political preferences. Share your confidential opinion with authentic party election symbols.'}
             </p>
 
             {/* Direct Dual CTAs: PM Poll & CM Poll */}
@@ -62,14 +62,14 @@ export function HomeClient() {
               <Link href="/pm" className="w-full sm:w-auto">
                 <GlassButton size="lg" className="w-full sm:w-auto gap-2 shadow-md font-bold">
                   <Globe className="w-4 h-4 text-white" />
-                  <span>{language === 'hi' ? 'PM जनमत (संपूर्ण भारत)' : 'PM Poll (All India)'}</span>
+                  <span>{language === 'hi' ? 'PM जनमत में भाग लें' : 'Participate in PM Poll'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </GlassButton>
               </Link>
               <Link href="/cm" className="w-full sm:w-auto">
                 <GlassButton variant="secondary" size="lg" className="w-full sm:w-auto gap-2 font-bold border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
                   <Building2 className="w-4 h-4" />
-                  <span>{language === 'hi' ? 'CM जनमत (राज्यवार)' : 'CM Poll (State-wise)'}</span>
+                  <span>{language === 'hi' ? 'CM जनमत में भाग लें' : 'Participate in CM Poll'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </GlassButton>
               </Link>
@@ -80,8 +80,17 @@ export function HomeClient() {
                   className="w-full sm:w-auto gap-2 font-bold bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-[var(--text-primary)] shadow-xs"
                 >
                   <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
-                  <span>{language === 'hi' ? 'लाइव परिणाम' : 'Live Results'}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[var(--text-tertiary)]" />
+                  <span>{language === 'hi' ? 'लाइव परिणाम' : 'Results'}</span>
+                </GlassButton>
+              </Link>
+              <Link href="/polls" className="w-full sm:w-auto">
+                <GlassButton
+                  variant="secondary"
+                  size="lg"
+                  className="w-full sm:w-auto gap-2 font-bold bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-[var(--text-primary)] shadow-xs"
+                >
+                  <Vote className="w-4 h-4 text-purple-500" />
+                  <span>{language === 'hi' ? 'सभी जनमत' : 'All Polls'}</span>
                 </GlassButton>
               </Link>
             </div>
@@ -230,7 +239,7 @@ export function HomeClient() {
               <Link href="/pm" className="w-full sm:flex-1">
                 <GlassButton variant="primary" size="md" className="w-full gap-2 font-bold justify-center shadow-md">
                   <Vote className="w-4 h-4" />
-                  <span>{language === 'hi' ? 'PM के लिए वोट करें' : 'Vote in PM Poll'}</span>
+                  <span>{language === 'hi' ? 'PM जनमत में भाग लें' : 'Participate in PM Poll'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </GlassButton>
               </Link>
@@ -330,7 +339,7 @@ export function HomeClient() {
               <Link href="/cm" className="w-full sm:flex-1">
                 <GlassButton variant="primary" size="md" className="w-full gap-2 font-bold justify-center shadow-md">
                   <Vote className="w-4 h-4" />
-                  <span>{language === 'hi' ? `${currentState.name_hi} CM के लिए वोट करें` : `Vote in ${currentState.code} CM Poll`}</span>
+                  <span>{language === 'hi' ? `${currentState.name_hi} CM जनमत में भाग लें` : `Participate in ${currentState.code} CM Poll`}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </GlassButton>
               </Link>
@@ -353,15 +362,20 @@ export function HomeClient() {
       <HomeTopPollLiveResult />
 
 
-      {/* Super Simple 3-Step Walkthrough */}
+      {/* Consolidated 3-Step Walkthrough */}
       <section className="space-y-4">
         <div className="text-center max-w-xl mx-auto space-y-1">
           <span className="text-xs font-bold uppercase tracking-wider text-[var(--accent)]">
-            {language === 'hi' ? 'आसान प्रक्रिया' : 'Simple 3-Step Process'}
+            {language === 'hi' ? 'सहज भागीदारी' : 'How Participation Works'}
           </span>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-[var(--text-primary)]">
-            {language === 'hi' ? 'केवल 30 सेकंड में अपना मत दर्ज करें' : 'Cast Your Opinion in 30 Seconds'}
+            {language === 'hi' ? 'अपनी राय साझा करें' : 'Share Your Opinion'}
           </h2>
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+            {language === 'hi'
+              ? 'तीन सरल और गोपनीय चरणों में अपनी नागरिक राय दर्ज करें।'
+              : 'A transparent, confidential, and direct process in three clear steps.'}
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -370,13 +384,13 @@ export function HomeClient() {
               <div className="flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center shrink-0">1</span>
                 <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                  {language === 'hi' ? '1. व्हाट्सएप ओटीपी सत्यापन' : '1. Verify via WhatsApp OTP'}
+                  {language === 'hi' ? '1. पात्रता सत्यापन' : '1. Verify Participation'}
                 </h3>
               </div>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11 pt-1">
                 {language === 'hi'
-                  ? 'व्हाट्सएप पर 6-अंकों का त्वरित ओटीपी प्राप्त करें। मोबाइल नंबर कभी स्टोर नहीं होता (एकतरफ़ा हैश सुरक्षा)।'
-                  : 'Receive a quick 6-digit OTP on WhatsApp. Mobile numbers are never saved (one-way HMAC hash).'}
+                  ? 'व्हाट्सएप पर 6-अंकों का निःशुल्क कोड प्राप्त करें। फोन नंबर गुप्त कुंजी द्वारा हैश हो जाता है और कभी वोट से नहीं जुड़ता।'
+                  : 'Receive a confidential 6-digit OTP on WhatsApp. Mobile numbers are converted into server-keyed cryptographic hashes and discarded.'}
               </p>
             </div>
           </GlassCard>
@@ -386,13 +400,13 @@ export function HomeClient() {
               <div className="flex items-center gap-3">
                 <span className="w-8 h-8 rounded-full bg-[var(--accent)] text-white text-xs font-black flex items-center justify-center shrink-0">2</span>
                 <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                  {language === 'hi' ? '2. PM या CM पार्टी चुनें' : '2. Select Your PM or CM Choice'}
+                  {language === 'hi' ? '2. अपनी पसंद चुनें' : '2. Select a Poll Option'}
                 </h3>
               </div>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11 pt-1">
                 {language === 'hi'
-                  ? 'राष्ट्रीय या राज्य स्तर पर अपने पसंदीदा दल या नोटा का चयन करें। असली चुनाव चिह्नों के साथ।'
-                  : 'Pick your preferred national or state party option with authentic verified symbols.'}
+                  ? 'राष्ट्रीय अथवा अपने राज्य की विधानसभा के लिए आधिकारिक चुनाव चिह्नों के साथ स्वतंत्र रूप से अपना पसंदीदा दल चुनें।'
+                  : 'Choose your preferred national or state assembly choice presented neutrally with authentic election symbols.'}
               </p>
             </div>
           </GlassCard>
@@ -400,15 +414,15 @@ export function HomeClient() {
           <GlassCard className="space-y-2 p-5 flex flex-col justify-between">
             <div>
               <div className="flex items-center gap-3">
-                <span className="w-8 h-8 rounded-full bg-[var(--success)] text-white text-xs font-black flex items-center justify-center shrink-0">3</span>
+                <span className="w-8 h-8 rounded-full bg-emerald-600 text-white text-xs font-black flex items-center justify-center shrink-0">3</span>
                 <h3 className="font-bold text-sm text-[var(--text-primary)]">
-                  {language === 'hi' ? '3. पुष्टि करें और परिणाम देखें' : '3. Confirm & View Live Results'}
+                  {language === 'hi' ? '3. पुष्टि करें और परिणाम देखें' : '3. Confirm & View Results'}
                 </h3>
               </div>
               <p className="text-xs text-[var(--text-secondary)] leading-relaxed pl-11 pt-1">
                 {language === 'hi'
-                  ? 'मतदान के बाद आपका वोट कभी नहीं बदलेगा। तुरंत राष्ट्रीय और राज्य-वार लाइव मतगणना देखें।'
-                  : 'Response is permanently sealed. Real-time vote counts update automatically.'}
+                  ? 'अपने मत की पुष्टि करें। आपका वोट सुरक्षित रूप से सील हो जाता है और तुरंत लाइव राष्ट्रीय और राज्य-वार मतगणना में जुड़ जाता है।'
+                  : 'Confirm your choice to seal your response. Aggregate counts update transparently across India.'}
               </p>
             </div>
           </GlassCard>

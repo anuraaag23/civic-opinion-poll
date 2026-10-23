@@ -10,6 +10,26 @@ export function FloatingSupportWidget() {
   const pathname = usePathname();
   const { language } = useI18n();
   const [stats, setStats] = useState<SupportStats>(() => getStoredSupportStats());
+  const [isNearFooter, setIsNearFooter] = useState(false);
+
+  useEffect(() => {
+    if (pathname !== '/') return;
+
+    // Observe footer to avoid covering footer links or legal disclaimers
+    const footerEl = document.querySelector('footer');
+    if (!footerEl) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        setIsNearFooter(entry.isIntersecting);
+      },
+      { root: null, threshold: 0.05 }
+    );
+
+    observer.observe(footerEl);
+    return () => observer.disconnect();
+  }, [pathname]);
 
   useEffect(() => {
     if (pathname !== '/') return;
@@ -42,10 +62,14 @@ export function FloatingSupportWidget() {
   const titleText =
     language === 'hi'
       ? 'इस वेबसाइट को जीवित रखने के लिए डेवलपर का समर्थन करें'
-      : 'support to developer for make alive this website';
+      : 'Support the developer to keep this platform running';
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-5 sm:right-6 z-40">
+    <div
+      className={`fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right))] sm:bottom-6 sm:right-6 z-40 transition-all duration-300 ${
+        isNearFooter ? 'opacity-0 pointer-events-none translate-y-4 scale-90' : 'opacity-100 translate-y-0 scale-100'
+      }`}
+    >
       {/* ── MOBILE VIEW: ANIMATED FLOATING CUP ICON BUTTON (< 640px) ── */}
       <a
         href={BUYMEACHAI_CONFIG.url}

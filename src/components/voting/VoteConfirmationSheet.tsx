@@ -5,7 +5,7 @@ import { Party } from '@/lib/types';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassModal } from '@/components/ui/GlassModal';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Vote } from 'lucide-react';
 
 interface VoteConfirmationSheetProps {
   isOpen: boolean;
@@ -54,10 +54,9 @@ export function VoteConfirmationSheet({
                 onError={() => setImgError(true)}
               />
             ) : (
-              <div
-                className="w-full h-full flex items-center justify-center"
-                dangerouslySetInnerHTML={{ __html: selectedParty.symbol_svg }}
-              />
+              <div className="w-full h-full flex items-center justify-center bg-[var(--bg-surface)] text-[var(--accent)]">
+                <Vote className="w-6 h-6 text-[var(--accent)]" />
+              </div>
             )}
           </div>
           <div className="space-y-0.5 min-w-0 flex-1">

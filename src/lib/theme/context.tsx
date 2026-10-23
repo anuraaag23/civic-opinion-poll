@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useSyncExternalStore, useCallback } from 'react';
 import { ThemeMode } from '../types';
 
 interface ThemeContextType {
@@ -10,6 +10,22 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+function subscribeSystemTheme(callback: () => void) {
+  if (typeof window === 'undefined') return () => {};
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  mediaQuery.addEventListener('change', callback);
+  return () => mediaQuery.removeEventListener('change', callback);
+}
+
+function getSystemThemeSnapshot(): 'light' | 'dark' {
+  if (typeof window === 'undefined') return 'dark';
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function getSystemThemeServerSnapshot(): 'light' | 'dark' {
+  return 'dark';
+}
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>(() => {
@@ -26,51 +42,35 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return 'system';
   });
 
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
+  const systemTheme = useSyncExternalStore(
+    subscribeSystemTheme,
+    getSystemThemeSnapshot,
+    getSystemThemeServerSnapshot
+  );
 
+  const resolvedTheme: 'light' | 'dark' =
+    theme === 'dark' ? 'dark' : theme === 'light' ? 'light' : systemTheme;
+
+  // Sync DOM with resolved theme
   useEffect(() => {
-    const computeTheme = () => {
-      let isDark = false;
-      if (theme === 'dark') {
-        isDark = true;
-      } else if (theme === 'light') {
-        isDark = false;
-      } else {
-        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      }
+    const root = document.documentElement;
+    if (resolvedTheme === 'dark') {
+      root.classList.add('dark');
+      root.setAttribute('data-theme', 'dark');
+    } else {
+      root.classList.remove('dark');
+      root.setAttribute('data-theme', 'light');
+    }
+  }, [resolvedTheme]);
 
-      setResolvedTheme(isDark ? 'dark' : 'light');
-      const root = document.documentElement;
-      if (isDark) {
-        root.classList.add('dark');
-        root.setAttribute('data-theme', 'dark');
-      } else {
-        root.classList.remove('dark');
-        root.setAttribute('data-theme', 'light');
-      }
-    };
-
-    computeTheme();
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handler = () => {
-      if (theme === 'system') {
-        computeTheme();
-      }
-    };
-
-    mediaQuery.addEventListener('change', handler);
-    return () => mediaQuery.removeEventListener('change', handler);
-  }, [theme]);
-
-  const setTheme = (newTheme: ThemeMode) => {
+  const setTheme = useCallback((newTheme: ThemeMode) => {
     setThemeState(newTheme);
     try {
       localStorage.setItem('civic_poll_theme', newTheme);
     } catch {
       // Ignore
     }
-  };
+  }, []);
 
   return (
     <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme }}>

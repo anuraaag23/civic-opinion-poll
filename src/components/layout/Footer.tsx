@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useI18n } from '@/lib/i18n/context';
 import { SupportButton } from '@/components/support/SupportButton';
+import { InstallAppNavButton } from '@/components/pwa/InstallAppPrompt';
 import { ShieldCheck, Lock, Mail, MapPin, User } from 'lucide-react';
 
 export function Footer() {
@@ -40,8 +41,9 @@ export function Footer() {
                 {t.common.tagline}. {t.hero.subtitle}
               </p>
 
-              <div className="pt-1">
+              <div className="pt-1 flex flex-wrap items-center gap-2">
                 <SupportButton variant="compact" />
+                <InstallAppNavButton />
               </div>
             </div>
 

@@ -49,26 +49,6 @@ const MONTH_OPTIONS = [
   { key: '2026-01', nameEn: 'January 2026', nameHi: 'जनवरी 2026' },
 ];
 
-const REGIONAL_TICKER_EN = [
-  'Self-verified participant from Uttar Pradesh recorded anonymously',
-  'Self-verified participant from Maharashtra recorded anonymously',
-  'Self-verified participant from Bihar recorded anonymously',
-  'Self-verified participant from West Bengal recorded anonymously',
-  'Self-verified participant from Madhya Pradesh recorded anonymously',
-  'Self-verified participant from Rajasthan recorded anonymously',
-  'Self-verified participant from Karnataka recorded anonymously',
-];
-
-const REGIONAL_TICKER_HI = [
-  'उत्तर प्रदेश से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'महाराष्ट्र से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'बिहार से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'पश्चिम बंगाल से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'मध्य प्रदेश से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'राजस्थान से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-  'कर्नाटक से एक स्व-सत्यापित नागरिक की प्रतिक्रिया गुमनाम रूप से दर्ज हुई',
-];
-
 export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
   const { t, language } = useI18n();
   const searchParams = useSearchParams();
@@ -95,7 +75,6 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [copied, setCopied] = useState<boolean>(false);
-  const [tickerIndex, setTickerIndex] = useState(0);
 
   const currentState = getStateById(selectedStateId);
 
@@ -171,22 +150,16 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
 
     const interval = setInterval(() => {
       loadResults();
-    }, 4000);
-
-    const tickerTimer = setInterval(() => {
-      setTickerIndex((prev) => (prev + 1) % REGIONAL_TICKER_EN.length);
-    }, 3500);
+    }, 6000);
 
     return () => {
       active = false;
       clearInterval(interval);
-      clearInterval(tickerTimer);
     };
   }, [loadResults, scope, selectedStateId, pollIdOrSlug, timeframe, selectedMonth]);
 
   const maxPercentage = Math.max(...results.map((r) => r.percentage), 1);
   const pollTitle = language === 'hi' ? pollTitleHi : pollTitleEn;
-  const currentTicker = language === 'hi' ? REGIONAL_TICKER_HI[tickerIndex] : REGIONAL_TICKER_EN[tickerIndex];
 
   const handleShare = async () => {
     try {
@@ -423,14 +396,22 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
           </div>
         </div>
 
-        {/* Live Anonymous Activity Ticker */}
-        <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
-          <Radio className="w-4 h-4 text-[var(--success)] shrink-0 animate-pulse" />
-          <span className="font-semibold text-[var(--text-primary)] shrink-0">
-            {language === 'hi' ? 'लाइव प्रवाह:' : 'Live Stream:'}
-          </span>
-          <span className="truncate italic transition-all duration-300">
-            {currentTicker}
+        {/* Live Status Indicator */}
+        <div className="p-3 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex items-center justify-between gap-2.5 text-xs text-[var(--text-secondary)]">
+          <div className="flex items-center gap-2">
+            <Radio className="w-4 h-4 text-[var(--success)] shrink-0 animate-pulse" />
+            <span className="font-semibold text-[var(--text-primary)]">
+              {language === 'hi' ? 'लाइव डेटा गणना:' : 'Live Counting Status:'}
+            </span>
+            <span className="text-[var(--text-secondary)]">
+              {language === 'hi'
+                ? 'क्रिप्टोग्राफिक रूप से सीलबंद और सीधे डेटाबेस से गणना की गई'
+                : 'Directly computed from cryptographically verified submissions'}
+            </span>
+          </div>
+          <span className="hidden sm:inline-flex items-center gap-1.5 text-[11px] font-mono text-[var(--success)] font-semibold">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)]" />
+            {language === 'hi' ? 'स्वतः अद्यतन सक्रिय' : 'Auto-sync active'}
           </span>
         </div>
 
@@ -461,7 +442,7 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
           </span>
           <span className="font-mono text-[11px] text-[var(--success)] font-semibold flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-[var(--success)]" />
-            Auto-Sync Every 4s
+            Auto-Sync Active
           </span>
         </div>
       </GlassCard>

@@ -53,9 +53,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check poll verification requirements
+    const poll = await db.getPollById(pollId);
+    if (!poll) {
+      return NextResponse.json({ success: false, error: 'Poll not found' }, { status: 404 });
+    }
+
+    if (poll.status !== 'LIVE') {
+      return NextResponse.json({ success: false, error: 'This opinion poll is no longer active' }, { status: 400 });
+    }
+
+    // If zero verification / open polling is enabled for this poll
+    if (poll.requires_verification === false || poll.verification_mode === 'NONE') {
+      const result = await db.incrementVoteOpen(pollId, optionId, ip);
+      if (!result.success) {
+        return NextResponse.json(
+          { success: false, error: result.error || 'Vote submission failed' },
+          { status: 400 }
+        );
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Vote recorded anonymously without verification',
+        idempotencyKey: typeof idempotencyKey === 'string' ? idempotencyKey.slice(0, 64) : undefined,
+      });
+    }
+
+    // For verified polls: check cryptographic CSPRNG anonymous token
     if (!anonymousToken || !isValidTokenFormat(anonymousToken)) {
       return NextResponse.json(
-        { success: false, error: 'Invalid anonymous credential token format' },
+        { success: false, error: 'Verification required. Please verify via WhatsApp OTP before submitting.' },
         { status: 400 }
       );
     }

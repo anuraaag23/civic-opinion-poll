@@ -15,13 +15,7 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Lotus - Official Election Symbol of Bharatiya Janata Party (BJP)',
     symbol_alt_hi: 'कमल - भारतीय जनता पार्टी (भाजपा) का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-orange-600">
-      <path d="M32 12C32 12 24 24 24 34C24 40 28 44 32 44C36 44 40 40 40 34C40 24 32 12 32 12Z" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="2"/>
-      <path d="M32 44C26 44 14 38 14 28C14 22 20 26 24 34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      <path d="M32 44C38 44 50 38 50 28C50 22 44 26 40 34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-      <path d="M22 46C26 50 38 50 42 46" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M28 50L24 56M36 50L40 56" stroke="currentColor" stroke-width="2"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'National recognized political party founded in 1980.',
     description_hi: '1980 में स्थापित राष्ट्रीय मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -41,9 +35,7 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Hand - Official Election Symbol of Indian National Congress (INC)',
     symbol_alt_hi: 'हाथ का पंजा - भारतीय राष्ट्रीय कांग्रेस का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-cyan-700">
-      <path d="M24 34V18C24 16 26 14 28 14C30 14 32 16 32 18V30M32 18C32 15 34 13 36 13C38 13 40 15 40 18V30M40 20C40 17 42 15 44 15C46 15 48 17 48 20V34C48 44 42 52 34 52C24 52 20 44 20 36V28C20 26 22 24 24 24C26 24 28 26 28 28V34" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'National recognized political party founded in 1885.',
     description_hi: '1885 में स्थापित राष्ट्रीय मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -63,11 +55,7 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Bicycle - Official Election Symbol of Samajwadi Party (SP)',
     symbol_alt_hi: 'साइकिल - समाजवादी पार्टी का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
-      <circle cx="18" cy="40" r="10" stroke="currentColor" stroke-width="2.5"/>
-      <circle cx="46" cy="40" r="10" stroke="currentColor" stroke-width="2.5"/>
-      <path d="M18 40L30 40L38 24M38 24L46 40M38 24L26 24M30 40L38 24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state recognized political party founded in 1992.',
     description_hi: '1992 में स्थापित प्रमुख मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -87,10 +75,7 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Broom - Official Election Symbol of Aam Aadmi Party (AAP)',
     symbol_alt_hi: 'झाड़ू - आम आदमी पार्टी का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-amber-700">
-      <path d="M12 48L38 22L44 28L18 54Z" fill="currentColor" fill-opacity="0.2" stroke="currentColor" stroke-width="2"/>
-      <line x1="38" y1="22" x2="52" y2="8" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'National recognized political party founded in 2012.',
     description_hi: '2012 में स्थापित राष्ट्रीय मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -110,10 +95,7 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Elephant - Official Election Symbol of Bahujan Samaj Party (BSP)',
     symbol_alt_hi: 'हाथी - बहुजन समाज पार्टी का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-700">
-      <path d="M14 42V30C14 24 20 18 32 18C44 18 50 24 50 30V42" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-      <path d="M20 42V52M28 42V52M36 42V52M44 42V52" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'National recognized political party founded in 1984.',
     description_hi: '1984 में स्थापित राष्ट्रीय मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -133,10 +115,7 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Hammer, Sickle and Star - Official Symbol of CPI(M)',
     symbol_alt_hi: 'हथौड़ा, हंसिया और सितारा - माकपा का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
-      <path d="M20 22L42 44M18 18L24 14L30 20L24 26L18 18Z" stroke="currentColor" stroke-width="2.5"/>
-      <polygon points="32,10 35,18 43,18 36,23 39,31 32,26 25,31 28,23 21,18 29,18" fill="currentColor"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'National recognized political party founded in 1964.',
     description_hi: '1964 में स्थापित राष्ट्रीय मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -156,11 +135,7 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Twin Flowers and Grass - Official Symbol of AITC',
     symbol_alt_hi: 'जोड़ा फूल और घास - तृणमूल कांग्रेस का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-emerald-600">
-      <path d="M24 48C24 36 28 26 32 20C36 26 40 36 40 48" stroke="currentColor" stroke-width="2.5"/>
-      <circle cx="28" cy="22" r="5" fill="currentColor"/>
-      <circle cx="36" cy="22" r="5" fill="currentColor"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state recognized political party founded in 1998.',
     description_hi: '1998 में स्थापित प्रमुख मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -180,16 +155,7 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_role_hi: 'प्रधानमंत्री प्रत्याशी',
     symbol_alt_en: 'Election Ballot Box & Vote - Other Parties & Independent Candidates',
     symbol_alt_hi: 'मतपेटी एवं मतपत्र - अन्य पंजीकृत दल व निर्दलीय उम्मीदवार',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-slate-700">
-      <circle cx="32" cy="32" r="30" fill="#1e293b"/>
-      <rect x="18" y="28" width="28" height="22" rx="3" fill="#334155" stroke="#94a3b8" stroke-width="1.5"/>
-      <rect x="15" y="25" width="34" height="5" rx="1.5" fill="#475569" stroke="#cbd5e1" stroke-width="1"/>
-      <rect x="25" y="11" width="14" height="15" rx="1.5" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1"/>
-      <line x1="28" y1="14" x2="36" y2="14" stroke="#94a3b8" stroke-width="1"/>
-      <line x1="28" y1="17" x2="36" y2="17" stroke="#94a3b8" stroke-width="1"/>
-      <path d="M29 22 L32 25 L36 19" fill="none" stroke="#10b981" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-      <text x="32" y="42" text-anchor="middle" fill="#f1f5f9" font-family="system-ui, sans-serif" font-size="6" font-weight="bold">OTH</text>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'All other recognized state parties and independent civic candidates.',
     description_hi: 'अन्य सभी मान्यता प्राप्त राज्य स्तरीय दल एवं निर्दलीय उम्मीदवार।',
     source_ref: 'Collective Civic Category',
@@ -209,15 +175,7 @@ export const NATIONAL_PARTIES: Party[] = [
     candidate_role_hi: 'अस्वीकृति विकल्प',
     symbol_alt_en: 'Ballot Stamp with Cross - NOTA Official Civic Option',
     symbol_alt_hi: 'मतपत्र पर क्रॉस - नोटा आधिकारिक नागरिक अभिव्यक्ति',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-stone-700">
-      <rect x="12" y="10" width="40" height="44" rx="4" fill="#ffffff" stroke="#334155" stroke-width="2.5"/>
-      <line x1="18" y1="20" x2="46" y2="20" stroke="#cbd5e1" stroke-width="2"/>
-      <line x1="18" y1="27" x2="46" y2="27" stroke="#cbd5e1" stroke-width="2"/>
-      <line x1="18" y1="34" x2="46" y2="34" stroke="#cbd5e1" stroke-width="2"/>
-      <line x1="18" y1="41" x2="46" y2="41" stroke="#cbd5e1" stroke-width="2"/>
-      <line x1="16" y1="14" x2="48" y2="50" stroke="#dc2626" stroke-width="4.5" stroke-linecap="round"/>
-      <line x1="48" y1="14" x2="16" y2="50" stroke="#dc2626" stroke-width="4.5" stroke-linecap="round"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Civic expression of not supporting any listed political option.',
     description_hi: 'सूचीबद्ध किसी भी राजनीतिक विकल्प का समर्थन न करने की नागरिक अभिव्यक्ति।',
     source_ref: 'Civic Standard Option',
@@ -236,9 +194,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#15803d',
     symbol_alt_en: 'Arrow - Official Election Symbol of Janata Dal (United)',
     symbol_alt_hi: 'तीर - जनता दल (यूनाइटेड) का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-emerald-700">
-      <path d="M12 32h36M36 20l16 12-16 12" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state party in Bihar founded in 2003.',
     description_hi: '2003 में स्थापित बिहार का प्रमुख राज्य स्तरीय राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -254,9 +210,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#166534',
     symbol_alt_en: 'Hurricane Lantern - Official Election Symbol of RJD',
     symbol_alt_hi: 'लालटेन - राष्ट्रीय जनता दल का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-emerald-800">
-      <path d="M24 16h16v8H24zM20 24h24v20H20zM22 44h20v8H22z" stroke="currentColor" stroke-width="2"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state party in Bihar founded in 1997.',
     description_hi: '1997 में स्थापित बिहार का प्रमुख राज्य स्तरीय राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -272,9 +226,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#dc2626',
     symbol_alt_en: 'Rising Sun - Official Election Symbol of DMK',
     symbol_alt_hi: 'उगता सूरज - द्रमुक का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
-      <circle cx="32" cy="40" r="16" fill="currentColor"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major ruling state party in Tamil Nadu founded in 1949.',
     description_hi: 'तमिलनाडु का प्रमुख सत्तारूढ़ राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -290,10 +242,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#16a34a',
     symbol_alt_en: 'Two Leaves - Official Election Symbol of AIADMK',
     symbol_alt_hi: 'दो पत्तियां - अन्नाद्रमुक का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-600">
-      <path d="M32 48C24 36 16 32 20 20C28 20 32 28 32 48Z" fill="currentColor"/>
-      <path d="M32 48C40 36 48 32 44 20C36 20 32 28 32 48Z" fill="currentColor"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state party in Tamil Nadu founded in 1972.',
     description_hi: 'तमिलनाडु का प्रमुख राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -309,10 +258,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#ea580c',
     symbol_alt_en: 'Bow and Arrow - Official Election Symbol of Shiv Sena',
     symbol_alt_hi: 'धनुष-बाण - शिवसेना का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-orange-600">
-      <path d="M20 16C36 24 36 40 20 48" stroke="currentColor" stroke-width="3"/>
-      <line x1="16" y1="32" x2="48" y2="32" stroke="currentColor" stroke-width="3"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state party in Maharashtra founded in 1966.',
     description_hi: 'महाराष्ट्र का प्रमुख मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -328,9 +274,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#c2410c',
     symbol_alt_en: 'Flaming Torch - Official Election Symbol of Shiv Sena (UBT)',
     symbol_alt_hi: 'मशाल - शिवसेना (उद्धव बालासाहेब ठाकरे) का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-amber-600">
-      <path d="M28 32h8v20h-8z" fill="currentColor"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'State recognized political party in Maharashtra.',
     description_hi: 'महाराष्ट्र का प्रमुख मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -346,10 +290,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#0284c7',
     symbol_alt_en: 'Clock - Official Election Symbol of Nationalist Congress Party',
     symbol_alt_hi: 'घड़ी - राष्ट्रवादी कांग्रेस पार्टी का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-600">
-      <circle cx="32" cy="34" r="16" stroke="currentColor" stroke-width="3"/>
-      <polyline points="26,26 32,34 38,30" stroke="currentColor" stroke-width="2.5"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'State recognized political party in Maharashtra founded in 1999.',
     description_hi: 'महाराष्ट्र का प्रमुख मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -365,9 +306,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#0369a1',
     symbol_alt_en: 'Man Blowing Tutari - Official Symbol of NCP (SP)',
     symbol_alt_hi: 'तुतारी बजाता व्यक्ति - राकांपा (शरदचंद्र पवार) का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-cyan-800">
-      <path d="M24 32C32 20 44 24 48 30" stroke="currentColor" stroke-width="3"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'State recognized political party in Maharashtra led by Sharad Pawar.',
     description_hi: 'महाराष्ट्र का प्रमुख मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -383,10 +322,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#eab308',
     symbol_alt_en: 'Bicycle on Yellow - Official Symbol of Telugu Desam Party (TDP)',
     symbol_alt_hi: 'साइकिल - तेलुगु देशम पार्टी का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-yellow-600">
-      <circle cx="18" cy="40" r="10" stroke="currentColor" stroke-width="2.5"/>
-      <circle cx="46" cy="40" r="10" stroke="currentColor" stroke-width="2.5"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major ruling state party in Andhra Pradesh founded in 1982.',
     description_hi: 'आंध्र प्रदेश का प्रमुख सत्तारूढ़ राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -402,9 +338,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#1e40af',
     symbol_alt_en: 'Ceiling Fan - Official Election Symbol of YSR Congress Party',
     symbol_alt_hi: 'सीलिंग फैन - वाईएसआर कांग्रेस पार्टी का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-700">
-      <circle cx="32" cy="32" r="8" fill="currentColor"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state party in Andhra Pradesh founded in 2011.',
     description_hi: 'आंध्र प्रदेश का प्रमुख राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -420,9 +354,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#dc2626',
     symbol_alt_en: 'Glass Tumbler - Official Election Symbol of Jana Sena Party',
     symbol_alt_hi: 'कांच का गिलास - जन सेना पार्टी का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-red-600">
-      <path d="M22 18L26 46H38L42 18Z" stroke="currentColor" stroke-width="2.5"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'State recognized political party in Andhra Pradesh founded by Pawan Kalyan.',
     description_hi: 'आंध्र प्रदेश का प्रमुख राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -438,9 +370,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#ec4899',
     symbol_alt_en: 'Car - Official Election Symbol of Bharat Rashtra Samithi (BRS)',
     symbol_alt_hi: 'कार - भारत राष्ट्र समिति का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-pink-600">
-      <rect x="14" y="26" width="36" height="16" rx="4" stroke="currentColor" stroke-width="2.5"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state party in Telangana founded in 2001.',
     description_hi: 'तेलंगाना का प्रमुख राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -456,9 +386,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#15803d',
     symbol_alt_en: 'Conch - Official Election Symbol of Biju Janata Dal (BJD)',
     symbol_alt_hi: 'शंख - बीजू जनता दल का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-700">
-      <path d="M20 40C16 32 24 20 36 18C44 24 44 36 32 42Z" fill="currentColor"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state party in Odisha founded in 1997.',
     description_hi: 'ओडिशा का प्रमुख राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -474,10 +402,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#15803d',
     symbol_alt_en: 'Bow and Arrow - Official Election Symbol of JMM',
     symbol_alt_hi: 'धनुष-बाण - झारखंड मुक्ति मोर्चा का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-700">
-      <path d="M20 16C36 24 36 40 20 48" stroke="currentColor" stroke-width="3"/>
-      <line x1="16" y1="32" x2="48" y2="32" stroke="currentColor" stroke-width="3"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Ruling state party in Jharkhand founded in 1972.',
     description_hi: 'झारखंड का प्रमुख सत्तारूढ़ राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -493,10 +418,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#1e3a8a',
     symbol_alt_en: 'Scales - Official Election Symbol of Shiromani Akali Dal',
     symbol_alt_hi: 'तराजू - शिरोमणि अकाली दल का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-900">
-      <line x1="32" y1="14" x2="32" y2="48" stroke="currentColor" stroke-width="2.5"/>
-      <line x1="16" y1="22" x2="48" y2="22" stroke="currentColor" stroke-width="2.5"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Historic state party in Punjab founded in 1920.',
     description_hi: 'पंजाब का ऐतिहासिक राज्य स्तरीय राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -512,9 +434,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#15803d',
     symbol_alt_en: 'Lady Farmer with Paddy - Official Symbol of JD(S)',
     symbol_alt_hi: 'सिर पर धान का बोझा उठाए महिला किसान - जद(एस) का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-700">
-      <circle cx="32" cy="24" r="8" fill="currentColor"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'Major state party in Karnataka founded in 1999.',
     description_hi: 'कर्नाटक का प्रमुख राज्य स्तरीय राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -530,9 +450,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#14532d',
     symbol_alt_en: 'Kite - Official Election Symbol of AIMIM',
     symbol_alt_hi: 'पतंग - एआईएमआईएम का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-green-800">
-      <polygon points="32,14 46,28 32,42 18,28" stroke="currentColor" stroke-width="2.5"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'State recognized political party in Telangana.',
     description_hi: 'तेलंगाना का प्रमुख मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
@@ -548,10 +466,7 @@ export const REGIONAL_PARTIES: Party[] = [
     color: '#1e3a8a',
     symbol_alt_en: 'Helicopter - Official Election Symbol of LJP (Ram Vilas)',
     symbol_alt_hi: 'हेलिकॉप्टर - लोक जनशक्ति पार्टी (रामविलास) का आधिकारिक चुनाव चिह्न',
-    symbol_svg: `<svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full text-blue-800">
-      <line x1="16" y1="20" x2="48" y2="20" stroke="currentColor" stroke-width="3"/>
-      <rect x="20" y="24" width="24" height="14" rx="4" stroke="currentColor" stroke-width="2.5"/>
-    </svg>`,
+    symbol_svg: '',
     description_en: 'State recognized political party in Bihar led by Chirag Paswan.',
     description_hi: 'बिहार का प्रमुख मान्यता प्राप्त राजनीतिक दल।',
     source_ref: 'Election Commission of India Political Parties List',
