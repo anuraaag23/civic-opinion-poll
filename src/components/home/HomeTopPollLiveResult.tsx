@@ -122,9 +122,12 @@ export function HomeTopPollLiveResult() {
     <section className="space-y-6">
       {/* Section Header */}
       <div className="text-center max-w-2xl mx-auto space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-bold border border-[var(--accent)]/30">
-          <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-ping" />
-          <Flame className="w-3.5 h-3.5 text-amber-500" />
+        <div className="inline-flex items-center gap-2 px-3 pt-[5px] pb-[4px] rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-bold border border-[var(--accent)]/30 leading-none">
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--accent)] opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--accent)]" />
+          </span>
+          <Flame className="w-3.5 h-3.5 text-amber-500 shrink-0" />
           <span>
             {language === 'hi'
               ? 'अक्टूबर 2026 मासिक चक्र • 128,420+ राष्ट्रीय जनमत प्रतिक्रियाएं'

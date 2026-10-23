@@ -24,13 +24,13 @@ export function GlassBadge({
   };
 
   const sizeStyles = {
-    sm: 'px-2 py-0.5 text-xs',
-    md: 'px-2.5 py-1 text-xs',
+    sm: 'px-2.5 pt-[4px] pb-[3px] text-[11px] min-h-[22px]',
+    md: 'px-3 pt-[5px] pb-[4px] text-xs min-h-[26px]',
   };
 
   return (
     <span
-      className={`inline-flex items-center justify-center gap-1.5 rounded-full border backdrop-blur-md leading-none select-none whitespace-nowrap shrink-0 ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 rounded-full border backdrop-blur-md select-none whitespace-nowrap shrink-0 text-center leading-none tracking-normal [&>svg]:shrink-0 ${sizeStyles[size]} ${variantStyles[variant]} ${className}`}
     >
       {children}
     </span>

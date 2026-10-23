@@ -66,7 +66,7 @@ export function FloatingSupportWidget() {
 
   return (
     <div
-      className={`fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right))] sm:bottom-6 sm:right-6 z-40 transition-all duration-300 ${
+      className={`fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-40 transition-all duration-300 ${
         isNearFooter ? 'opacity-0 pointer-events-none translate-y-4 scale-90' : 'opacity-100 translate-y-0 scale-100'
       }`}
     >

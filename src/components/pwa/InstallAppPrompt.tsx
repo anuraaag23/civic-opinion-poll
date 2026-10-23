@@ -92,11 +92,11 @@ export function InstallAppPrompt() {
 
   return (
     <>
-      {/* Smart Mobile/Tablet Install App Banner */}
+      {/* Smart Mobile/Tablet Install App Banner (Native Push Notification Style on Mobile, Toast on Desktop) */}
       {!bannerDismissed && (deferredPrompt || isIos) && (
         <aside
           aria-label="App installation banner"
-          className="fixed bottom-16 sm:bottom-6 left-3 right-3 sm:left-auto sm:right-6 sm:max-w-md z-40 bg-[var(--bg-glass-elevated)] backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-3.5 shadow-2xl animate-in slide-in-from-bottom-4 duration-300 transition-all"
+          className="fixed top-3 sm:top-auto sm:bottom-6 left-3 right-3 sm:left-auto sm:right-6 sm:max-w-md z-50 bg-[var(--bg-glass-elevated)] backdrop-blur-xl border border-[var(--border-glass)] rounded-2xl p-3.5 shadow-2xl animate-in slide-in-from-top-4 sm:slide-in-from-bottom-4 duration-300 transition-all"
         >
           <div className="flex items-start gap-3">
             <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shrink-0 shadow-md">
@@ -107,7 +107,7 @@ export function InstallAppPrompt() {
             <div className="flex-1 min-w-0 pr-1">
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-black text-[var(--text-primary)]">Mera Vote App</span>
-                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400">
+                <span className="px-1.5 pt-[3px] pb-[2px] rounded-full text-[9px] font-bold bg-blue-500/15 text-blue-600 dark:text-blue-400 leading-none">
                   {language === 'hi' ? 'आधिकारिक ऐप' : 'Official App'}
                 </span>
               </div>

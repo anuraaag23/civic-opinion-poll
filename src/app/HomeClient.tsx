@@ -32,11 +32,14 @@ export function HomeClient() {
             <div className="space-y-1">
               <div className="inline-flex items-center gap-2 flex-wrap">
                 <GlassBadge variant="accent">
-                  <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-ping" />
-                  {t.common.liveBadge}
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--accent)] opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--accent)]" />
+                  </span>
+                  <span>{t.common.liveBadge}</span>
                 </GlassBadge>
                 <GlassBadge variant="success">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[var(--success)]" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[var(--success)] shrink-0" />
                   <span>{language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage Guaranteed'}</span>
                 </GlassBadge>
               </div>
@@ -147,7 +150,7 @@ export function HomeClient() {
           <GlassCard elevated className="space-y-5 border-t-4 border-t-[var(--accent)] flex flex-col justify-between h-full">
             <div className="space-y-4 flex-1 flex flex-col justify-between">
               <div className="flex items-center justify-between gap-2">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-700/60 text-xs font-bold whitespace-nowrap shadow-2xs">
+                <div className="inline-flex items-center gap-1.5 px-3 pt-[5px] pb-[4px] rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-700/60 text-xs font-bold whitespace-nowrap shadow-2xs leading-none">
                   <Globe className="w-3.5 h-3.5 text-blue-700 dark:text-blue-300 shrink-0" />
                   <span>{language === 'hi' ? '1. प्रधानमंत्री (PM) वर्ग' : '1. Prime Minister (PM) Section'}</span>
                 </div>
@@ -156,7 +159,7 @@ export function HomeClient() {
                     <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
                     <span>{language === 'hi' ? 'संपूर्ण भारत' : 'India Only'}</span>
                   </GlassBadge>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 pt-[4px] pb-[3px] rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 leading-none">
                     <Calendar className="w-3 h-3" />
                     <span>{language === 'hi' ? 'अक्टूबर 2026' : 'October 2026'}</span>
                   </span>
@@ -260,7 +263,7 @@ export function HomeClient() {
           <GlassCard elevated className="space-y-5 border-t-4 border-t-emerald-500 flex flex-col justify-between h-full">
             <div className="space-y-4 flex-1 flex flex-col justify-between">
               <div className="flex items-center justify-between gap-2">
-                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700/60 text-xs font-bold whitespace-nowrap shadow-2xs">
+                <div className="inline-flex items-center gap-1.5 px-3 pt-[5px] pb-[4px] rounded-full bg-emerald-100 dark:bg-emerald-950/70 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700/60 text-xs font-bold whitespace-nowrap shadow-2xs leading-none">
                   <Building2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-300 shrink-0" />
                   <span>{language === 'hi' ? '2. मुख्यमंत्री (CM) वर्ग' : '2. Chief Minister (CM) Section'}</span>
                 </div>
@@ -269,7 +272,7 @@ export function HomeClient() {
                     <MapPin className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
                     <span>{language === 'hi' ? 'राज्यवार चयन' : 'State-by-State'}</span>
                   </GlassBadge>
-                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 pt-[4px] pb-[3px] rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30 leading-none">
                     <Calendar className="w-3 h-3" />
                     <span>{language === 'hi' ? 'अक्टूबर 2026' : 'October 2026'}</span>
                   </span>

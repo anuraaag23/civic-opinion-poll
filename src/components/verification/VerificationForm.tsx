@@ -294,7 +294,7 @@ export function VerificationForm({
             <MessageSquare className="w-6 h-6" />
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold mx-auto">
+          <div className="inline-flex items-center gap-1.5 px-3 pt-[4px] pb-[3px] rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold mx-auto leading-none">
             <ShieldCheck className="w-3.5 h-3.5" />
             <span>
               {language === 'hi'

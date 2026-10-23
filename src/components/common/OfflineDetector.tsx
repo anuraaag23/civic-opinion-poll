@@ -151,7 +151,7 @@ export function OfflineDetector() {
 
         {/* Headings */}
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 text-[11px] font-bold uppercase tracking-wider">
+          <div className="inline-flex items-center gap-1.5 px-3 pt-[4px] pb-[3px] rounded-full bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20 text-[11px] font-bold uppercase tracking-wider leading-none">
             <AlertCircle className="w-3 h-3" />
             <span>Connection Offline • नेटवर्क अनुपलब्ध</span>
           </div>

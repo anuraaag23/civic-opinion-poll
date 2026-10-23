@@ -80,7 +80,7 @@ export function PartyCard({
               {party.short_name}
             </span>
             {party.candidate_role_en && (
-              <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30">
+              <span className="text-[10px] font-bold px-1.5 pt-[3px] pb-[2px] rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30 leading-none">
                 {language === 'hi' ? party.candidate_role_hi || party.candidate_role_en : party.candidate_role_en}
               </span>
             )}
