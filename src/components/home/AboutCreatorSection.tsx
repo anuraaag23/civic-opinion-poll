@@ -37,10 +37,10 @@ export function AboutCreatorSection({ alwaysExpanded = false }: AboutCreatorSect
         >
           {/* ── ALWAYS VISIBLE COMPACT BAR ── */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-1">
-            <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
               <Link
                 href="/"
-                className="w-10 h-10 rounded-xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform"
+                className="w-10 h-10 rounded-xl bg-white dark:bg-white/95 border border-[var(--border-glass)] p-1 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform mt-0.5 sm:mt-0"
                 aria-label="Mera Vote Home"
               >
                 <Image
@@ -69,13 +69,13 @@ export function AboutCreatorSection({ alwaysExpanded = false }: AboutCreatorSect
               </div>
             </div>
 
-            {/* Toggle button only rendered when not in alwaysExpanded mode */}
+            {/* Toggle button: on desktop right-aligned & vertically centered; on mobile aligned to the right */}
             {!alwaysExpanded && (
-              <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+              <div className="flex items-center gap-2 self-end sm:self-center shrink-0 pt-1 sm:pt-0">
                 <button
                   type="button"
                   onClick={() => setIsExpanded(!isExpanded)}
-                  className="py-1.5 px-3.5 rounded-xl bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)]/80 text-[var(--accent)] font-bold text-xs flex items-center gap-2 shrink-0 transition-all cursor-pointer border border-[var(--accent)]/30 active:scale-95 shadow-xs min-h-[32px]"
+                  className="py-1.5 px-3.5 rounded-xl bg-[var(--accent-soft)] hover:bg-[var(--accent-soft)]/80 text-[var(--accent)] font-bold text-xs flex items-center gap-1.5 shrink-0 transition-all cursor-pointer border border-[var(--accent)]/30 active:scale-95 shadow-xs min-h-[34px]"
                   aria-expanded={effectiveExpanded}
                 >
                   <span>

@@ -39,10 +39,6 @@ export function HomeClient() {
                   <ShieldCheck className="w-3.5 h-3.5 text-[var(--success)]" />
                   <span>{language === 'hi' ? 'शून्य आईडी भंडारण' : 'Zero ID Storage Guaranteed'}</span>
                 </GlassBadge>
-                <GlassBadge variant="neutral">
-                  <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
-                  <span>{language === 'hi' ? '2 अलग वर्ग: PM एवं CM' : '2 Dedicated Sections: PM & CM'}</span>
-                </GlassBadge>
               </div>
             </div>
 
