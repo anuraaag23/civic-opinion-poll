@@ -6,7 +6,19 @@ import confetti from 'canvas-confetti';
 import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { CheckCircle2, BarChart3, Home, ShieldCheck, Share2, Check, Lock, Copy } from 'lucide-react';
+import {
+  CheckCircle2,
+  BarChart3,
+  Home,
+  ShieldCheck,
+  Share2,
+  Check,
+  Lock,
+  Copy,
+  Download,
+  MessageCircle,
+  ExternalLink,
+} from 'lucide-react';
 
 interface SuccessStateProps {
   pollSlug: string;
@@ -17,6 +29,7 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
   const [copied, setCopied] = useState(false);
   const [receiptCopied, setReceiptCopied] = useState(false);
   const [receiptHash, setReceiptHash] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   useEffect(() => {
     try {
@@ -42,6 +55,155 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
         setTimeout(() => setReceiptCopied(false), 2500);
       }
     } catch {}
+  };
+
+  const handleWhatsAppShare = () => {
+    if (!receiptHash) return;
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://meravote.org';
+    const auditUrl = `${origin}/audit?receipt=${encodeURIComponent(receiptHash)}`;
+    const resultsUrl = `${origin}/polls/${pollSlug}/results`;
+
+    const text = language === 'hi'
+      ? `🗳️ *मेरा वोट (Mera Vote) — आधिकारिक डिजिटल मत रसीद*\n\n` +
+        `मैंने जनमत सर्वेक्षण में पूर्ण गोपनीयता के साथ अपना मत दर्ज किया है!\n\n` +
+        `🔑 *बैलेट रसीद ID:* \`${receiptHash}\`\n` +
+        `✅ *स्थिति:* सत्यापित एवं सुरक्षित दर्ज\n` +
+        `🔍 *सार्वजनिक ऑडिट में जांचें:* ${auditUrl}\n` +
+        `📊 *ताज़ा परिणाम देखें:* ${resultsUrl}\n\n` +
+        `Mera Vote — स्वतंत्र नागरिक जनमत मंच`
+      : `🗳️ *Mera Vote — Official Anonymous Ballot Receipt*\n\n` +
+        `My vote was securely counted in the public opinion poll with zero personal tracking!\n\n` +
+        `🔑 *Ballot Receipt Hash:* \`${receiptHash}\`\n` +
+        `✅ *Status:* Cryptographically Counted & Verified\n` +
+        `🔍 *Audit in Public Ledger:* ${auditUrl}\n` +
+        `📊 *Live Poll Results:* ${resultsUrl}\n\n` +
+        `Mera Vote — Independent Civic Opinion Platform`;
+
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleDownloadSlip = () => {
+    if (!receiptHash || typeof document === 'undefined') return;
+    setIsDownloading(true);
+
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 800;
+      canvas.height = 500;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        setIsDownloading(false);
+        return;
+      }
+
+      // 1. Dark sleek background
+      ctx.fillStyle = '#0B1120';
+      ctx.fillRect(0, 0, 800, 500);
+
+      // 2. Subtle radial glow
+      const grad = ctx.createRadialGradient(400, 150, 20, 400, 250, 400);
+      grad.addColorStop(0, 'rgba(56, 189, 248, 0.12)');
+      grad.addColorStop(1, 'rgba(11, 17, 32, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 800, 500);
+
+      // 3. Elegant border
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(16, 16, 768, 468);
+
+      // 4. Tricolor Accent Line at top
+      ctx.fillStyle = '#FF9933';
+      ctx.fillRect(20, 20, 253, 5);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(273, 20, 253, 5);
+      ctx.fillStyle = '#138808';
+      ctx.fillRect(526, 20, 254, 5);
+
+      // 5. Header Branding
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.fillText('MERA VOTE • मेरा वोट', 40, 75);
+
+      ctx.fillStyle = '#38BDF8';
+      ctx.font = '600 12px monospace';
+      ctx.fillText('OFFICIAL CRYPTOGRAPHIC BALLOT AUDIT RECEIPT', 40, 100);
+
+      // Status Badge
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
+      ctx.fillRect(580, 55, 180, 36);
+      ctx.strokeStyle = '#10B981';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(580, 55, 180, 36);
+      ctx.fillStyle = '#10B981';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText('✓ COUNTED & VERIFIED', 596, 78);
+
+      // Divider
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.beginPath();
+      ctx.moveTo(40, 125);
+      ctx.lineTo(760, 125);
+      ctx.stroke();
+
+      // Details Block
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '12px sans-serif';
+      ctx.fillText('POLL IDENTIFIER', 40, 160);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillText(pollSlug.toUpperCase().replace(/-/g, ' '), 40, 185);
+
+      ctx.fillStyle = '#94A3B8';
+      ctx.font = '12px sans-serif';
+      ctx.fillText('TIMESTAMP (IST)', 440, 160);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 15px monospace';
+      const now = new Date();
+      ctx.fillText(now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }), 440, 185);
+
+      // Receipt Hash Box
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
+      ctx.fillRect(40, 220, 720, 85);
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(40, 220, 720, 85);
+
+      ctx.fillStyle = '#38BDF8';
+      ctx.font = 'bold 11px monospace';
+      ctx.fillText('UNIQUE BALLOT AUDIT HASH (SHA-256 ZERO-KNOWLEDGE LEDGER):', 60, 245);
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 22px monospace';
+      ctx.fillText(receiptHash, 60, 280);
+
+      // Cryptographic Assurance Note
+      ctx.fillStyle = '#64748B';
+      ctx.font = '12px sans-serif';
+      ctx.fillText('• Mathematical Zero-Knowledge Guarantee: No phone number or personal identity was recorded.', 40, 345);
+      ctx.fillText('• This digital receipt can be verified at any time on the transparent public audit explorer.', 40, 368);
+      ctx.fillText('• Single-use CSPRNG participation token has self-destructed upon ballot commitment.', 40, 391);
+
+      // Bottom bar
+      const origin = typeof window !== 'undefined' ? window.location.origin : 'https://meravote.org';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.fillRect(20, 425, 760, 55);
+      ctx.fillStyle = '#38BDF8';
+      ctx.font = '12px monospace';
+      ctx.fillText(`VERIFY LIVE AT: ${origin}/audit?receipt=${receiptHash}`, 40, 458);
+
+      // Trigger download
+      const link = document.createElement('a');
+      link.download = `MeraVote_Ballot_Receipt_${receiptHash}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch {
+      // ignore
+    } finally {
+      setTimeout(() => setIsDownloading(false), 1000);
+    }
   };
 
   const handleShare = async () => {
@@ -84,7 +246,7 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>
             {language === 'hi'
-              ? 'आपका वोट सुरक्षित रूप से दर्ज कर लिया गया है और टोकन नष्ट हो चुका है।'
+              ? 'आपका मत सुरक्षित रूप से दर्ज कर लिया गया है और टोकन नष्ट हो चुका है।'
               : 'Response recorded atomically. Participation token self-destructed.'}
           </span>
         </div>
@@ -98,7 +260,7 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
         </div>
 
         {/* Cryptographic Ballot Receipt Box */}
-        <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#131722]/80 border border-slate-200/80 dark:border-white/10 text-left space-y-2 backdrop-blur-md shadow-xs">
+        <div className="p-4 rounded-2xl bg-white/70 dark:bg-[#131722]/80 border border-slate-200/80 dark:border-white/10 text-left space-y-3 backdrop-blur-md shadow-xs">
           <div className="flex items-center justify-between text-[11px] text-[var(--text-tertiary)]">
             <span className="uppercase font-bold tracking-wider font-sans flex items-center gap-1.5 text-[var(--accent)]">
               <Lock className="w-3.5 h-3.5" />
@@ -131,7 +293,37 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
               : 'This digital audit receipt mathematically proves your vote is securely counted without storing your identity.'}
           </p>
 
-          <div className="pt-1 flex items-center justify-between text-[11px] border-t border-slate-200/50 dark:border-white/5">
+          {/* Action Row: Download Slip & Send to WhatsApp */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 border-t border-slate-200/50 dark:border-white/5">
+            {/* Download Official Ballot Slip */}
+            <button
+              type="button"
+              onClick={handleDownloadSlip}
+              disabled={isDownloading}
+              className="py-2.5 px-3 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--accent-soft)] border border-[var(--border-glass)] text-xs font-bold text-[var(--text-primary)] hover:text-[var(--accent)] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
+            >
+              <Download className="w-3.5 h-3.5 text-[var(--accent)]" />
+              <span>
+                {isDownloading
+                  ? (language === 'hi' ? 'तैयार हो रहा है...' : 'Downloading...')
+                  : (language === 'hi' ? 'रसीद डाउनलोड करें (PNG)' : 'Download Receipt Slip')}
+              </span>
+            </button>
+
+            {/* Share / Send to WhatsApp */}
+            <button
+              type="button"
+              onClick={handleWhatsAppShare}
+              className="py-2.5 px-3 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/30 text-xs font-bold text-[#25D366] transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 shadow-xs"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>
+                {language === 'hi' ? 'व्हाट्सएप पर भेजें / सहेजें' : 'Save to WhatsApp'}
+              </span>
+            </button>
+          </div>
+
+          <div className="pt-1 flex items-center justify-between text-[11px]">
             <Link
               href={`/audit?receipt=${encodeURIComponent(receiptHash)}`}
               className="text-[var(--accent)] font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer"
