@@ -1049,8 +1049,11 @@ export function AdminClient() {
     try {
       const params = new URLSearchParams({
         action: 'ping',
+        provider: whatsappConfig.provider || 'baileys_gateway',
         url: whatsappConfig.baileysGatewayUrl || '',
         key: whatsappConfig.baileysApiKey || '',
+        metaPhoneNumberId: whatsappConfig.metaPhoneNumberId || '',
+        metaCloudToken: whatsappConfig.metaCloudToken || '',
       });
       const res = await fetch(`/api/admin/whatsapp?${params.toString()}`);
       const data = await res.json();
@@ -2090,8 +2093,47 @@ export function AdminClient() {
                     placeholder="http://localhost:8000"
                     className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--accent)]"
                   />
+                  <div className="flex items-center gap-2 pt-1 flex-wrap">
+                    <span className="text-[10px] text-[var(--text-tertiary)] font-bold">1-Click Presets:</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setWhatsappConfig((prev) => ({
+                          ...prev,
+                          baileysGatewayUrl: 'https://meravote-wa-gateway.up.railway.app',
+                        }))
+                      }
+                      className="text-[10px] px-2.5 py-1 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono transition-all cursor-pointer"
+                    >
+                      Option B (Railway.app)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setWhatsappConfig((prev) => ({
+                          ...prev,
+                          baileysGatewayUrl: 'https://meravote-wa-gateway.onrender.com',
+                        }))
+                      }
+                      className="text-[10px] px-2.5 py-1 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono transition-all cursor-pointer"
+                    >
+                      Option A (Render.com)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setWhatsappConfig((prev) => ({
+                          ...prev,
+                          baileysGatewayUrl: 'http://localhost:3001',
+                        }))
+                      }
+                      className="text-[10px] px-2.5 py-1 rounded-lg bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-mono transition-all cursor-pointer"
+                    >
+                      Local Bridge (:3001)
+                    </button>
+                  </div>
                   <p className="text-[11px] text-[var(--text-secondary)]">
-                    Endpoint expected to accept POST /send-otp with JSON {`{ phoneNumber, message }`} or GET /ping.
+                    Endpoint expected to accept POST /send-otp or /send-message with JSON {`{ phoneNumber, message }`} or GET /status.
                   </p>
                 </div>
 
@@ -2196,23 +2238,35 @@ export function AdminClient() {
             </GlassCard>
           )}
 
-          {/* Section 2B: Meta Cloud API Parameters */}
+          {/* Section 2B: Meta Cloud API Parameters (Option C) */}
           {whatsappConfig.provider === 'meta_cloud_api' && (
             <GlassCard className="p-5 space-y-4">
-              <div>
-                <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
-                  <Globe className="w-4 h-4 text-blue-500" />
-                  <span>Meta WhatsApp Cloud API Configuration</span>
-                </h3>
-                <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                  Configure your official WhatsApp Business App credentials registered on Meta Developers.
-                </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                    <Globe className="w-4 h-4 text-blue-500" />
+                    <span>Option C: Meta WhatsApp Cloud API (100% Serverless)</span>
+                  </h3>
+                  <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                    Official Meta WhatsApp Business platform. Meta provides <strong>1,000 free service conversations per month</strong>. Runs 100% serverless directly from Vercel.
+                  </p>
+                </div>
+                <a
+                  href="https://developers.facebook.com/apps"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  <span>Meta Dev Portal</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[var(--text-primary)]">
-                    Phone Number ID (`WHATSAPP_PHONE_NUMBER_ID`)
+                  <label className="text-xs font-bold text-[var(--text-primary)] flex items-center justify-between">
+                    <span>Phone Number ID (`WHATSAPP_PHONE_NUMBER_ID`)</span>
+                    <span className="text-[10px] text-[var(--text-tertiary)]">Found under WhatsApp &gt; API Setup</span>
                   </label>
                   <input
                     type="text"
@@ -2224,13 +2278,14 @@ export function AdminClient() {
                       }))
                     }
                     placeholder="e.g. 109283746501928"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--accent)]"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-[var(--text-primary)]">
-                    Permanent System User Token (`WHATSAPP_CLOUD_API_TOKEN`)
+                  <label className="text-xs font-bold text-[var(--text-primary)] flex items-center justify-between">
+                    <span>Permanent System User Token (`WHATSAPP_CLOUD_API_TOKEN`)</span>
+                    <span className="text-[10px] text-[var(--text-tertiary)]">System User or App Token</span>
                   </label>
                   <input
                     type="password"
@@ -2242,19 +2297,29 @@ export function AdminClient() {
                       }))
                     }
                     placeholder="EAAGm..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--accent)]"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end pt-2">
+              <div className="flex items-center justify-between pt-2 flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handlePingGateway}
+                  disabled={isPinging || !whatsappConfig.metaPhoneNumberId || !whatsappConfig.metaCloudToken}
+                  className="py-2 px-3.5 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-xs font-bold text-[var(--text-primary)] transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
+                >
+                  <Activity className={`w-3.5 h-3.5 ${isPinging ? 'animate-spin text-blue-500' : 'text-blue-500'}`} />
+                  <span>{isPinging ? 'Verifying Meta Credentials...' : 'Test Meta API Connection'}</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={handleSaveWhatsappConfig}
                   disabled={isSavingWhatsapp}
-                  className="py-2 px-4 rounded-xl bg-[var(--accent)] hover:opacity-90 text-xs font-bold text-white transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60 shadow-md"
+                  className="py-2.5 px-5 rounded-xl bg-[var(--accent)] hover:opacity-90 text-xs font-bold text-white transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60 shadow-md"
                 >
-                  <Save className="w-3.5 h-3.5" />
+                  <Save className={`w-3.5 h-3.5 ${isSavingWhatsapp ? 'animate-spin' : ''}`} />
                   <span>Save Meta API Credentials</span>
                 </button>
               </div>
@@ -2596,44 +2661,104 @@ export function AdminClient() {
             )}
           </GlassCard>
 
-          {/* Section 5: Self-Hosting Guide & 1-Minute Baileys Deployment */}
-          <GlassCard className="p-5 space-y-3">
+          {/* Section 5: Step-by-Step Free Setup Guide for Option B and Option C */}
+          <GlassCard className="p-5 space-y-4">
             <div className="flex items-center justify-between gap-2">
               <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
                 <Terminal className="w-4 h-4 text-[var(--accent)]" />
                 <span>
                   {language === 'hi'
-                    ? '५. Baileys गेटवे को निःशुल्क कैसे होस्ट करें (1-मिनट सेटअप)'
-                    : '5. Free Baileys 1-Minute Self-Hosting Quickstart'}
+                    ? '५. निःशुल्क व्हाट्सएप गेटवे सेटअप गाइड (विकल्प B एवं C)'
+                    : '5. Free WhatsApp OTP Setup Guide (Option B & Option C)'}
                 </span>
               </h3>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/30">
-                100% Free
+                100% Free Tiers
               </span>
             </div>
 
-            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-              Baileys is an open-source WhatsApp Web socket library. You can run it on your local server, Render (Free Tier), Railway, or a VPS with Docker in 3 steps:
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Option B Card */}
+              <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wide">
+                    Option B: Railway.app / Local Cloud Bridge
+                  </span>
+                  <span className="text-[10px] font-mono text-[var(--text-secondary)]">2 Minutes Setup</span>
+                </div>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  The complete Baileys gateway server is bundled in your repository at <code className="text-emerald-400">/whatsapp-gateway</code>. You can deploy it directly to Railway or run it locally:
+                </p>
+                <ol className="text-[11px] text-[var(--text-secondary)] space-y-1.5 list-decimal pl-4">
+                  <li>Go to <a href="https://railway.app" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">railway.app</a> &rarr; <strong>New Project</strong> &rarr; <strong>Deploy from GitHub</strong>.</li>
+                  <li>Select your repo &rarr; set Root Directory to <code className="text-[var(--text-primary)]">whatsapp-gateway</code>.</li>
+                  <li>Under <strong>Networking</strong>, click <strong>Generate Domain</strong> (e.g. <code className="text-emerald-400 font-mono">https://wa.up.railway.app</code>).</li>
+                  <li>Under <strong>Volumes</strong>, add a volume mounted to <code className="text-[var(--text-primary)]">/app/baileys_auth_info</code> (saves login session).</li>
+                  <li>Open the domain, scan the QR code with WhatsApp, then paste the URL into Section 2 above!</li>
+                </ol>
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        provider: 'baileys_gateway',
+                        baileysGatewayUrl: 'https://meravote-wa-gateway.up.railway.app',
+                      }));
+                      showToast('Selected Option B & loaded Railway URL format');
+                    }}
+                    className="w-full py-2 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 text-xs font-bold transition-all cursor-pointer text-center"
+                  >
+                    Activate Option B (Railway)
+                  </button>
+                </div>
+              </div>
 
-            <div className="p-3.5 rounded-xl bg-black/40 border border-[var(--border-glass)] font-mono text-[11px] text-emerald-400 space-y-2 overflow-x-auto">
-              <div className="text-[var(--text-tertiary)] text-[10px]">
-                # Option A: Run lightweight Baileys HTTP Bridge with Docker:
+              {/* Option C Card */}
+              <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-bold text-blue-400 uppercase tracking-wide">
+                    Option C: Meta WhatsApp Business Cloud API
+                  </span>
+                  <span className="text-[10px] font-mono text-[var(--text-secondary)]">1,000 Free/Mo</span>
+                </div>
+                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+                  Official WhatsApp platform by Meta. Runs <strong>100% serverless directly from Vercel</strong> with <strong>zero servers or containers to run</strong>:
+                </p>
+                <ol className="text-[11px] text-[var(--text-secondary)] space-y-1.5 list-decimal pl-4">
+                  <li>Go to <a href="https://developers.facebook.com/apps" target="_blank" rel="noopener noreferrer" className="text-blue-400 underline">developers.facebook.com</a> &rarr; <strong>Create App</strong> &rarr; <strong>Business</strong>.</li>
+                  <li>Add <strong>WhatsApp</strong> to your App.</li>
+                  <li>Under <strong>WhatsApp &gt; API Setup</strong>, copy your <strong>Phone Number ID</strong> and <strong>Permanent Access Token</strong>.</li>
+                  <li>Select <strong>Option C</strong> in Section 1 above, paste both credentials into Section 2B, and click Save.</li>
+                  <li>Meta provides 1,000 free service conversations each month automatically!</li>
+                </ol>
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        provider: 'meta_cloud_api',
+                      }));
+                      showToast('Selected Option C (Meta WhatsApp Cloud API)');
+                    }}
+                    className="w-full py-2 rounded-lg bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 text-xs font-bold transition-all cursor-pointer text-center"
+                  >
+                    Activate Option C (Meta Cloud API)
+                  </button>
+                </div>
               </div>
-              <code>
-                docker run -d -p 8000:8000 -e PORT=8000 -e API_KEY=my_secret_key meravote/baileys-gw
-              </code>
-              <div className="text-[var(--text-tertiary)] text-[10px] pt-1">
-                # Option B: Run locally on your machine with Node.js:
-              </div>
-              <code>
-                git clone https://github.com/WhiskeySockets/Baileys.git &amp;&amp; npm install &amp;&amp; npm start
-              </code>
             </div>
 
-            <p className="text-[11px] text-[var(--text-tertiary)]">
-              Once started on port 8000, simply enter <span className="font-mono text-[var(--text-secondary)]">http://localhost:8000</span> in Section 2 above and click &quot;Save Gateway Settings&quot;. Your voting app will immediately start sending free WhatsApp OTPs!
-            </p>
+            {/* Local Docker Command for Developers */}
+            <div className="p-3.5 rounded-xl bg-black/40 border border-[var(--border-glass)] font-mono text-[11px] text-emerald-400 space-y-1.5 overflow-x-auto">
+              <div className="text-[var(--text-tertiary)] text-[10px]">
+                # Or run the bundled gateway locally on your machine with Node.js:
+              </div>
+              <code>
+                cd whatsapp-gateway &amp;&amp; npm install &amp;&amp; node server.mjs
+              </code>
+            </div>
           </GlassCard>
         </div>
       )}

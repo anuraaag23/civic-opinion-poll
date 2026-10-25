@@ -24,6 +24,82 @@ export async function GET(request: NextRequest) {
 
     // If ping action requested:
     if (action === 'ping') {
+      const targetProvider = (searchParams.get('provider') || gw.provider || 'baileys_gateway') as WhatsAppGatewayConfig['provider'];
+
+      // A) Simulator Ping
+      if (targetProvider === 'dev_simulator') {
+        return NextResponse.json({
+          success: true,
+          ping: {
+            online: true,
+            status: 'SIMULATOR_ACTIVE',
+            latencyMs: 1,
+            details: { mode: 'Local Simulator (Zero Network)' },
+          },
+        });
+      }
+
+      // B) Meta WhatsApp Cloud API Ping (Option C)
+      if (targetProvider === 'meta_cloud_api') {
+        const metaPhoneId = searchParams.get('metaPhoneNumberId') || gw.metaPhoneNumberId || process.env.WHATSAPP_PHONE_NUMBER_ID;
+        const metaToken = searchParams.get('metaCloudToken') || gw.metaCloudToken || process.env.WHATSAPP_CLOUD_API_TOKEN;
+
+        if (!metaPhoneId || !metaToken) {
+          return NextResponse.json({
+            success: true,
+            ping: {
+              online: false,
+              status: 'UNCONFIGURED',
+              error: 'Missing Meta Phone Number ID or Permanent Access Token',
+            },
+          });
+        }
+
+        const startTime = Date.now();
+        try {
+          const res = await fetch(`https://graph.facebook.com/v20.0/${metaPhoneId}?access_token=${metaToken}`);
+          const latencyMs = Date.now() - startTime;
+          if (res.ok) {
+            const data = await res.json();
+            return NextResponse.json({
+              success: true,
+              ping: {
+                online: true,
+                status: 'CONNECTED',
+                latencyMs,
+                details: {
+                  verifiedName: data.verified_name || 'Meta WhatsApp Business',
+                  displayPhone: data.display_phone_number || data.id,
+                  qualityRating: data.quality_rating || 'GREEN',
+                },
+              },
+            });
+          } else {
+            const err = await res.json().catch(() => ({}));
+            return NextResponse.json({
+              success: true,
+              ping: {
+                online: false,
+                status: 'META_API_ERROR',
+                latencyMs,
+                error: err.error?.message || `Meta API HTTP ${res.status}`,
+              },
+            });
+          }
+        } catch (err: unknown) {
+          return NextResponse.json({
+            success: true,
+            ping: {
+              online: false,
+              status: 'NETWORK_ERROR',
+              latencyMs: Date.now() - startTime,
+              error: (err as Error)?.message || 'Meta connectivity failure',
+            },
+          });
+        }
+      }
+
+      // C) Baileys Self-Hosted Gateway Ping (Option B & A)
       const targetUrl = searchParams.get('url') || gw.baileysGatewayUrl || process.env.WHATSAPP_BAILEYS_GATEWAY_URL;
       const targetKey = searchParams.get('key') || gw.baileysApiKey || process.env.WHATSAPP_BAILEYS_API_KEY;
 

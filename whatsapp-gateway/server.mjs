@@ -104,6 +104,8 @@ app.get('/status', (req, res) => {
     connected: isConnected,
     phone: connectedUser ? (connectedUser.id || '').split(':')[0] : null,
     hasQr: Boolean(latestQrDataUrl),
+    qr: latestQrDataUrl || latestRawQr,
+    qrCode: latestQrDataUrl || latestRawQr,
     uptime: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
   });
@@ -383,8 +385,8 @@ app.get(['/', '/qr'], (req, res) => {
 });
 
 // Send message endpoint called by Mera-Vote on Vercel
-app.post('/send-message', async (req, res) => {
-  const { jid, phoneNumber, message, text } = req.body;
+app.post(['/send-message', '/send-otp'], async (req, res) => {
+  const { jid, phoneNumber, message, text, otp, code } = req.body;
 
   // Optional API key authorization
   if (API_KEY) {
@@ -403,7 +405,8 @@ app.post('/send-message', async (req, res) => {
 
   const cleanDigits = String(phoneNumber || '').replace(/[^0-9]/g, '');
   const targetJid = jid || (cleanDigits ? (cleanDigits.startsWith('91') ? `${cleanDigits}@s.whatsapp.net` : `91${cleanDigits}@s.whatsapp.net`) : null);
-  const content = message || text;
+  const otpCode = otp || code;
+  const content = message || text || (otpCode ? `🇮🇳 Mera Vote Verification Code: ${otpCode}\n\nValid for 5 minutes. Do NOT share this code with anyone.` : null);
 
   if (!targetJid || !content) {
     return res.status(400).json({ success: false, error: 'Missing target jid/phoneNumber or message text.' });
