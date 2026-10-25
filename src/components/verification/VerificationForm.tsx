@@ -39,16 +39,14 @@ export function VerificationForm({
   const [phoneNumber, setPhoneNumber] = useState('');
   const [cleanPhone, setCleanPhone] = useState('');
 
-  // Anti-bot arithmetic challenge
-  const [num1, setNum1] = useState(7);
-  const [num2, setNum2] = useState(4);
-  const [mathAnswer, setMathAnswer] = useState('');
+  // Invisible bot honeypot state
+  const [honeypot, setHoneypot] = useState('');
 
   // Citizen declaration checkbox
-  const [isDeclarationChecked, setIsDeclarationChecked] = useState(false);
+  const [isDeclarationChecked, setIsDeclarationChecked] = useState(true);
 
-  // OTP input state
-  const [otpCode, setOtpCode] = useState('');
+  // 6-digit segmented OTP input state
+  const [otpDigits, setOtpDigits] = useState<string[]>(['', '', '', '', '', '']);
   const [devOtp, setDevOtp] = useState<string | null>(null);
 
   // Resend cooldown timer (60 seconds)
@@ -61,7 +59,74 @@ export function VerificationForm({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const otpInputRef = useRef<HTMLInputElement>(null);
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Derived 6-digit OTP code string
+  const currentOtpCode = otpDigits.join('');
+
+  const handleDigitChange = (index: number, value: string) => {
+    const clean = value.replace(/[^0-9]/g, '');
+    if (!clean) {
+      const next = [...otpDigits];
+      next[index] = '';
+      setOtpDigits(next);
+      return;
+    }
+
+    const next = [...otpDigits];
+    next[index] = clean.slice(-1);
+    setOtpDigits(next);
+    if (error) setError(null);
+
+    // Auto-advance to next input
+    if (index < 5 && clean.length > 0) {
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      if (otpDigits[index] === '' && index > 0) {
+        otpInputRefs.current[index - 1]?.focus();
+        const next = [...otpDigits];
+        next[index - 1] = '';
+        setOtpDigits(next);
+      }
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      e.preventDefault();
+      otpInputRefs.current[index - 1]?.focus();
+    } else if (e.key === 'ArrowRight' && index < 5) {
+      e.preventDefault();
+      otpInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+    if (!pasted) return;
+
+    const next = [...otpDigits];
+    for (let i = 0; i < 6; i++) {
+      next[i] = pasted[i] || '';
+    }
+    setOtpDigits(next);
+    if (error) setError(null);
+
+    const targetFocus = Math.min(pasted.length, 5);
+    otpInputRefs.current[targetFocus]?.focus();
+  };
+
+  const fillDevOtp = (code: string) => {
+    const chars = code.slice(0, 6).split('');
+    const next = ['', '', '', '', '', ''];
+    chars.forEach((c, idx) => {
+      if (idx < 6) next[idx] = c;
+    });
+    setOtpDigits(next);
+    if (error) setError(null);
+    otpInputRefs.current[5]?.focus();
+  };
 
   // Generate lightweight stable client device fingerprint
   useEffect(() => {
@@ -95,15 +160,6 @@ export function VerificationForm({
     return () => clearInterval(interval);
   }, [resendCooldown]);
 
-  // Generate anti-bot arithmetic challenge
-  const generateNewMathChallenge = useCallback(() => {
-    const n1 = Math.floor(Math.random() * 8) + 3;
-    const n2 = Math.floor(Math.random() * 8) + 2;
-    setNum1(n1);
-    setNum2(n2);
-    setMathAnswer('');
-  }, []);
-
   // Handle phone number input with formatting
   const handlePhoneChange = (val: string) => {
     const digitsOnly = val.replace(/[^0-9]/g, '').slice(0, 10);
@@ -116,21 +172,14 @@ export function VerificationForm({
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
+    // Silent rejection for automated bot scrapers triggering honeypot
+    if (honeypot) return;
+
     if (cleanPhone.length !== 10 || !/^[6-9]/.test(cleanPhone)) {
       setError(
         language === 'hi'
           ? 'कृपया वैध 10-अंकों का भारतीय मोबाइल नंबर दर्ज करें (6, 7, 8 या 9 से प्रारंभ)।'
           : 'Please enter a valid 10-digit Indian mobile number starting with 6, 7, 8, or 9.'
-      );
-      return;
-    }
-
-    const expectedAnswer = num1 + num2;
-    if (parseInt(mathAnswer, 10) !== expectedAnswer) {
-      setError(
-        language === 'hi'
-          ? 'सुरक्षा जोड़ गलत है। कृपया सही उत्तर दर्ज करें।'
-          : 'Security arithmetic verification failed. Please enter the correct sum.'
       );
       return;
     }
@@ -154,11 +203,6 @@ export function VerificationForm({
         body: JSON.stringify({
           pollId,
           phoneNumber: cleanPhone,
-          mathChallenge: {
-            num1,
-            num2,
-            answer: parseInt(mathAnswer, 10),
-          },
         }),
       });
 
@@ -190,8 +234,9 @@ export function VerificationForm({
       }
       setStep('otp');
       setResendCooldown(60);
+      setOtpDigits(['', '', '', '', '', '']);
       setTimeout(() => {
-        otpInputRef.current?.focus();
+        otpInputRefs.current[0]?.focus();
       }, 200);
     } catch (err) {
       console.error('Send OTP error:', err);
@@ -209,7 +254,7 @@ export function VerificationForm({
   const handleVerifyOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    const cleanOtp = otpCode.trim().replace(/[^0-9]/g, '');
+    const cleanOtp = currentOtpCode.trim().replace(/[^0-9]/g, '');
     if (cleanOtp.length !== 6) {
       setError(
         language === 'hi'
@@ -371,44 +416,16 @@ export function VerificationForm({
               </span>
             </div>
 
-            {/* Anti-Bot Arithmetic Challenge */}
-            <div className="p-4 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-2.5">
-              <div className="flex items-center justify-between">
-                <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1.5">
-                  <Fingerprint className="w-4 h-4 text-emerald-500" />
-                  <span>
-                    {language === 'hi'
-                      ? 'सुरक्षा सत्यापन (Anti-Bot Challenge) *'
-                      : 'Security Verification (Anti-Bot Challenge) *'}
-                  </span>
-                </label>
-                <button
-                  type="button"
-                  onClick={generateNewMathChallenge}
-                  className="text-[11px] text-emerald-500 hover:underline flex items-center gap-1 cursor-pointer"
-                >
-                  <RefreshCw className="w-3 h-3" />
-                  <span>{language === 'hi' ? 'बदलें' : 'Refresh'}</span>
-                </button>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <div className="px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] font-mono font-bold text-sm text-[var(--text-primary)] select-none">
-                  {num1} + {num2} = ?
-                </div>
-                <input
-                  type="number"
-                  required
-                  value={mathAnswer}
-                  onChange={(e) => {
-                    setMathAnswer(e.target.value);
-                    if (error) setError(null);
-                  }}
-                  placeholder="?"
-                  className="w-24 px-3 py-2 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-sm font-bold text-center text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                />
-              </div>
-            </div>
+            {/* Invisible Anti-Bot Honeypot Field */}
+            <input
+              type="text"
+              name="b_trap"
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              aria-hidden="true"
+              className="opacity-0 absolute -z-10 w-0 h-0 pointer-events-none"
+            />
 
             {/* Legal Citizen Declaration Checkbox */}
             <label className="flex items-start gap-3 p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] cursor-pointer hover:bg-[var(--bg-surface-hover)] transition-colors">
@@ -434,7 +451,7 @@ export function VerificationForm({
               type="submit"
               variant="primary"
               size="lg"
-              disabled={isLoading || cleanPhone.length !== 10 || !isDeclarationChecked || !mathAnswer}
+              disabled={isLoading || cleanPhone.length !== 10 || !isDeclarationChecked}
               className="w-full gap-2 font-bold justify-center shadow-md py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500/40"
             >
               {isLoading ? (
@@ -454,7 +471,7 @@ export function VerificationForm({
           </form>
         )}
 
-        {/* ── STEP 2: ENTER 6-DIGIT OTP ── */}
+        {/* ── STEP 2: ENTER 6-DIGIT OTP (6 SEGMENTED BOXES) ── */}
         {step === 'otp' && (
           <form onSubmit={handleVerifyOtp} className="space-y-5 animate-in fade-in duration-200">
             {/* Phone Info Banner */}
@@ -475,7 +492,7 @@ export function VerificationForm({
                 type="button"
                 onClick={() => {
                   setStep('phone');
-                  setOtpCode('');
+                  setOtpDigits(['', '', '', '', '', '']);
                   setError(null);
                 }}
                 className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline font-semibold cursor-pointer"
@@ -487,10 +504,7 @@ export function VerificationForm({
             {/* Development / Test Helper Mode Pill */}
             {devOtp && (
               <div
-                onClick={() => {
-                  setOtpCode(devOtp);
-                  if (error) setError(null);
-                }}
+                onClick={() => fillDevOtp(devOtp)}
                 className="p-3 rounded-xl bg-[var(--accent-soft)] border border-[var(--accent)]/30 text-xs text-[var(--text-primary)] flex items-center justify-between cursor-pointer hover:bg-[var(--accent)]/20 transition-all shadow-xs"
               >
                 <div className="flex items-center gap-2">
@@ -506,8 +520,8 @@ export function VerificationForm({
               </div>
             )}
 
-            {/* OTP Input */}
-            <div className="space-y-1.5">
+            {/* 6 Segmented Square Digit Boxes */}
+            <div className="space-y-2.5">
               <label className="text-xs font-bold text-[var(--text-primary)] flex items-center justify-between">
                 <span>
                   {language === 'hi'
@@ -519,19 +533,31 @@ export function VerificationForm({
                 </span>
               </label>
 
-              <input
-                ref={otpInputRef}
-                type="text"
-                required
-                value={otpCode}
-                onChange={(e) => {
-                  setOtpCode(e.target.value.replace(/[^0-9]/g, '').slice(0, 6));
-                  if (error) setError(null);
-                }}
-                placeholder="• • • • • •"
-                maxLength={6}
-                className="w-full px-4 py-3 rounded-xl bg-[var(--bg-primary)] border border-[var(--border-glass)] text-center font-mono font-black text-xl sm:text-2xl tracking-[0.5em] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-              />
+              <div className="flex items-center justify-center gap-2 sm:gap-3 py-1">
+                {otpDigits.map((digit, i) => (
+                  <input
+                    key={i}
+                    ref={(el) => {
+                      otpInputRefs.current[i] = el;
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleDigitChange(i, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(i, e)}
+                    onPaste={handlePaste}
+                    autoComplete={i === 0 ? 'one-time-code' : 'off'}
+                    className={`w-11 h-14 sm:w-13 sm:h-16 text-center text-xl sm:text-2xl font-black font-mono rounded-2xl border-2 transition-all duration-150 select-none ${
+                      digit
+                        ? 'bg-emerald-500/10 border-emerald-500 text-emerald-600 dark:text-emerald-400 shadow-sm'
+                        : 'bg-[var(--bg-surface)] border-slate-200 dark:border-white/15 text-[var(--text-primary)] focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/20'
+                    }`}
+                    aria-label={`Digit ${i + 1}`}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Cooldown Timer & Resend Action */}
@@ -567,7 +593,7 @@ export function VerificationForm({
                 type="submit"
                 variant="primary"
                 size="lg"
-                disabled={isLoading || otpCode.trim().length !== 6}
+                disabled={isLoading || currentOtpCode.length !== 6}
                 className="flex-1 justify-center gap-2 font-bold py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white border-emerald-500/40"
               >
                 {isLoading ? (
@@ -655,7 +681,7 @@ export function VerificationForm({
                   setStep('phone');
                   setPhoneNumber('');
                   setCleanPhone('');
-                  setOtpCode('');
+                  setOtpDigits(['', '', '', '', '', '']);
                   setError(null);
                 }}
                 className="text-xs font-bold"

@@ -59,12 +59,12 @@ export function ResultBar({ result }: ResultBarProps) {
           </div>
         </div>
 
-        {/* Stats */}
+        {/* Stats with Institutional Tabular Numbers */}
         <div className="flex flex-col sm:flex-row sm:items-baseline sm:gap-2 shrink-0 text-right leading-tight">
-          <span className="text-sm sm:text-base font-black text-[var(--text-primary)]">
+          <span className="text-sm sm:text-base font-black text-[var(--text-primary)] tabular-nums font-mono sm:font-sans">
             {result.percentage.toFixed(1)}%
           </span>
-          <span suppressHydrationWarning className="text-[10px] sm:text-xs text-[var(--text-tertiary)]">
+          <span suppressHydrationWarning className="text-[10px] sm:text-xs text-[var(--text-tertiary)] tabular-nums font-mono sm:font-sans">
             ({result.count.toLocaleString('en-IN')})
           </span>
         </div>

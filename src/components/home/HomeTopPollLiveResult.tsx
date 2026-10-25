@@ -225,12 +225,12 @@ export function HomeTopPollLiveResult() {
                     </div>
                   </div>
 
-                  {/* Vote Count and Percentage */}
+                  {/* Vote Count and Percentage with Institutional Tabular Numbers */}
                   <div className="text-right shrink-0">
-                    <span className="font-black text-sm sm:text-base text-[var(--text-primary)]">
+                    <span className="font-black text-sm sm:text-base text-[var(--text-primary)] tabular-nums font-mono sm:font-sans">
                       {item.percentage.toFixed(1)}%
                     </span>
-                    <span suppressHydrationWarning className="text-xs text-[var(--text-tertiary)] block sm:inline sm:ml-2">
+                    <span suppressHydrationWarning className="text-xs text-[var(--text-tertiary)] block sm:inline sm:ml-2 tabular-nums font-mono sm:font-sans">
                       ({item.count.toLocaleString('en-IN')} {language === 'hi' ? 'मत' : 'votes'})
                     </span>
                   </div>

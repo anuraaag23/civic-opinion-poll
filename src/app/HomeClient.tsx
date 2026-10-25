@@ -60,42 +60,40 @@ export function HomeClient() {
                 : 'An independent public opinion platform for national and state-level political preferences. Share your confidential opinion with authentic party election symbols.'}
             </p>
 
-            {/* Direct Dual CTAs: PM Poll & CM Poll */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
-              <Link href="/pm" className="w-full sm:w-auto">
-                <GlassButton size="lg" className="w-full sm:w-auto gap-2 shadow-md font-bold">
-                  <Globe className="w-4 h-4 text-white" />
-                  <span>{language === 'hi' ? 'PM जनमत में भाग लें' : 'Participate in PM Poll'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </GlassButton>
-              </Link>
-              <Link href="/cm" className="w-full sm:w-auto">
-                <GlassButton variant="secondary" size="lg" className="w-full sm:w-auto gap-2 font-bold border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
-                  <Building2 className="w-4 h-4" />
-                  <span>{language === 'hi' ? 'CM जनमत में भाग लें' : 'Participate in CM Poll'}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </GlassButton>
-              </Link>
-              <Link href="/polls/national-opinion-poll-2029/results" className="w-full sm:w-auto">
-                <GlassButton
-                  variant="secondary"
-                  size="lg"
-                  className="w-full sm:w-auto gap-2 font-bold bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-[var(--text-primary)] shadow-xs"
-                >
-                  <BarChart3 className="w-4 h-4 text-[var(--accent)]" />
-                  <span>{language === 'hi' ? 'लाइव परिणाम' : 'Results'}</span>
-                </GlassButton>
-              </Link>
-              <Link href="/polls" className="w-full sm:w-auto">
-                <GlassButton
-                  variant="secondary"
-                  size="lg"
-                  className="w-full sm:w-auto gap-2 font-bold bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-[var(--text-primary)] shadow-xs"
-                >
-                  <Vote className="w-4 h-4 text-purple-500" />
-                  <span>{language === 'hi' ? 'सभी जनमत' : 'All Polls'}</span>
-                </GlassButton>
-              </Link>
+            {/* Clear Action Hierarchy: 1 Dominant Action + 1 Secondary Accent + Tertiary Links */}
+            <div className="space-y-3 pt-1">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                <Link href="/pm" className="w-full sm:w-auto flex-1">
+                  <GlassButton size="lg" className="w-full gap-2 shadow-md font-bold justify-center py-3.5">
+                    <Globe className="w-4 h-4 text-white" />
+                    <span>{language === 'hi' ? 'PM जनमत में भाग लें' : 'Participate in PM Poll'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </GlassButton>
+                </Link>
+                <Link href="/cm" className="w-full sm:w-auto flex-1">
+                  <GlassButton variant="secondary" size="lg" className="w-full gap-2 font-bold justify-center py-3.5 border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20">
+                    <Building2 className="w-4 h-4" />
+                    <span>{language === 'hi' ? 'CM जनमत में भाग लें' : 'Participate in CM Poll'}</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </GlassButton>
+                </Link>
+              </div>
+
+              {/* Tertiary Clean Pill Row */}
+              <div className="flex items-center gap-2 flex-wrap pt-0.5">
+                <Link href="/polls/national-opinion-poll-2029/results">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/60 dark:bg-white/[0.05] hover:bg-white dark:hover:bg-white/[0.1] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 transition-colors shadow-2xs">
+                    <BarChart3 className="w-3.5 h-3.5 text-[var(--accent)]" />
+                    <span>{language === 'hi' ? 'लाइव परिणाम देखें' : 'View Live Results'}</span>
+                  </span>
+                </Link>
+                <Link href="/polls">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-white/60 dark:bg-white/[0.05] hover:bg-white dark:hover:bg-white/[0.1] text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-white/10 transition-colors shadow-2xs">
+                    <Vote className="w-3.5 h-3.5 text-purple-500" />
+                    <span>{language === 'hi' ? 'अन्य सभी जनमत (12)' : 'Explore All 12 Polls'}</span>
+                  </span>
+                </Link>
+              </div>
             </div>
 
             {/* Trust Metrics Pill */}

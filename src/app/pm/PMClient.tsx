@@ -13,7 +13,8 @@ import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ShieldCheck, Vote, Loader2, BarChart3, Lock, ArrowRight, Globe, Calendar } from 'lucide-react';
+import { PollSkeleton } from '@/components/ui/PollSkeleton';
+import { ShieldCheck, Vote, BarChart3, Lock, ArrowRight, Globe, Calendar } from 'lucide-react';
 
 type FlowStep = 'RULES' | 'VERIFY' | 'VOTE' | 'SUCCESS' | 'DUPLICATE';
 
@@ -89,10 +90,7 @@ export function PMClient() {
       <DisclaimerBanner />
 
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <Loader2 className="w-8 h-8 text-[var(--accent)] animate-spin" />
-          <p className="text-sm text-[var(--text-secondary)]">Loading Prime Minister Poll...</p>
-        </div>
+        <PollSkeleton cardCount={9} />
       ) : !poll ? (
         <GlassCard className="text-center py-16">
           <Vote className="w-12 h-12 text-[var(--text-tertiary)] mx-auto mb-3" />

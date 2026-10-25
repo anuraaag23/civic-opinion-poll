@@ -129,6 +129,14 @@ button, a, input, select, textarea {
   touch-action: manipulation;
 }
 
+/* Institutional Tabular Numbers for rock-steady data counters */
+.tabular-nums,
+[data-tabular-nums="true"] {
+  font-variant-numeric: tabular-nums;
+  -webkit-font-feature-settings: "tnum";
+  font-feature-settings: "tnum";
+}
+
 /* Completely remove visible scrollbars across all browsers and elements while preserving scrolling */
 html,
 body,
