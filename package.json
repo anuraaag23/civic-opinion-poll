@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
+    "@svg-maps/india": "^2.0.0",
     "@whiskeysockets/baileys": "^7.0.0-rc14",
     "canvas-confetti": "^1.9.4",
     "framer-motion": "^13.4.6",

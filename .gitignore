@@ -49,3 +49,6 @@ baileys_auth_info/
 whatsapp-gateway/baileys_auth_info/
 whatsapp-gateway/node_modules/
 
+# Local maintenance and verification scripts
+scripts/
+
