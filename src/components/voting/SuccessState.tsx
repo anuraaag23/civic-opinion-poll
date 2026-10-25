@@ -91,7 +91,7 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
               <>
                 <Check className="w-4 h-4 text-[var(--success)]" />
                 <span className="text-[var(--success)] font-bold">
-                  {language === 'hi' ? 'लिंक क्लिपबोर्ड पर कॉपी हो गया! ✓' : 'Link copied to clipboard! ✓'}
+                  {language === 'hi' ? 'लिंक क्लिपबोर्ड पर कॉपी हो गया!' : 'Link copied to clipboard!'}
                 </span>
               </>
             ) : (

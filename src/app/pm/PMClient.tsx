@@ -62,22 +62,25 @@ export function PMClient() {
             : 'Independent national civic inquiry for Prime Minister of India across all 28 States and 8 Union Territories. Cryptographically decoupled, zero ID storage.'}
         </p>
 
-        {/* Live India Only Badge Banner */}
-        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-          <GlassBadge variant="success">
-            <span className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
+        {/* Live India Only Badge Banner — iOS 27 Vision Glass Capsules */}
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+          <GlassBadge variant="success" interactive>
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+            </span>
             <span>{language === 'hi' ? 'सक्रिय राष्ट्रीय सर्वेक्षण' : 'Live National Poll'}</span>
           </GlassBadge>
-          <GlassBadge variant="accent">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{language === 'hi' ? 'अक्टूबर 2026 (वर्ष: 2026)' : 'October 2026 (Year: 2026)'}</span>
+          <GlassBadge variant="accent" interactive>
+            <Calendar className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
+            <span>{language === 'hi' ? 'अक्टूबर 2026 चक्र' : 'October 2026 Edition'}</span>
           </GlassBadge>
-          <GlassBadge variant="neutral">
-            <Globe className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
-            <span className="font-bold text-[var(--accent)]">{language === 'hi' ? 'केवल भारत स्तर' : 'India Only'}</span>
+          <GlassBadge variant="neutral" interactive>
+            <Globe className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
+            <span className="font-bold text-blue-600 dark:text-blue-400">{language === 'hi' ? 'केवल भारत स्तर' : 'India Only'}</span>
           </GlassBadge>
-          <GlassBadge variant="neutral">
-            <Lock className="w-3 h-3 text-[var(--accent)]" />
+          <GlassBadge variant="neutral" interactive>
+            <Lock className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
             <span>{language === 'hi' ? 'शून्य व्यक्तिगत डेटा' : 'Zero Personal Data Stored'}</span>
           </GlassBadge>
         </div>

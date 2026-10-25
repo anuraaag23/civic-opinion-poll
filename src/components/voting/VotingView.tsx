@@ -6,7 +6,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { PartyCard } from './PartyCard';
 import { VoteConfirmationSheet } from './VoteConfirmationSheet';
 import { GlassBadge } from '@/components/ui/GlassBadge';
-import { Lock, AlertCircle } from 'lucide-react';
+import { Lock, AlertCircle, Zap, CheckCircle2 } from 'lucide-react';
 
 interface VotingViewProps {
   poll: Poll;
@@ -74,25 +74,27 @@ export function VotingView({ poll, anonymousToken, onVoteSuccess }: VotingViewPr
         <div className="inline-flex flex-wrap items-center justify-center gap-2">
           {poll.requires_verification === false ? (
             <>
-              <GlassBadge variant="success">
-                <span>⚡ {language === 'hi' ? 'ओपन पोल (बिना नंबर के)' : 'Open Poll (No Phone Required)'}</span>
+              <GlassBadge variant="success" interactive>
+                <Zap className="w-3.5 h-3.5 text-emerald-500 fill-emerald-500/20 shrink-0" />
+                <span>{language === 'hi' ? 'ओपन पोल (बिना नंबर के)' : 'Open Poll (No Phone Required)'}</span>
               </GlassBadge>
-              <GlassBadge variant="accent">
+              <GlassBadge variant="accent" interactive>
                 <span>{language === 'hi' ? 'तुरंत गुमनाम वोट' : 'Instant Anonymous Vote'}</span>
               </GlassBadge>
             </>
           ) : (
             <>
-              <GlassBadge variant="success">
-                <span>✓ {t.verification.selfVerificationConfirmed}</span>
+              <GlassBadge variant="success" interactive>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                <span>{t.verification.selfVerificationConfirmed}</span>
               </GlassBadge>
-              <GlassBadge variant="accent">
-                <Lock className="w-3 h-3 text-[var(--accent)]" />
+              <GlassBadge variant="accent" interactive>
+                <Lock className="w-3 h-3 text-[var(--accent)] shrink-0" />
                 <span>{t.voting.headerProgress}</span>
               </GlassBadge>
             </>
           )}
-          <GlassBadge variant="neutral">
+          <GlassBadge variant="neutral" interactive>
             <span>{t.common.privacyGuaranteed}</span>
           </GlassBadge>
         </div>

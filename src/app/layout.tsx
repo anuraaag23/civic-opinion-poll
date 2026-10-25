@@ -127,7 +127,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <GlassNavbar />
 
               {/* Main Application Content */}
-              <main className="flex-1 w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 pb-20 lg:pb-8 relative z-10 overflow-x-hidden">
+              <main className="flex-1 w-full max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 pb-24 lg:pb-8 relative z-10 overflow-x-hidden">
                 {children}
               </main>
 

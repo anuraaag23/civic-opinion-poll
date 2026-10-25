@@ -122,10 +122,10 @@ export function HomeTopPollLiveResult() {
     <section className="space-y-6">
       {/* Section Header */}
       <div className="text-center max-w-2xl mx-auto space-y-2">
-        <div className="inline-flex items-center gap-2 px-3 pt-[5px] pb-[4px] rounded-full bg-[var(--accent-soft)] text-[var(--accent)] text-xs font-bold border border-[var(--accent)]/30 leading-none">
+        <GlassBadge variant="accent" interactive className="text-xs">
           <span className="relative flex h-2 w-2 shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--accent)] opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--accent)]" />
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.8)]" />
           </span>
           <Flame className="w-3.5 h-3.5 text-amber-500 shrink-0" />
           <span>
@@ -133,7 +133,7 @@ export function HomeTopPollLiveResult() {
               ? 'अक्टूबर 2026 मासिक चक्र • 128,420+ राष्ट्रीय जनमत प्रतिक्रियाएं'
               : 'October 2026 Monthly Edition • 128,420+ National Poll Responses'}
           </span>
-        </div>
+        </GlassBadge>
 
         <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-[var(--text-primary)]">
           {language === 'hi'

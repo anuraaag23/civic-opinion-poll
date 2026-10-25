@@ -48,6 +48,7 @@ import {
   Calendar,
   Globe,
   Building2,
+  Zap,
 } from 'lucide-react';
 import { translateEnToHi, translateHiToEn } from '@/lib/utils/translation';
 
@@ -1368,7 +1369,17 @@ export function AdminClient() {
                           }`}
                           title="Click to toggle between WhatsApp OTP and Open Polling"
                         >
-                          {poll.requires_verification === false ? '⚡ Open (Zero Verification)' : '✓ WhatsApp OTP'}
+                          {poll.requires_verification === false ? (
+                            <span className="inline-flex items-center gap-1">
+                              <Zap className="w-3 h-3 text-emerald-500 fill-emerald-500/20" />
+                              <span>Open (Zero Verification)</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1">
+                              <ShieldCheck className="w-3 h-3 text-blue-500" />
+                              <span>WhatsApp OTP</span>
+                            </span>
+                          )}
                         </button>
                       </div>
 
@@ -2864,7 +2875,8 @@ export function AdminClient() {
                       </p>
                     </div>
                     <span className="mt-2 text-[10px] font-bold text-blue-600 dark:text-blue-400 inline-flex items-center gap-1">
-                      ✓ 1-Person-1-Vote Verified
+                      <ShieldCheck className="w-3 h-3 text-blue-500" />
+                      <span>1-Person-1-Vote Verified</span>
                     </span>
                   </label>
 
@@ -2894,7 +2906,8 @@ export function AdminClient() {
                       </p>
                     </div>
                     <span className="mt-2 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 inline-flex items-center gap-1">
-                      ⚡ Instant Voting (No Phone Required)
+                      <Zap className="w-3 h-3 text-emerald-500 fill-emerald-500/20" />
+                      <span>Instant Voting (No Phone Required)</span>
                     </span>
                   </label>
                 </div>

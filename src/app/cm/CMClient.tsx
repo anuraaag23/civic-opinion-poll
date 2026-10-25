@@ -100,22 +100,25 @@ export function CMClient() {
             : 'Select your state to view the exact contesting parties and official symbols active in your Legislative Assembly.'}
         </p>
 
-        {/* Live Badges */}
-        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
-          <GlassBadge variant="success">
-            <span className="w-2 h-2 rounded-full bg-[var(--success)] animate-pulse" />
-            <span>{language === 'hi' ? 'राज्यवार लाइव सर्वेक्षण' : 'State-by-State Active Poll'}</span>
+        {/* Live Badges — iOS 27 Vision Glass Capsules */}
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+          <GlassBadge variant="success" interactive>
+            <span className="relative flex h-2 w-2 shrink-0">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+            </span>
+            <span>{language === 'hi' ? 'राज्यवार लाइव जनमत' : 'State-by-State Active Poll'}</span>
           </GlassBadge>
-          <GlassBadge variant="accent">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{language === 'hi' ? 'अक्टूबर 2026 (वर्ष: 2026)' : 'October 2026 (Year: 2026)'}</span>
+          <GlassBadge variant="accent" interactive>
+            <Calendar className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
+            <span>{language === 'hi' ? 'अक्टूबर 2026 चक्र' : 'October 2026 Edition'}</span>
           </GlassBadge>
-          <GlassBadge variant="neutral">
-            <MapPin className="w-3 h-3 text-[var(--accent)]" />
+          <GlassBadge variant="neutral" interactive>
+            <MapPin className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
             <span>{language === 'hi' ? '28 राज्य एवं 8 केंद्र शासित प्रदेश' : 'All 28 States & UTs Supported'}</span>
           </GlassBadge>
-          <GlassBadge variant="neutral">
-            <Lock className="w-3 h-3 text-[var(--accent)]" />
+          <GlassBadge variant="neutral" interactive>
+            <Lock className="w-3.5 h-3.5 text-blue-500 dark:text-blue-400 shrink-0" />
             <span>{language === 'hi' ? 'शून्य व्यक्तिगत आईडी भंडारण' : 'Zero Personal ID Stored'}</span>
           </GlassBadge>
         </div>

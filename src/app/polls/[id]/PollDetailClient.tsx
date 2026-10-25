@@ -11,7 +11,7 @@ import { DisclaimerBanner } from '@/components/layout/DisclaimerBanner';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ShieldCheck, Vote, Loader2, ArrowRight, Lock, BarChart3 } from 'lucide-react';
+import { ShieldCheck, Vote, Loader2, ArrowRight, Lock, BarChart3, Zap } from 'lucide-react';
 import Link from 'next/link';
 
 type FlowStep = 'RULES' | 'VERIFY' | 'VOTE' | 'SUCCESS' | 'DUPLICATE';
@@ -82,14 +82,17 @@ export function PollDetailClient({ idOrSlug }: PollDetailClientProps) {
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <GlassBadge variant={poll.status === 'LIVE' ? 'success' : 'neutral'}>
+                  <GlassBadge variant={poll.status === 'LIVE' ? 'success' : 'neutral'} interactive>
                     {poll.status === 'LIVE' && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />
+                      <span className="relative flex h-2 w-2 shrink-0">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                      </span>
                     )}
-                    {poll.status}
+                    <span>{poll.status}</span>
                   </GlassBadge>
-                  <GlassBadge variant="neutral">
-                    <Lock className="w-3 h-3 text-[var(--accent)]" />
+                  <GlassBadge variant="neutral" interactive>
+                    <Lock className="w-3.5 h-3.5 text-blue-500 shrink-0" />
                     <span>{t.common.privacyGuaranteed}</span>
                   </GlassBadge>
                 </div>
@@ -114,7 +117,7 @@ export function PollDetailClient({ idOrSlug }: PollDetailClientProps) {
               {poll.requires_verification === false ? (
                 <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-800 dark:text-emerald-300 space-y-1.5">
                   <div className="font-bold flex items-center gap-1.5">
-                    <span className="text-sm">⚡</span>
+                    <Zap className="w-4 h-4 text-emerald-500 fill-emerald-500/20 shrink-0" />
                     <span>{language === 'hi' ? 'ओपन जनमत (शून्य सत्यापन)' : 'Open Opinion Poll (Zero Verification Required)'}</span>
                   </div>
                   <p className="leading-relaxed text-[11px] text-[var(--text-secondary)]">

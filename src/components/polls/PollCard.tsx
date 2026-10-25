@@ -7,7 +7,7 @@ import { useI18n } from '@/lib/i18n/context';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
-import { ArrowRight, Calendar, Users, Globe, Building2, Vote } from 'lucide-react';
+import { ArrowRight, Calendar, Users, Globe, Building2, Vote, Zap } from 'lucide-react';
 
 interface PollCardProps {
   poll: Poll;
@@ -37,36 +37,42 @@ export function PollCard({ poll }: PollCardProps) {
     <GlassCard interactive className="flex flex-col justify-between space-y-6">
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
-            <GlassBadge variant={statusVariant}>
-              {isLive && <span className="w-1.5 h-1.5 rounded-full bg-[var(--success)] animate-pulse" />}
-              {statusLabel}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+            <GlassBadge variant={statusVariant} size="sm" interactive>
+              {isLive && (
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
+                </span>
+              )}
+              <span>{statusLabel}</span>
             </GlassBadge>
 
             {isPM && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30">
-                <Globe className="w-3 h-3" />
+              <GlassBadge variant="accent" size="sm" interactive>
+                <Globe className="w-3 h-3 text-blue-500 shrink-0" />
                 <span>{language === 'hi' ? 'PM • संपूर्ण भारत' : 'PM • India Only'}</span>
-              </span>
+              </GlassBadge>
             )}
 
             {poll.requires_verification === false && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                <span>⚡ {language === 'hi' ? 'ओपन पोल' : 'Open (No Phone)'}</span>
-              </span>
+              <GlassBadge variant="success" size="sm" interactive>
+                <Zap className="w-3 h-3 text-emerald-500 fill-emerald-500/20 shrink-0" />
+                <span>{language === 'hi' ? 'ओपन पोल' : 'Open (No Phone)'}</span>
+              </GlassBadge>
             )}
 
             {isCM && (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                <Building2 className="w-3 h-3" />
+              <GlassBadge variant="success" size="sm" interactive>
+                <Building2 className="w-3 h-3 text-emerald-500 shrink-0" />
                 <span>{language === 'hi' ? 'CM • राज्य विधानसभा' : 'CM • State Assembly'}</span>
-              </span>
+              </GlassBadge>
             )}
 
-            <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/30">
-              <Calendar className="w-3 h-3" />
+            <GlassBadge variant="warning" size="sm" interactive>
+              <Calendar className="w-3 h-3 text-amber-500 shrink-0" />
               <span>{language === 'hi' ? `${poll.poll_month === 'October' ? 'अक्टूबर' : (poll.poll_month || 'अक्टूबर')} ${poll.poll_year || 2026}` : `${poll.poll_month || 'October'} ${poll.poll_year || 2026}`}</span>
-            </span>
+            </GlassBadge>
           </div>
 
           <span className="text-xs text-[var(--text-tertiary)] font-mono">
