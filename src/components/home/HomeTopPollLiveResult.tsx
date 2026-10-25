@@ -27,8 +27,8 @@ const DEFAULT_TOP_PARTIES: LeaderboardItem[] = [
     nameHi: 'भारतीय जनता पार्टी',
     logoUrl: '/parties/bjp.png',
     color: '#FF9933',
-    count: 48620,
-    percentage: 37.9,
+    count: 0,
+    percentage: 0,
   },
   {
     partyId: 'party-inc',
@@ -37,8 +37,8 @@ const DEFAULT_TOP_PARTIES: LeaderboardItem[] = [
     nameHi: 'भारतीय राष्ट्रीय कांग्रेस',
     logoUrl: '/parties/inc.png',
     color: '#19AAED',
-    count: 34240,
-    percentage: 26.7,
+    count: 0,
+    percentage: 0,
   },
   {
     partyId: 'party-sp',
@@ -47,18 +47,8 @@ const DEFAULT_TOP_PARTIES: LeaderboardItem[] = [
     nameHi: 'समाजवादी पार्टी',
     logoUrl: '/parties/sp.png',
     color: '#E11D48',
-    count: 18450,
-    percentage: 14.4,
-  },
-  {
-    partyId: 'party-others',
-    shortName: 'Others',
-    nameEn: 'Other Parties & NOTA',
-    nameHi: 'अन्य दल एवं नोटा',
-    logoUrl: '/parties/others.png',
-    color: '#64748B',
-    count: 15220,
-    percentage: 11.7,
+    count: 0,
+    percentage: 0,
   },
   {
     partyId: 'party-aap',
@@ -67,15 +57,25 @@ const DEFAULT_TOP_PARTIES: LeaderboardItem[] = [
     nameHi: 'आम आदमी पार्टी',
     logoUrl: '/parties/aap.png',
     color: '#0072B0',
-    count: 11890,
-    percentage: 9.3,
+    count: 0,
+    percentage: 0,
+  },
+  {
+    partyId: 'party-others',
+    shortName: 'Others',
+    nameEn: 'Other Parties & NOTA',
+    nameHi: 'अन्य दल एवं नोटा',
+    logoUrl: '/parties/others.png',
+    color: '#64748B',
+    count: 0,
+    percentage: 0,
   },
 ];
 
 export function HomeTopPollLiveResult() {
   const { language } = useI18n();
   const [items, setItems] = useState<LeaderboardItem[]>(DEFAULT_TOP_PARTIES);
-  const [totalVotes, setTotalVotes] = useState<number>(128420);
+  const [totalVotes, setTotalVotes] = useState<number>(0);
   const [imgErrors, setImgErrors] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -83,8 +83,8 @@ export function HomeTopPollLiveResult() {
       try {
         const res = await fetch('/api/polls/poll-national-2029/results');
         const data = await res.json();
-        if (data.success && Array.isArray(data.results) && data.results.length > 0) {
-          const total = data.totalResponses || 128420;
+        if (data.success && Array.isArray(data.results)) {
+          const total = data.totalResponses ?? 0;
           setTotalVotes(total);
           // Sort descending by count
           const sorted = [...data.results].sort((a: { count: number }, b: { count: number }) => b.count - a.count);
