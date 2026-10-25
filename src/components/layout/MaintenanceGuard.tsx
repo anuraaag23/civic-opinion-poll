@@ -43,8 +43,14 @@ export function MaintenanceGuard({ children }: MaintenanceGuardProps) {
 
   useEffect(() => {
     let active = true;
+    let lastSettingsJson = '';
 
     const pollStatus = async () => {
+      // If the tab is in the background, skip polling to save CPU and battery
+      if (typeof document !== 'undefined' && document.hidden) {
+        return;
+      }
+
       try {
         const res = await fetch('/api/site-status', {
           cache: 'no-store',
@@ -55,12 +61,16 @@ export function MaintenanceGuard({ children }: MaintenanceGuardProps) {
         if (res.ok) {
           const json = await res.json();
           if (active && json.success && json.data) {
-            setSiteStatus(json.data);
-            // Broadcast to other components like SiteAnnouncementBanner
-            if (typeof window !== 'undefined') {
-              window.dispatchEvent(
-                new CustomEvent('site_settings_updated', { detail: json.data })
-              );
+            const currentJson = JSON.stringify(json.data);
+            // Only trigger React state update and event broadcast if settings actually changed
+            if (currentJson !== lastSettingsJson) {
+              lastSettingsJson = currentJson;
+              setSiteStatus(json.data);
+              if (typeof window !== 'undefined') {
+                window.dispatchEvent(
+                  new CustomEvent('site_settings_updated', { detail: json.data })
+                );
+              }
             }
           }
         }
@@ -71,10 +81,20 @@ export function MaintenanceGuard({ children }: MaintenanceGuardProps) {
 
     pollStatus();
 
-    // 1. Real-time background status polling every 3 seconds
-    const interval = setInterval(pollStatus, 3000);
+    // Relaxed, non-blocking polling interval (60 seconds) instead of battery-draining 3s
+    const interval = setInterval(pollStatus, 60000);
 
-    // 2. Immediate local event listener (e.g. when admin toggles setting in another tab or same window)
+    // Refresh immediately when tab regains focus or becomes visible
+    const handleVisibilityOrFocus = () => {
+      if (typeof document !== 'undefined' && !document.hidden) {
+        pollStatus();
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityOrFocus);
+    window.addEventListener('focus', handleVisibilityOrFocus);
+
+    // Immediate local event listener (e.g. when admin toggles setting in another tab or same window)
     const handleLocalUpdate = (e: Event) => {
       const customEvent = e as CustomEvent<SiteSettings>;
       if (customEvent.detail) {
@@ -86,6 +106,8 @@ export function MaintenanceGuard({ children }: MaintenanceGuardProps) {
     return () => {
       active = false;
       clearInterval(interval);
+      window.removeEventListener('visibilitychange', handleVisibilityOrFocus);
+      window.removeEventListener('focus', handleVisibilityOrFocus);
       window.removeEventListener('site_settings_updated', handleLocalUpdate);
     };
   }, []);

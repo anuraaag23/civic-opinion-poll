@@ -30,10 +30,7 @@ export function SiteAnnouncementBanner() {
 
     fetchSettings();
 
-    // 1. Polling interval to ensure real-time alerts appear within 3 seconds
-    const interval = setInterval(fetchSettings, 3000);
-
-    // 2. Immediate local window event listener
+    // Listen to centralized site settings update events from MaintenanceGuard
     const handleUpdate = (e: Event) => {
       const customEvent = e as CustomEvent<SiteSettings>;
       if (customEvent.detail) {
@@ -47,7 +44,6 @@ export function SiteAnnouncementBanner() {
 
     return () => {
       active = false;
-      clearInterval(interval);
       window.removeEventListener('site_settings_updated', handleUpdate);
     };
   }, []);

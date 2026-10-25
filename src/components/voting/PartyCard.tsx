@@ -42,19 +42,22 @@ export function PartyCard({
       tabIndex={disabled ? -1 : 0}
       onClick={() => !disabled && onSelect(optionId)}
       onKeyDown={handleKeyDown}
-      className={`glass-panel p-3 sm:p-5 flex items-center justify-between gap-3 sm:gap-4 transition-all duration-150 cursor-pointer select-none active:scale-[0.98] ${
+      className={`group relative overflow-hidden rounded-2xl p-3.5 sm:p-5 flex items-center justify-between gap-3 sm:gap-4 transition-all duration-200 cursor-pointer select-none active:scale-[0.98] ${
         disabled ? 'opacity-50 cursor-not-allowed' : ''
       } ${
         isSelected
-          ? 'border-[var(--accent)] ring-2 ring-[var(--accent)]/30 bg-[var(--bg-glass-elevated)] shadow-md'
-          : 'hover:border-[var(--border-glass)] hover:bg-[var(--bg-glass-elevated)]'
-      }`}
+          ? 'bg-gradient-to-br from-blue-500/[0.08] via-transparent to-blue-600/[0.05] dark:from-blue-500/[0.12] dark:to-blue-900/[0.1] border-blue-500/80 dark:border-blue-400/80 ring-2 ring-blue-500/25 dark:ring-blue-400/20 shadow-[0_8px_30px_-6px_rgba(37,99,235,0.22),inset_0_1px_1px_rgba(255,255,255,0.5)] dark:shadow-[0_12px_36px_-6px_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(147,197,253,0.3)]'
+          : 'bg-white/70 dark:bg-[#131722]/80 hover:bg-white dark:hover:bg-[#181d2a] border-slate-200/80 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 shadow-xs hover:shadow-md'
+      } border backdrop-blur-xl`}
     >
+      {/* Specular top rim highlight */}
+      <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent ${isSelected ? 'via-blue-400/60 dark:via-blue-300/60' : 'via-white/60 dark:via-white/15'} to-transparent pointer-events-none`} />
+
       {/* Party Symbol & Information */}
-      <div className="flex items-center gap-3 sm:gap-5 min-w-0">
-        {/* Verified Authentic High-Quality Party Logo - Highly Visible */}
+      <div className="flex items-center gap-3.5 sm:gap-5 min-w-0">
+        {/* Verified Authentic High-Quality Party Logo */}
         <div
-          className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl p-1 sm:p-1.5 bg-white dark:bg-white/95 border border-[var(--border-glass)] flex items-center justify-center shrink-0 shadow-sm overflow-hidden"
+          className="w-14 h-14 sm:w-20 sm:h-20 rounded-2xl p-1.5 sm:p-2 bg-white dark:bg-white/95 border border-slate-200/90 dark:border-white/20 flex items-center justify-center shrink-0 shadow-sm overflow-hidden group-hover:scale-[1.02] transition-transform duration-200"
           title={symbolAlt}
         >
           {party.logo_url && !imgError ? (
@@ -76,11 +79,11 @@ export function PartyCard({
         {/* Text Metadata */}
         <div className="space-y-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-[var(--border-glass)] text-[var(--text-secondary)]">
+            <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-white/[0.08] text-slate-700 dark:text-slate-300 border border-slate-200/60 dark:border-white/10">
               {party.short_name}
             </span>
             {party.candidate_role_en && (
-              <span className="text-[10px] font-bold px-1.5 pt-[3px] pb-[2px] rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30 leading-none">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent)]/30 leading-none">
                 {language === 'hi' ? party.candidate_role_hi || party.candidate_role_en : party.candidate_role_en}
               </span>
             )}
@@ -106,13 +109,13 @@ export function PartyCard({
       {/* Neutral Selection Indicator */}
       <div className="shrink-0 flex items-center">
         <div
-          className={`w-6 h-6 rounded-full border flex items-center justify-center transition-colors ${
+          className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full border flex items-center justify-center transition-all duration-200 ${
             isSelected
-              ? 'bg-[var(--accent)] border-[var(--accent)] text-white shadow-xs'
-              : 'border-[var(--border-glass)] bg-[var(--bg-surface)]'
+              ? 'bg-gradient-to-br from-blue-500 to-blue-600 border-blue-400 text-white shadow-[0_2px_10px_rgba(37,99,235,0.45)] scale-105'
+              : 'border-slate-300 dark:border-white/20 bg-slate-100/80 dark:bg-white/[0.05] group-hover:border-slate-400 dark:group-hover:border-white/30'
           }`}
         >
-          {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+          {isSelected && <Check className="w-4 h-4 stroke-[3]" />}
         </div>
       </div>
     </div>

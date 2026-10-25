@@ -193,6 +193,8 @@ body,
   border-top: 1px solid var(--border-highlight);
   box-shadow: var(--shadow-glass);
   border-radius: 1.25rem;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
 .glass-panel-elevated {
@@ -203,6 +205,20 @@ body,
   border-top: 1px solid var(--border-highlight);
   box-shadow: var(--shadow-glass-hover);
   border-radius: 1.25rem;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/* Mobile GPU optimization for silky smooth 60fps scrolling */
+@media (max-width: 640px) {
+  .glass-panel {
+    backdrop-filter: blur(12px) saturate(160%);
+    -webkit-backdrop-filter: blur(12px) saturate(160%);
+  }
+  .glass-panel-elevated {
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+  }
 }
 
 .glass-card-interactive {
@@ -296,17 +312,22 @@ select option:checked {
   font-weight: 700;
 }
 
-/* Subtle Civic Neutral Ambient Background Depth */
+/* Hardware-Accelerated Civic Neutral Ambient Background Depth */
 .civic-ambient-depth {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: 600px;
+  height: 520px;
   pointer-events: none;
   z-index: 0;
   opacity: 0.45;
   background: radial-gradient(circle at 50% -10%, rgba(36, 87, 214, 0.08) 0%, transparent 70%);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  contain: strict;
 }
 
 .dark .civic-ambient-depth {

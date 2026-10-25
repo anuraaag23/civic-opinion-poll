@@ -149,12 +149,21 @@ export function LiveResultsView({ pollIdOrSlug }: LiveResultsViewProps) {
       });
 
     const interval = setInterval(() => {
+      if (typeof document !== 'undefined' && document.hidden) return;
       loadResults();
-    }, 6000);
+    }, 12000);
+
+    const handleVisibility = () => {
+      if (typeof document !== 'undefined' && !document.hidden && active) {
+        loadResults();
+      }
+    };
+    window.addEventListener('visibilitychange', handleVisibility);
 
     return () => {
       active = false;
       clearInterval(interval);
+      window.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [loadResults, scope, selectedStateId, pollIdOrSlug, timeframe, selectedMonth]);
 

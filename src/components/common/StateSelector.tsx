@@ -54,32 +54,35 @@ export function StateSelector({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full glass-panel p-3.5 sm:p-4 rounded-2xl flex items-center justify-between gap-3 text-left border-2 border-[var(--accent)]/40 hover:border-[var(--accent)] transition-all cursor-pointer shadow-sm group focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+          className="w-full relative overflow-hidden rounded-2xl p-3.5 sm:p-4 flex items-center justify-between gap-3 text-left transition-all duration-200 cursor-pointer group focus:outline-none focus:ring-2 focus:ring-[var(--accent)] bg-white/70 dark:bg-[#121620]/80 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1),inset_0_1px_1px_rgba(255,255,255,0.4)] dark:shadow-[0_8px_30px_-4px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08)] hover:border-[var(--accent)]/50 active:scale-[0.99]"
           aria-expanded={isOpen}
           aria-haspopup="listbox"
         >
-          <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center font-black text-sm shrink-0 border border-[var(--accent)]/30">
+          {/* Top specular highlight rim */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 dark:via-blue-400/30 to-transparent pointer-events-none" />
+
+          <div className="flex items-center gap-3.5 min-w-0 flex-1">
+            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/15 via-blue-600/10 to-indigo-600/20 text-[var(--accent)] flex items-center justify-center font-black text-sm shrink-0 border border-blue-500/25 shadow-xs">
               {currentState.code}
             </div>
             <div className="min-w-0 flex-1">
-              <span className="text-xs font-bold text-[var(--accent)] block mb-0.5">
+              <span className="text-[11px] font-bold text-[var(--accent)] uppercase tracking-wider block mb-0.5">
                 {language === 'hi' ? 'चयनित राज्य / केंद्र शासित प्रदेश' : 'Selected State / Union Territory'}
               </span>
               <div className="flex items-center justify-between gap-3">
-                <h3 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate leading-normal">
+                <h3 className="text-base sm:text-lg font-black text-[var(--text-primary)] truncate leading-tight">
                   {language === 'hi' ? currentState.name_hi : currentState.name_en}
                 </h3>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="hidden sm:inline-flex items-center text-xs font-semibold text-[var(--accent)] px-2.5 py-1 rounded-full bg-[var(--accent-soft)]">
+                  <span className="hidden sm:inline-flex items-center text-xs font-semibold text-[var(--accent)] px-2.5 py-1 rounded-full bg-[var(--accent-soft)] border border-[var(--accent)]/20">
                     {language === 'hi' ? 'राज्य बदलें' : 'Change State'}
                   </span>
-                  <div className={`p-1.5 rounded-lg bg-[var(--bg-surface)] text-[var(--text-secondary)] transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}>
+                  <div className={`p-1.5 rounded-lg bg-black/5 dark:bg-white/[0.06] text-[var(--text-secondary)] transition-transform duration-200 border border-black/5 dark:border-white/5 ${isOpen ? 'rotate-180' : ''}`}>
                     <ChevronDown className="w-4 h-4" />
                   </div>
                 </div>
               </div>
-              <span className="text-xs text-[var(--text-secondary)] font-medium block">
+              <span className="text-xs text-[var(--text-secondary)] font-medium block mt-0.5">
                 {currentState.assemblySeats
                   ? language === 'hi'
                     ? `विधानसभा सीटें: ${currentState.assemblySeats}`
@@ -183,27 +186,39 @@ export function StateSelector({
         )}
       </div>
 
-      {/* Quick Select Buttons below trigger when not compact */}
+      {/* iOS 27 Vision Glass Quick Select Pill Strip */}
       {!compact && (
-        <div className="flex items-center gap-2 flex-wrap pt-1">
-          <span className="text-xs text-[var(--text-tertiary)] font-semibold flex items-center gap-1">
-            <MapPin className="w-3.5 h-3.5 text-[var(--accent)]" />
-            {language === 'hi' ? 'त्वरित चयन:' : 'Quick Select:'}
-          </span>
-          {quickStates.slice(0, 6).map((st) => (
-            <button
-              key={st.id}
-              type="button"
-              onClick={() => onSelectState(st.id)}
-              className={`text-xs px-2.5 py-1 rounded-full transition-all cursor-pointer active:scale-95 ${
-                st.id === selectedStateId
-                  ? 'bg-[var(--accent)] text-white font-bold shadow-xs'
-                  : 'bg-[var(--bg-surface)] hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] text-[var(--text-secondary)] border border-[var(--border-glass)] font-medium'
-              }`}
-            >
-              {language === 'hi' ? st.name_hi : st.name_en}
-            </button>
-          ))}
+        <div className="relative pt-1">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 -mx-1 px-1">
+            <div className="shrink-0 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full bg-slate-100/90 dark:bg-white/[0.06] border border-slate-200/80 dark:border-white/10 text-slate-600 dark:text-slate-300 shadow-xs backdrop-blur-md">
+              <MapPin className="w-3.5 h-3.5 text-[var(--accent)] shrink-0" />
+              <span className="text-[11px] font-bold uppercase tracking-wider">
+                {language === 'hi' ? 'त्वरित चयन:' : 'Quick Select:'}
+              </span>
+            </div>
+
+            {quickStates.map((st) => {
+              const isActive = st.id === selectedStateId;
+              return (
+                <button
+                  key={st.id}
+                  type="button"
+                  onClick={() => onSelectState(st.id)}
+                  className={`group relative shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer active:scale-95 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white font-bold shadow-[0_2px_12px_rgba(37,99,235,0.4),inset_0_1px_1px_rgba(255,255,255,0.45)] border border-blue-400/50'
+                      : 'bg-white/70 dark:bg-[#141822]/90 hover:bg-white dark:hover:bg-white/[0.08] text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200/80 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 shadow-xs backdrop-blur-md font-medium'
+                  }`}
+                  aria-pressed={isActive}
+                >
+                  {isActive && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_6px_#ffffff] shrink-0" />
+                  )}
+                  <span>{language === 'hi' ? st.name_hi : st.name_en}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

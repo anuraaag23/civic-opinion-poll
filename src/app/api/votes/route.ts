@@ -7,8 +7,13 @@ const voteSubmissions = new Map<string, { count: number; resetAt: number }>();
 
 function checkVoteRateLimit(ip: string): boolean {
   const now = Date.now();
-  const entry = voteSubmissions.get(ip);
+  if (voteSubmissions.size > 2000) {
+    for (const [key, val] of voteSubmissions.entries()) {
+      if (now > val.resetAt) voteSubmissions.delete(key);
+    }
+  }
 
+  const entry = voteSubmissions.get(ip);
   if (!entry || now > entry.resetAt) {
     voteSubmissions.set(ip, { count: 1, resetAt: now + 60000 });
     return true;
@@ -65,11 +70,15 @@ export async function POST(request: NextRequest) {
 
     // If zero verification / open polling is enabled for this poll
     if (poll.requires_verification === false || poll.verification_mode === 'NONE') {
-      const result = await db.incrementVoteOpen(pollId, optionId, ip);
+      const voterFingerprint = hashToken(`OPEN_POLL:${ip}:${pollId}`);
+      const result = await db.incrementVoteOpen(pollId, optionId, voterFingerprint);
       if (!result.success) {
         return NextResponse.json(
-          { success: false, error: result.error || 'Vote submission failed' },
-          { status: 400 }
+          {
+            success: false,
+            error: result.error === 'ALREADY_VOTED' ? 'You have already voted in this opinion poll.' : (result.error || 'Vote submission failed'),
+          },
+          { status: result.error === 'ALREADY_VOTED' ? 409 : 400 }
         );
       }
 

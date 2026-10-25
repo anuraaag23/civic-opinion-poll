@@ -665,6 +665,14 @@ export const db = {
     const validOption = poll.options.find((o) => o.id === optionId && o.is_active);
     if (!validOption) return { success: false, error: 'INVALID_POLL_OPTION' };
 
+    if (voterFingerprint) {
+      const alreadyVoted = await this.hasParticipated(pollId, voterFingerprint);
+      if (alreadyVoted) {
+        return { success: false, error: 'ALREADY_VOTED' };
+      }
+      await this.recordParticipation(pollId, voterFingerprint);
+    }
+
     let countsMap = civicStore.voteCounts.get(pollId);
     if (!countsMap) {
       countsMap = new Map<string, number>();

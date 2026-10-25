@@ -1,5 +1,32 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { sanitizeText, fetchSupporters, submitSupporter } from '@/lib/supabase';
+import { verifyAdminRequest } from '@/lib/auth/admin';
+
+// In-memory rate limiting: max 5 public supporter submissions per 10 minutes per IP
+const supportSubmissions = new Map<string, { count: number; resetAt: number }>();
+
+function checkSupportRateLimit(ip: string): boolean {
+  const now = Date.now();
+  // Prune expired entries if map grows
+  if (supportSubmissions.size > 1000) {
+    for (const [key, val] of supportSubmissions.entries()) {
+      if (now > val.resetAt) supportSubmissions.delete(key);
+    }
+  }
+
+  const entry = supportSubmissions.get(ip);
+  if (!entry || now > entry.resetAt) {
+    supportSubmissions.set(ip, { count: 1, resetAt: now + 10 * 60 * 1000 });
+    return true;
+  }
+
+  if (entry.count >= 5) {
+    return false;
+  }
+
+  entry.count += 1;
+  return true;
+}
 
 export async function GET() {
   try {
@@ -33,10 +60,27 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      '127.0.0.1';
+
+    if (!checkSupportRateLimit(ip)) {
+      return NextResponse.json(
+        { success: false, error: 'Too many submissions. Please wait before submitting again.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { name, amount, cups, rating, message, paymentRef, verified } = body;
+
+    // Security Hardening: Only an authenticated administrator can mark a supporter verified via POST.
+    // Public user submissions are strictly unverified pending webhook or creator approval.
+    const isAdmin = verifyAdminRequest(request);
+    const isVerified = isAdmin && verified === true;
 
     const numAmount = Math.max(1, Math.min(100000, Number(amount) || 50));
     const numCups = Math.max(1, Math.min(2000, Number(cups) || Math.round(numAmount / 50)));
@@ -52,7 +96,7 @@ export async function POST(request: Request) {
       rating: numRating,
       message: cleanMessage,
       paymentId: cleanRef,
-      verified: verified === true,
+      verified: isVerified,
     });
 
     const list = await fetchSupporters();
@@ -78,8 +122,20 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
   try {
+    const ip =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      '127.0.0.1';
+
+    if (!checkSupportRateLimit(ip)) {
+      return NextResponse.json(
+        { success: false, error: 'Too many requests. Please wait a moment.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { id, rating, message, name } = body;
 
