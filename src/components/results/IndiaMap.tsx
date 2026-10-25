@@ -17,8 +17,9 @@ import {
   ArrowRight,
   Search,
   TrendingUp,
-  RotateCcw,
   Sparkles,
+  Award,
+  Swords,
 } from 'lucide-react';
 
 interface IndiaMapProps {
@@ -99,6 +100,12 @@ export function IndiaMap({
     );
   }, [searchQuery]);
 
+  // Projected margin calculation
+  const margin = useMemo(() => {
+    if (!activeState.runnerUp) return null;
+    return (activeState.projectedShare - activeState.runnerUp.projectedShare).toFixed(1);
+  }, [activeState]);
+
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Search & Header Strip */}
@@ -140,9 +147,14 @@ export function IndiaMap({
                   }}
                   className="w-full text-left px-3 py-2 rounded-lg text-xs hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] flex items-center justify-between cursor-pointer transition-colors"
                 >
-                  <span className="font-semibold text-[var(--text-primary)]">
-                    {language === 'hi' ? s.nameHi : s.nameEn}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="font-semibold text-[var(--text-primary)]">
+                      {language === 'hi' ? s.nameHi : s.nameEn}
+                    </span>
+                    <span className="text-[10px] text-[var(--text-tertiary)] font-mono">
+                      (Rank #{s.nationalSeatRank})
+                    </span>
+                  </div>
                   <span className="font-mono text-[10px] text-[var(--text-tertiary)] font-bold">{s.code}</span>
                 </button>
               ))}
@@ -174,22 +186,25 @@ export function IndiaMap({
             {/* Floating Hover Tooltip */}
             {hoveredState && tooltipPos && (
               <div
-                className="absolute pointer-events-none z-30 -translate-x-1/2 -translate-y-[120%] px-3 py-1.5 rounded-xl bg-slate-900/95 text-white border border-cyan-500/30 shadow-2xl backdrop-blur-md flex items-center gap-2 text-xs animate-in fade-in zoom-in-95 duration-150"
+                className="absolute pointer-events-none z-30 -translate-x-1/2 -translate-y-[120%] px-3 py-2 rounded-xl bg-slate-900/95 text-white border border-cyan-500/30 shadow-2xl backdrop-blur-md flex flex-col gap-0.5 text-xs animate-in fade-in zoom-in-95 duration-150"
                 style={{
                   left: `${tooltipPos.x}px`,
                   top: `${tooltipPos.y}px`,
                 }}
               >
-                <span
-                  className="w-2.5 h-2.5 rounded-full shadow-sm"
-                  style={{ backgroundColor: hoveredState.leadingPartyColor }}
-                />
-                <span className="font-bold">
-                  {language === 'hi' ? hoveredState.nameHi : hoveredState.nameEn}
-                </span>
-                <span className="font-mono text-[11px] font-black text-amber-300">
-                  {hoveredState.projectedShare}%
-                </span>
+                <div className="flex items-center gap-1.5 font-bold">
+                  <span
+                    className="w-2.5 h-2.5 rounded-full shadow-sm"
+                    style={{ backgroundColor: hoveredState.leadingPartyColor }}
+                  />
+                  <span>{language === 'hi' ? hoveredState.nameHi : hoveredState.nameEn}</span>
+                  <span className="text-[10px] font-mono text-cyan-400">
+                    (Rank #{hoveredState.nationalSeatRank})
+                  </span>
+                </div>
+                <div className="text-[11px] text-slate-300 font-medium">
+                  {language === 'hi' ? 'अग्रणी:' : 'Lead:'} {hoveredState.leadingCandidateEn.split('/')[0].trim()} ({hoveredState.projectedShare}%)
+                </div>
               </div>
             )}
 
@@ -313,25 +328,30 @@ export function IndiaMap({
         {/* Selected State Detail Card */}
         <div className="lg:col-span-5 space-y-4">
           <GlassCard elevated className="p-6 space-y-5 animate-in fade-in duration-200">
-            {/* State Name & Code */}
+            {/* State Header & National Rank */}
             <div className="flex items-start justify-between gap-3 border-b border-[var(--border-glass)] pb-4">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--accent)] font-mono block">
-                  State Assembly Jurisdiction
-                </span>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="px-2 py-0.5 rounded-md bg-[var(--accent)]/10 text-[var(--accent)] text-[10px] font-mono font-bold border border-[var(--accent)]/20 uppercase tracking-wider">
+                    {language === 'hi'
+                      ? `राष्ट्रीय विधानसभा रैंक #${activeState.nationalSeatRank}`
+                      : `National Rank #${activeState.nationalSeatRank} by Seats`}
+                  </span>
+                </div>
                 <h3 className="text-2xl font-black text-[var(--text-primary)]">
                   {language === 'hi' ? activeState.nameHi : activeState.nameEn}
                 </h3>
                 <span className="text-xs text-[var(--text-tertiary)] font-mono">
-                  State Code: {activeState.code} • Republic of India
+                  Code: {activeState.code} • {activeState.assemblySeats} Assembly Seats
                 </span>
               </div>
 
               <div
-                className="w-12 h-12 rounded-2xl flex items-center justify-center font-mono font-black text-white text-base shadow-lg transition-colors"
+                className="w-12 h-12 rounded-2xl flex flex-col items-center justify-center font-mono text-white shadow-lg transition-colors shrink-0"
                 style={{ backgroundColor: activeState.leadingPartyColor }}
               >
-                {activeState.code}
+                <span className="text-base font-black leading-none">{activeState.code}</span>
+                <span className="text-[9px] font-bold opacity-80 mt-0.5">#{activeState.nationalSeatRank}</span>
               </div>
             </div>
 
@@ -341,49 +361,108 @@ export function IndiaMap({
                 <span className="text-[10px] text-[var(--text-tertiary)] uppercase font-semibold block">
                   {language === 'hi' ? 'विधानसभा सीटें' : 'Assembly Seats'}
                 </span>
-                <span className="text-xl font-black text-[var(--text-primary)] font-mono">
-                  {rawStateDetails?.assemblySeats || 'N/A'}
-                </span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-black text-[var(--text-primary)] font-mono">
+                    {activeState.assemblySeats || 'N/A'}
+                  </span>
+                  <span className="text-[10px] text-[var(--text-tertiary)] font-mono">
+                    (Rank #{activeState.nationalSeatRank})
+                  </span>
+                </div>
               </div>
 
               <div className="p-3.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] space-y-1">
                 <span className="text-[10px] text-[var(--text-tertiary)] uppercase font-semibold block">
-                  {language === 'hi' ? 'प्रक्षेपित मत प्रतिशत' : 'Projected Share'}
+                  {language === 'hi' ? 'अग्रणी मत प्रतिशत' : 'Leader Vote Share'}
                 </span>
-                <span className="text-xl font-black text-emerald-500 font-mono">
-                  {activeState.projectedShare}%
-                </span>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-xl font-black text-emerald-500 font-mono">
+                    {activeState.projectedShare}%
+                  </span>
+                  {margin && (
+                    <span className="text-[10px] font-bold text-emerald-500 font-mono">
+                      (+{margin}%)
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 
-            {/* Leading Choice Spotlight */}
-            <div className="p-4 rounded-xl bg-[var(--accent-soft)] border border-[var(--accent)]/30 space-y-2.5">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-[var(--accent)] uppercase tracking-wider text-[10px]">
-                  {language === 'hi' ? 'सर्वेक्षण में अग्रणी दल' : 'Projected Leading Front'}
+            {/* Contest Spotlight: Front-Runner vs Challenger */}
+            <div className="p-4 rounded-xl bg-[var(--accent-soft)] border border-[var(--accent)]/30 space-y-3">
+              <div className="flex items-center justify-between text-xs border-b border-[var(--accent)]/20 pb-2">
+                <span className="font-bold text-[var(--accent)] uppercase tracking-wider text-[10px] flex items-center gap-1.5">
+                  <Swords className="w-3.5 h-3.5" />
+                  {language === 'hi' ? 'राज्य जनमत रुझान' : 'State CM Contest Projection'}
                 </span>
-                <GlassBadge variant="success">
-                  <TrendingUp className="w-3 h-3" />
-                  <span>Rank #1</span>
-                </GlassBadge>
+                <span className="text-[10px] font-mono font-bold text-[var(--text-tertiary)]">
+                  {language === 'hi' ? 'शीर्ष द्वंद' : 'Front-Runner vs Challenger'}
+                </span>
               </div>
 
-              <div className="flex items-center gap-3 pt-0.5">
-                <div
-                  className="w-4 h-4 rounded-full shrink-0 shadow-sm"
-                  style={{ backgroundColor: activeState.leadingPartyColor }}
-                />
-                <div>
-                  <span className="text-sm font-black text-[var(--text-primary)] block">
-                    {language === 'hi'
-                      ? activeState.leadingCandidateHi
-                      : activeState.leadingCandidateEn}
+              {/* #1 Front-Runner */}
+              <div className="flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div
+                    className="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm"
+                    style={{ backgroundColor: activeState.leadingPartyColor }}
+                  />
+                  <div className="truncate">
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-500 text-[9px] font-black uppercase font-mono">
+                        #1 Lead
+                      </span>
+                      <span className="font-black text-[var(--text-primary)] truncate text-xs">
+                        {language === 'hi' ? activeState.leadingCandidateHi : activeState.leadingCandidateEn}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-[var(--text-secondary)] font-medium">
+                      {activeState.defaultLeadingParty.replace('party-', '').toUpperCase()} Front
+                    </span>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="text-sm font-black text-[var(--text-primary)] font-mono block">
+                    {activeState.projectedShare}%
                   </span>
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">
-                    {activeState.defaultLeadingParty.replace('party-', '').toUpperCase()} Front
+                  <span className="text-[10px] font-bold text-emerald-500 font-mono">
+                    Projected Win
                   </span>
                 </div>
               </div>
+
+              {/* #2 Challenger / Runner-Up */}
+              {activeState.runnerUp && (
+                <div className="flex items-center justify-between gap-3 text-xs pt-1 border-t border-[var(--border-glass)]">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div
+                      className="w-3.5 h-3.5 rounded-full shrink-0 shadow-sm"
+                      style={{ backgroundColor: activeState.runnerUp.partyColor }}
+                    />
+                    <div className="truncate">
+                      <div className="flex items-center gap-1.5">
+                        <span className="px-1.5 py-0.2 rounded bg-slate-500/20 text-[var(--text-secondary)] text-[9px] font-black uppercase font-mono">
+                          #2 Challenger
+                        </span>
+                        <span className="font-bold text-[var(--text-secondary)] truncate text-xs">
+                          {language === 'hi' ? activeState.runnerUp.candidateHi : activeState.runnerUp.candidateEn}
+                        </span>
+                      </div>
+                      <span className="text-[11px] text-[var(--text-tertiary)] font-medium">
+                        {activeState.runnerUp.party} Front
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="text-sm font-bold text-[var(--text-secondary)] font-mono block">
+                      {activeState.runnerUp.projectedShare}%
+                    </span>
+                    <span className="text-[10px] font-medium text-[var(--text-tertiary)] font-mono">
+                      Runner-up
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* CTA: Go to State CM Poll */}
@@ -406,7 +485,7 @@ export function IndiaMap({
             )}
           </GlassCard>
 
-          {/* Quick State Jump Pills Strip */}
+          {/* Quick State Jump Pills Strip with National Ranks */}
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-[var(--text-tertiary)] block">
               {language === 'hi' ? 'त्वरित प्रमुख राज्य चयन' : 'Quick Jump to Major State:'}
@@ -414,15 +493,15 @@ export function IndiaMap({
             <div className="flex flex-wrap gap-1.5">
               {[
                 'uttar-pradesh',
+                'west-bengal',
                 'maharashtra',
                 'bihar',
-                'west-bengal',
                 'tamil-nadu',
-                'delhi',
-                'gujarat',
-                'rajasthan',
-                'karnataka',
                 'madhya-pradesh',
+                'karnataka',
+                'rajasthan',
+                'gujarat',
+                'delhi',
               ].map((stId) => {
                 const st = REALISTIC_INDIA_STATES.find((s) => s.id === stId);
                 if (!st) return null;
@@ -432,13 +511,20 @@ export function IndiaMap({
                     key={st.id}
                     type="button"
                     onClick={() => handleStateClick(st.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
                       isSelected
                         ? 'bg-[var(--accent)] text-white shadow-md'
                         : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] border border-[var(--border-glass)]'
                     }`}
                   >
-                    {language === 'hi' ? st.nameHi : st.nameEn}
+                    <span>{language === 'hi' ? st.nameHi : st.nameEn}</span>
+                    <span
+                      className={`text-[10px] font-mono px-1 rounded ${
+                        isSelected ? 'bg-white/20 text-white' : 'bg-black/10 text-[var(--text-tertiary)]'
+                      }`}
+                    >
+                      #{st.nationalSeatRank}
+                    </span>
                   </button>
                 );
               })}
