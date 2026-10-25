@@ -7,7 +7,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassDropdown } from '@/components/ui/GlassDropdown';
 import { OFFICIAL_PARTIES, INDIAN_STATES, IndianState, Party } from '@/lib/data/parties';
-import { Poll, OptionResult, SiteSettings, AuditEvent, DbSupporter, AdminUser } from '@/lib/types';
+import { Poll, OptionResult, SiteSettings, AuditEvent, DbSupporter, AdminUser, WhatsAppGatewayConfig, WhatsAppGatewayProvider } from '@/lib/types';
 import {
   ShieldCheck,
   Users,
@@ -49,6 +49,15 @@ import {
   Globe,
   Building2,
   Zap,
+  MessageSquare,
+  Send,
+  QrCode,
+  Wifi,
+  WifiOff,
+  Activity,
+  ExternalLink,
+  Copy,
+  Terminal,
 } from 'lucide-react';
 import { translateEnToHi, translateHiToEn } from '@/lib/utils/translation';
 
@@ -101,7 +110,7 @@ export function AdminClient() {
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<
-    'overview' | 'polls' | 'settings' | 'supporters' | 'parties' | 'export'
+    'overview' | 'polls' | 'whatsapp' | 'settings' | 'supporters' | 'parties' | 'export'
   >('overview');
 
   // Core Data
@@ -167,6 +176,42 @@ export function AdminClient() {
   const [tempSettings, setTempSettings] = useState<SiteSettings | null>(null);
   const [isSavingSettings, setIsSavingSettings] = useState(false);
 
+  // WhatsApp Gateway Management State
+  const [whatsappConfig, setWhatsappConfig] = useState<WhatsAppGatewayConfig>({
+    provider: 'baileys_gateway',
+    baileysGatewayUrl: '',
+    baileysApiKey: '',
+    metaPhoneNumberId: '',
+    metaCloudToken: '',
+    ultraMsgInstanceId: '',
+    ultraMsgToken: '',
+    greenApiInstanceId: '',
+    greenApiToken: '',
+    senderPhone: '',
+    fallbackToSimulator: true,
+    status: 'STANDBY',
+  });
+  const [isSavingWhatsapp, setIsSavingWhatsapp] = useState(false);
+  const [isPinging, setIsPinging] = useState(false);
+  const [pingStatus, setPingStatus] = useState<{
+    online: boolean;
+    status?: string;
+    latencyMs?: number;
+    qrCode?: string;
+    error?: string;
+    details?: any;
+  } | null>(null);
+  const [testPhone, setTestPhone] = useState('');
+  const [isTestingDispatch, setIsTestingDispatch] = useState(false);
+  const [testDispatchResult, setTestDispatchResult] = useState<{
+    success: boolean;
+    deliveredVia?: string;
+    testCode?: string;
+    latencyMs?: number;
+    error?: string;
+    messageId?: string;
+  } | null>(null);
+
   // Vote tally edit map: pollId -> optionId -> count
   const [tallyInputs, setTallyInputs] = useState<Record<string, Record<string, number>>>({});
 
@@ -202,7 +247,7 @@ export function AdminClient() {
   const fetchAllData = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      const [statsRes, pollsRes, settingsRes, supportersRes, auditRes, partiesRes, accountRes, usersRes] = await Promise.all([
+      const [statsRes, pollsRes, settingsRes, supportersRes, auditRes, partiesRes, accountRes, usersRes, whatsappRes] = await Promise.all([
         fetch('/api/admin/stats').catch(() => null),
         fetch('/api/admin/polls').catch(() => null),
         fetch('/api/admin/settings').catch(() => null),
@@ -211,6 +256,7 @@ export function AdminClient() {
         fetch('/api/admin/parties').catch(() => null),
         fetch('/api/admin/account').catch(() => null),
         fetch('/api/admin/users').catch(() => null),
+        fetch('/api/admin/whatsapp').catch(() => null),
       ]);
 
       if (statsRes?.status === 401) {
@@ -284,6 +330,16 @@ export function AdminClient() {
         const d = await auditRes.json();
         if (d.success && Array.isArray(d.data)) {
           setAuditEvents(d.data);
+        }
+      }
+
+      if (whatsappRes?.ok) {
+        const d = await whatsappRes.json();
+        if (d.success && d.data) {
+          setWhatsappConfig((prev) => ({
+            ...prev,
+            ...d.data,
+          }));
         }
       }
     } catch (err) {
@@ -958,6 +1014,118 @@ export function AdminClient() {
     }
   };
 
+  // WhatsApp Gateway Management Handlers
+  const handleSaveWhatsappConfig = async () => {
+    setIsSavingWhatsapp(true);
+    try {
+      const res = await fetch('/api/admin/whatsapp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(whatsappConfig),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast(
+          language === 'hi'
+            ? 'व्हाट्सएप गेटवे सेटिंग्स सुरक्षित की गईं और सक्रिय हैं'
+            : 'WhatsApp Gateway settings saved and applied dynamically'
+        );
+        if (data.data) {
+          setWhatsappConfig((prev) => ({ ...prev, ...data.data }));
+        }
+      } else {
+        showToast(data.error || 'Failed to save WhatsApp gateway settings', true);
+      }
+    } catch {
+      showToast('Error saving WhatsApp gateway settings', true);
+    } finally {
+      setIsSavingWhatsapp(false);
+    }
+  };
+
+  const handlePingGateway = async () => {
+    setIsPinging(true);
+    setPingStatus(null);
+    try {
+      const params = new URLSearchParams({
+        action: 'ping',
+        url: whatsappConfig.baileysGatewayUrl || '',
+        key: whatsappConfig.baileysApiKey || '',
+      });
+      const res = await fetch(`/api/admin/whatsapp?${params.toString()}`);
+      const data = await res.json();
+      if (data.success && data.ping) {
+        setPingStatus(data.ping);
+        if (data.ping.online) {
+          showToast(
+            language === 'hi'
+              ? `गेटवे सक्रिय एवं तैयार (${data.ping.latencyMs || 0}ms)`
+              : `Gateway is ONLINE & responsive (${data.ping.latencyMs || 0}ms)`
+          );
+        } else {
+          showToast(data.ping.error || 'Gateway ping returned offline or pairing needed', true);
+        }
+      } else {
+        setPingStatus({
+          online: false,
+          error: data.error || 'Could not reach WhatsApp gateway',
+        });
+        showToast('Gateway unreachable', true);
+      }
+    } catch (err: unknown) {
+      setPingStatus({
+        online: false,
+        error: (err as Error)?.message || 'Network error pinging gateway',
+      });
+      showToast('Ping failed', true);
+    } finally {
+      setIsPinging(false);
+    }
+  };
+
+  const handleTestDispatch = async () => {
+    if (!testPhone.trim()) {
+      showToast(
+        language === 'hi'
+          ? 'कृपया वैध मोबाइल नंबर दर्ज करें'
+          : 'Please enter a valid mobile number',
+        true
+      );
+      return;
+    }
+    setIsTestingDispatch(true);
+    setTestDispatchResult(null);
+    try {
+      const res = await fetch('/api/admin/whatsapp', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'test_dispatch',
+          phoneNumber: testPhone.trim(),
+        }),
+      });
+      const data = await res.json();
+      setTestDispatchResult(data);
+      if (data.success) {
+        showToast(
+          language === 'hi'
+            ? `परीक्षण ओटीपी कोड (${data.testCode}) भेजा गया via ${data.deliveredVia}`
+            : `Test OTP (${data.testCode}) dispatched via ${data.deliveredVia}!`
+        );
+      } else {
+        showToast(data.error || 'Failed to dispatch test OTP', true);
+      }
+    } catch (err: unknown) {
+      setTestDispatchResult({
+        success: false,
+        error: (err as Error)?.message || 'Network error executing test dispatch',
+      });
+      showToast('Dispatch test failed', true);
+    } finally {
+      setIsTestingDispatch(false);
+    }
+  };
+
   // Supporter & Review Handlers
   const handleToggleVerifySupporter = async (id: string, currentVerified: boolean) => {
     try {
@@ -1169,6 +1337,7 @@ export function AdminClient() {
         {[
           { id: 'overview', label: language === 'hi' ? 'अवलोकन' : 'Overview', icon: Sliders },
           { id: 'polls', label: language === 'hi' ? 'सर्वेक्षण एवं मत नियंत्रण' : 'Polls & Ballots', icon: Vote },
+          { id: 'whatsapp', label: language === 'hi' ? 'व्हाट्सएप गेटवे (Baileys)' : 'WhatsApp Gateway (Baileys)', icon: MessageSquare },
           { id: 'settings', label: language === 'hi' ? 'साइट सेटिंग्स एवं अलर्ट' : 'Site Controls', icon: Settings },
           { id: 'supporters', label: language === 'hi' ? 'चाय समर्थक समीक्षाएँ' : 'Chai Supporters', icon: Coffee },
           { id: 'parties', label: language === 'hi' ? 'मान्यता प्राप्त दल' : 'Official Parties', icon: Layers },
@@ -1580,6 +1749,892 @@ export function AdminClient() {
               );
             })}
           </div>
+        </div>
+      )}
+
+      {/* TAB 2.5: WHATSAPP GATEWAY & BAILEYS MANAGER */}
+      {activeTab === 'whatsapp' && (
+        <div className="space-y-6">
+          {/* Header & Main Actions */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-500">
+                  {language === 'hi' ? 'व्हाट्सएप गेटवे नियंत्रण' : 'WhatsApp Gateway Control'}
+                </span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-black text-[var(--text-primary)]">
+                {language === 'hi'
+                  ? 'व्हाट्सएप गेटवे एवं Baileys अवसंरचना प्रबंधन'
+                  : 'WhatsApp Gateway & Baileys Infrastructure'}
+              </h2>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5 max-w-2xl">
+                {language === 'hi'
+                  ? 'नागरिक 1-व्यक्ति-1-मत सत्यापन (OTP) के लिए लाइव गेटवे प्रदाता, Baileys API एंडपॉइंट्स, प्रमाणीकरण कुंजी और लाइव पिंग टेस्ट को किसी भी समय तुरंत बदलें।'
+                  : 'Configure real-time OTP delivery engines, Baileys self-hosted gateway URL & API keys, inspect live pairing status, and send diagnostic OTP dispatches.'}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <button
+                type="button"
+                onClick={handlePingGateway}
+                disabled={isPinging}
+                className="py-2.5 px-4 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-xs font-bold text-[var(--text-primary)] transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60"
+              >
+                <Activity
+                  className={`w-3.5 h-3.5 ${
+                    isPinging ? 'animate-spin text-[var(--accent)]' : 'text-emerald-500'
+                  }`}
+                />
+                <span>
+                  {isPinging
+                    ? language === 'hi'
+                      ? 'पिंग जांच जारी...'
+                      : 'Pinging Gateway...'
+                    : language === 'hi'
+                    ? 'गेटवे पिंग जांचें'
+                    : 'Test Gateway Ping'}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveWhatsappConfig}
+                disabled={isSavingWhatsapp}
+                className="py-2.5 px-4 rounded-xl bg-[var(--accent)] hover:opacity-90 text-xs font-bold text-white transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60 shadow-md"
+              >
+                <Save className={`w-3.5 h-3.5 ${isSavingWhatsapp ? 'animate-spin' : ''}`} />
+                <span>
+                  {isSavingWhatsapp
+                    ? language === 'hi'
+                      ? 'सहेज रहे हैं...'
+                      : 'Saving Changes...'
+                    : language === 'hi'
+                    ? 'गेटवे सेटिंग्स सहेजें'
+                    : 'Save Gateway Settings'}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Metrics & Diagnostic Status Banners */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Card 1: Active Provider */}
+            <GlassCard className="p-4 space-y-2">
+              <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
+                <span className="font-semibold uppercase tracking-wider text-[10px]">
+                  {language === 'hi' ? 'सक्रिय गेटवे इंजन' : 'Active Delivery Engine'}
+                </span>
+                <MessageSquare className="w-4 h-4 text-[var(--accent)]" />
+              </div>
+              <div className="text-base font-bold text-[var(--text-primary)] capitalize">
+                {whatsappConfig.provider === 'baileys_gateway' && 'Baileys Self-Hosted Bridge'}
+                {whatsappConfig.provider === 'meta_cloud_api' && 'Meta WhatsApp Cloud API'}
+                {whatsappConfig.provider === 'ultramsg_cloud' && 'UltraMsg Hosted Gateway'}
+                {whatsappConfig.provider === 'greenapi_cloud' && 'Green-API Hosted Instance'}
+                {whatsappConfig.provider === 'dev_simulator' && 'Local Dev Simulator'}
+              </div>
+              <div className="flex items-center gap-1.5 pt-1">
+                {whatsappConfig.provider === 'baileys_gateway' ? (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/30">
+                    100% Free • Unlimited OTPs
+                  </span>
+                ) : whatsappConfig.provider === 'meta_cloud_api' ? (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/30">
+                    Official Meta Platform
+                  </span>
+                ) : whatsappConfig.provider === 'dev_simulator' ? (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/30">
+                    Simulation Mode
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-500 border border-purple-500/30">
+                    Cloud Provider
+                  </span>
+                )}
+              </div>
+            </GlassCard>
+
+            {/* Card 2: Live Ping Status */}
+            <GlassCard className="p-4 space-y-2">
+              <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
+                <span className="font-semibold uppercase tracking-wider text-[10px]">
+                  {language === 'hi' ? 'गेटवे कनेक्टिविटी स्थिति' : 'Gateway Live Health'}
+                </span>
+                <Activity className="w-4 h-4 text-emerald-500" />
+              </div>
+              <div>
+                {pingStatus ? (
+                  pingStatus.online ? (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="text-base font-bold text-emerald-500">
+                        {language === 'hi' ? 'सक्रिय एवं तैयार' : 'ONLINE & READY'}
+                      </span>
+                      {typeof pingStatus.latencyMs === 'number' && (
+                        <span className="text-[11px] font-mono text-[var(--text-secondary)]">
+                          ({pingStatus.latencyMs}ms)
+                        </span>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
+                      <span className="text-base font-bold text-red-500">
+                        {pingStatus.status || (language === 'hi' ? 'अनुपलब्ध' : 'OFFLINE')}
+                      </span>
+                    </div>
+                  )
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[var(--text-tertiary)]" />
+                    <span className="text-sm font-semibold text-[var(--text-secondary)]">
+                      {whatsappConfig.baileysGatewayUrl
+                        ? language === 'hi'
+                          ? 'कॉन्फ़िगर किया गया (जांचें)'
+                          : 'Configured (Click Ping)'
+                        : language === 'hi'
+                        ? 'URL सेट नहीं है'
+                        : 'No URL configured'}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <p className="text-[11px] text-[var(--text-secondary)] truncate">
+                {pingStatus?.error
+                  ? pingStatus.error
+                  : whatsappConfig.baileysGatewayUrl
+                  ? whatsappConfig.baileysGatewayUrl
+                  : 'Enter your Baileys endpoint URL below'}
+              </p>
+            </GlassCard>
+
+            {/* Card 3: Failover Protection */}
+            <GlassCard className="p-4 space-y-2">
+              <div className="flex items-center justify-between text-xs text-[var(--text-secondary)]">
+                <span className="font-semibold uppercase tracking-wider text-[10px]">
+                  {language === 'hi' ? 'शून्य विफलता बैकअप' : 'Zero-Downtime Fallback'}
+                </span>
+                <ShieldCheck className="w-4 h-4 text-[var(--accent)]" />
+              </div>
+              <div className="text-base font-bold text-[var(--text-primary)]">
+                {whatsappConfig.fallbackToSimulator !== false ? (
+                  <span className="text-emerald-500 flex items-center gap-1.5">
+                    <CheckCircle2 className="w-4 h-4" />
+                    {language === 'hi' ? 'सुरक्षा बैकअप सक्रिय' : 'Simulator Fallback ON'}
+                  </span>
+                ) : (
+                  <span className="text-amber-500 flex items-center gap-1.5">
+                    <AlertTriangle className="w-4 h-4" />
+                    {language === 'hi' ? 'बैकअप अक्षम' : 'Strict Mode (No Fallback)'}
+                  </span>
+                )}
+              </div>
+              <p className="text-[11px] text-[var(--text-secondary)]">
+                {language === 'hi'
+                  ? 'यदि Baileys किसी समय अनपेक्षित रूप से डिस्कनेक्ट हो जाए तो नागरिकों का वोट अवरुद्ध नहीं होगा।'
+                  : 'Automatic graceful fallback guarantees citizens can still verify and vote during temporary bridge outages.'}
+              </p>
+            </GlassCard>
+          </div>
+
+          {/* Section 1: Provider Selection */}
+          <GlassCard className="p-5 space-y-4">
+            <div>
+              <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider">
+                {language === 'hi'
+                  ? '१. प्राथमिक व्हाट्सएप डिलीवरी इंजन चुनें'
+                  : '1. Select Active WhatsApp Delivery Engine'}
+              </h3>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                {language === 'hi'
+                  ? 'पूरे प्लेटफॉर्म पर तुरंत लागू होने वाला ओटीपी डिस्पैच इंजन चुनें। किसी सर्वर रीस्टार्ट की आवश्यकता नहीं है।'
+                  : 'Select which service delivers OTP verification messages to citizens. Switches take effect instantly without restarting.'}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {[
+                {
+                  id: 'baileys_gateway' as WhatsAppGatewayProvider,
+                  title: 'Baileys Self-Hosted Gateway',
+                  tag: 'Recommended • Free',
+                  tagColor: 'text-emerald-500 bg-emerald-500/10 border-emerald-500/30',
+                  desc: 'Run a free Node.js Baileys instance on your VPS/Docker/Local. Sends OTPs directly from your WhatsApp number without any per-message charges.',
+                },
+                {
+                  id: 'meta_cloud_api' as WhatsAppGatewayProvider,
+                  title: 'Meta WhatsApp Cloud API',
+                  tag: 'Official Meta Platform',
+                  tagColor: 'text-blue-500 bg-blue-500/10 border-blue-500/30',
+                  desc: 'Official WhatsApp Business Platform via Meta Graph API. Requires verified Meta developer business app and access token.',
+                },
+                {
+                  id: 'ultramsg_cloud' as WhatsAppGatewayProvider,
+                  title: 'UltraMsg Cloud Gateway',
+                  tag: 'Cloud Service',
+                  tagColor: 'text-purple-500 bg-purple-500/10 border-purple-500/30',
+                  desc: 'Hosted multi-device WhatsApp gateway API service with webhook support and simple REST endpoint.',
+                },
+                {
+                  id: 'greenapi_cloud' as WhatsAppGatewayProvider,
+                  title: 'Green-API Cloud Instance',
+                  tag: 'Enterprise Cloud',
+                  tagColor: 'text-teal-500 bg-teal-500/10 border-teal-500/30',
+                  desc: 'Stable cloud WhatsApp API service for automated messaging and instance hosting.',
+                },
+                {
+                  id: 'dev_simulator' as WhatsAppGatewayProvider,
+                  title: 'Local Dev Simulator',
+                  tag: 'Development Mode',
+                  tagColor: 'text-amber-500 bg-amber-500/10 border-amber-500/30',
+                  desc: 'Zero-cost offline testing: Bypasses external HTTP requests and outputs 6-digit verification codes to terminal and UI notification toast.',
+                },
+              ].map((provider) => {
+                const isSelected = (whatsappConfig.provider || 'baileys_gateway') === provider.id;
+                return (
+                  <button
+                    key={provider.id}
+                    type="button"
+                    onClick={() =>
+                      setWhatsappConfig((prev) => ({ ...prev, provider: provider.id }))
+                    }
+                    className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-3 ${
+                      isSelected
+                        ? 'bg-[var(--accent-soft)] border-[var(--accent)] shadow-sm'
+                        : 'bg-[var(--bg-surface)] border-[var(--border-glass)] hover:border-[var(--text-tertiary)]'
+                    }`}
+                  >
+                    <div className="space-y-1.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs font-bold text-[var(--text-primary)]">
+                          {provider.title}
+                        </span>
+                        <span
+                          className={`text-[9px] font-bold px-2 py-0.5 rounded-full border whitespace-nowrap ${provider.tagColor}`}
+                        >
+                          {provider.tag}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                        {provider.desc}
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-1 border-t border-[var(--border-glass)]/60">
+                      <span
+                        className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center transition-all ${
+                          isSelected
+                            ? 'border-[var(--accent)] bg-[var(--accent)] text-white'
+                            : 'border-[var(--text-tertiary)] bg-transparent'
+                        }`}
+                      >
+                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      </span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">
+                        {isSelected ? 'Active Selection' : 'Click to Select'}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </GlassCard>
+
+          {/* Section 2: Baileys Gateway Parameters */}
+          {(whatsappConfig.provider === 'baileys_gateway' || !whatsappConfig.provider) && (
+            <GlassCard className="p-5 space-y-5">
+              <div>
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                    <MessageSquare className="w-4 h-4 text-[var(--accent)]" />
+                    <span>
+                      {language === 'hi'
+                        ? '२. Baileys गेटवे एंडपॉइंट एवं प्रमाणीकरण'
+                        : '2. Baileys Gateway Endpoint & Credentials'}
+                    </span>
+                  </h3>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/30">
+                    Self-Hosted Bridge
+                  </span>
+                </div>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                  {language === 'hi'
+                    ? 'अपने Baileys सर्वर का HTTP URL और सुरक्षा कुंजी दर्ज करें। यह गेटवे आपके व्हाट्सएप से सीधे ओटीपी संदेश भेजेगा।'
+                    : 'Enter the HTTP bridge URL and secret authorization key where your Baileys WhatsApp client is running.'}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Gateway URL */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-xs font-bold text-[var(--text-primary)] flex items-center justify-between">
+                    <span>
+                      {language === 'hi' ? 'Baileys गेटवे सर्वर URL' : 'Baileys Gateway Server URL'}
+                    </span>
+                    <span className="text-[11px] font-mono text-[var(--text-tertiary)]">
+                      e.g. http://localhost:8000 or https://baileys.yourserver.com
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={whatsappConfig.baileysGatewayUrl || ''}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        baileysGatewayUrl: e.target.value,
+                      }))
+                    }
+                    placeholder="http://localhost:8000"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--accent)]"
+                  />
+                  <p className="text-[11px] text-[var(--text-secondary)]">
+                    Endpoint expected to accept POST /send-otp with JSON {`{ phoneNumber, message }`} or GET /ping.
+                  </p>
+                </div>
+
+                {/* API Key */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)] flex items-center justify-between">
+                    <span>{language === 'hi' ? 'गेटवे गुप्त API कुंजी' : 'Gateway Secret API Key'}</span>
+                    <span className="text-[10px] text-[var(--text-tertiary)]">(Optional / Bearer Auth)</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={whatsappConfig.baileysApiKey || ''}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        baileysApiKey: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter secret authorization key"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--accent)]"
+                  />
+                  <p className="text-[11px] text-[var(--text-secondary)]">
+                    Passed as Bearer token or x-api-key header for authenticated gateway endpoints.
+                  </p>
+                </div>
+
+                {/* Sender Phone */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)] flex items-center justify-between">
+                    <span>
+                      {language === 'hi' ? 'प्रेषक मोबाइल नंबर (वैकल्पिक)' : 'Sender Phone / Instance (Optional)'}
+                    </span>
+                    <span className="text-[10px] text-[var(--text-tertiary)]">e.g. +919876543210</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={whatsappConfig.senderPhone || ''}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        senderPhone: e.target.value,
+                      }))
+                    }
+                    placeholder="+919876543210"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--accent)]"
+                  />
+                  <p className="text-[11px] text-[var(--text-secondary)]">
+                    Identifies which WhatsApp account or session instance dispatches the verification code.
+                  </p>
+                </div>
+              </div>
+
+              {/* Graceful Fallback Toggle */}
+              <div className="pt-2 border-t border-[var(--border-glass)]">
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={whatsappConfig.fallbackToSimulator !== false}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        fallbackToSimulator: e.target.checked,
+                      }))
+                    }
+                    className="mt-1 w-4 h-4 rounded border-[var(--border-glass)] text-[var(--accent)] focus:ring-[var(--accent)]"
+                  />
+                  <div className="space-y-0.5">
+                    <span className="text-xs font-bold text-[var(--text-primary)]">
+                      {language === 'hi'
+                        ? 'गेटवे ऑफ़लाइन होने पर स्वचालित सिम्युलेटर बैकअप चालू रखें (अनुशंसित)'
+                        : 'Enable Automatic Simulator Fallback if Baileys Gateway is Offline (Recommended)'}
+                    </span>
+                    <p className="text-[11px] text-[var(--text-secondary)]">
+                      {language === 'hi'
+                        ? 'यदि आपका Baileys सर्वर कभी रुक जाता है या डिस्कनेक्ट होता है, तो नागरिक सत्यापन नहीं रुकेगा और वोट तुरंत सुरक्षित रूप से पंजीकृत हो जाएगा।'
+                        : 'If your Baileys bridge is unreachable or experiences network latency, fallback ensures OTP verification continues without dropping votes.'}
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              {/* Save Button inside card */}
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={handleSaveWhatsappConfig}
+                  disabled={isSavingWhatsapp}
+                  className="py-2.5 px-5 rounded-xl bg-[var(--accent)] hover:opacity-90 text-xs font-bold text-white transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60 shadow-md"
+                >
+                  <Save className={`w-3.5 h-3.5 ${isSavingWhatsapp ? 'animate-spin' : ''}`} />
+                  <span>
+                    {isSavingWhatsapp
+                      ? language === 'hi'
+                        ? 'सहेज रहे हैं...'
+                        : 'Saving Gateway...'
+                      : language === 'hi'
+                      ? 'Baileys गेटवे कॉन्फ़िगरेशन सहेजें'
+                      : 'Save Baileys Configuration'}
+                  </span>
+                </button>
+              </div>
+            </GlassCard>
+          )}
+
+          {/* Section 2B: Meta Cloud API Parameters */}
+          {whatsappConfig.provider === 'meta_cloud_api' && (
+            <GlassCard className="p-5 space-y-4">
+              <div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-blue-500" />
+                  <span>Meta WhatsApp Cloud API Configuration</span>
+                </h3>
+                <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                  Configure your official WhatsApp Business App credentials registered on Meta Developers.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)]">
+                    Phone Number ID (`WHATSAPP_PHONE_NUMBER_ID`)
+                  </label>
+                  <input
+                    type="text"
+                    value={whatsappConfig.metaPhoneNumberId || ''}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        metaPhoneNumberId: e.target.value,
+                      }))
+                    }
+                    placeholder="e.g. 109283746501928"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)]">
+                    Permanent System User Token (`WHATSAPP_CLOUD_API_TOKEN`)
+                  </label>
+                  <input
+                    type="password"
+                    value={whatsappConfig.metaCloudToken || ''}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        metaCloudToken: e.target.value,
+                      }))
+                    }
+                    placeholder="EAAGm..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={handleSaveWhatsappConfig}
+                  disabled={isSavingWhatsapp}
+                  className="py-2 px-4 rounded-xl bg-[var(--accent)] hover:opacity-90 text-xs font-bold text-white transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60 shadow-md"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Save Meta API Credentials</span>
+                </button>
+              </div>
+            </GlassCard>
+          )}
+
+          {/* Section 2C: UltraMsg Cloud Parameters */}
+          {whatsappConfig.provider === 'ultramsg_cloud' && (
+            <GlassCard className="p-5 space-y-4">
+              <div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-purple-500" />
+                  <span>UltraMsg WhatsApp Cloud Configuration</span>
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)]">
+                    UltraMsg Instance ID
+                  </label>
+                  <input
+                    type="text"
+                    value={whatsappConfig.ultraMsgInstanceId || ''}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        ultraMsgInstanceId: e.target.value,
+                      }))
+                    }
+                    placeholder="instance98765"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)]">
+                    UltraMsg Token
+                  </label>
+                  <input
+                    type="password"
+                    value={whatsappConfig.ultraMsgToken || ''}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        ultraMsgToken: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter UltraMsg API token"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={handleSaveWhatsappConfig}
+                  disabled={isSavingWhatsapp}
+                  className="py-2 px-4 rounded-xl bg-[var(--accent)] hover:opacity-90 text-xs font-bold text-white transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60 shadow-md"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Save UltraMsg Credentials</span>
+                </button>
+              </div>
+            </GlassCard>
+          )}
+
+          {/* Section 2D: Green-API Cloud Parameters */}
+          {whatsappConfig.provider === 'greenapi_cloud' && (
+            <GlassCard className="p-5 space-y-4">
+              <div>
+                <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                  <Zap className="w-4 h-4 text-teal-500" />
+                  <span>Green-API WhatsApp Instance Configuration</span>
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)]">
+                    Green-API IdInstance
+                  </label>
+                  <input
+                    type="text"
+                    value={whatsappConfig.greenApiInstanceId || ''}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        greenApiInstanceId: e.target.value,
+                      }))
+                    }
+                    placeholder="e.g. 1101928374"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-[var(--text-primary)]">
+                    Green-API ApiTokenInstance
+                  </label>
+                  <input
+                    type="password"
+                    value={whatsappConfig.greenApiToken || ''}
+                    onChange={(e) =>
+                      setWhatsappConfig((prev) => ({
+                        ...prev,
+                        greenApiToken: e.target.value,
+                      }))
+                    }
+                    placeholder="Enter Green-API token"
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <button
+                  type="button"
+                  onClick={handleSaveWhatsappConfig}
+                  disabled={isSavingWhatsapp}
+                  className="py-2 px-4 rounded-xl bg-[var(--accent)] hover:opacity-90 text-xs font-bold text-white transition-all flex items-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60 shadow-md"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  <span>Save Green-API Credentials</span>
+                </button>
+              </div>
+            </GlassCard>
+          )}
+
+          {/* Section 3: Live QR Code Device Pairing Box (Baileys) */}
+          {(whatsappConfig.provider === 'baileys_gateway' || !whatsappConfig.provider) && (
+            <GlassCard className="p-5 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                    <QrCode className="w-4 h-4 text-[var(--accent)]" />
+                    <span>
+                      {language === 'hi'
+                        ? '३. Baileys डिवाइस पेयरिंग एवं QR कोड'
+                        : '3. Baileys Device Linking & QR Code'}
+                    </span>
+                  </h3>
+                  <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                    {language === 'hi'
+                      ? 'यदि आपका Baileys ब्रिज नया है या फिर से लिंक करने की आवश्यकता है, तो व्हाट्सएप से QR कोड स्कैन करें।'
+                      : 'If your Baileys bridge requires a new device session, scan the QR code via WhatsApp (Linked Devices).'}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handlePingGateway}
+                  disabled={isPinging}
+                  className="py-2 px-3.5 rounded-xl bg-[var(--bg-surface)] hover:bg-[var(--border-glass)] border border-[var(--border-glass)] text-xs font-bold text-[var(--text-primary)] transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-60 self-start sm:self-auto"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isPinging ? 'animate-spin' : ''}`} />
+                  <span>{language === 'hi' ? 'QR रिफ्रेश करें' : 'Refresh Pairing QR'}</span>
+                </button>
+              </div>
+
+              {pingStatus?.qrCode ? (
+                <div className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-glass)] flex flex-col items-center justify-center text-center space-y-3">
+                  <div className="p-3 bg-white rounded-xl shadow-lg inline-block">
+                    {/* If QR is image data URI */}
+                    {pingStatus.qrCode.startsWith('data:image') ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={pingStatus.qrCode}
+                        alt="WhatsApp Pairing QR"
+                        className="w-56 h-56 object-contain"
+                      />
+                    ) : (
+                      <pre className="font-mono text-[9px] leading-tight text-black max-w-xs overflow-x-auto p-2 bg-white rounded">
+                        {pingStatus.qrCode}
+                      </pre>
+                    )}
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-[var(--text-primary)]">
+                      {language === 'hi'
+                        ? 'अपने फ़ोन से QR कोड स्कैन करें'
+                        : 'Scan this QR Code with WhatsApp'}
+                    </p>
+                    <p className="text-[11px] text-[var(--text-secondary)] max-w-md">
+                      Open WhatsApp on your phone &rarr; Settings &rarr; Linked Devices &rarr; Link a Device &rarr; Point camera at this QR code.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-secondary)] space-y-2">
+                  <div className="flex items-center gap-2 text-[var(--text-primary)] font-bold">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    <span>
+                      {pingStatus?.online
+                        ? language === 'hi'
+                          ? 'डिवाइस सक्रिय रूप से लिंक है और संदेश भेजने हेतु तैयार है!'
+                          : 'WhatsApp device session is active and linked! Ready to send OTPs.'
+                        : language === 'hi'
+                        ? 'Baileys गेटवे स्थिति की जांच करें'
+                        : 'Ready to inspect Baileys Gateway'}
+                    </span>
+                  </div>
+                  <p className="text-[11px] leading-relaxed">
+                    Once your Baileys bridge is connected, credentials persist in the auth session folder on your bridge server. Re-scanning is only needed when unlinking.
+                  </p>
+                </div>
+              )}
+            </GlassCard>
+          )}
+
+          {/* Section 4: Live Test OTP Dispatcher */}
+          <GlassCard className="p-5 space-y-4">
+            <div>
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                  <Send className="w-4 h-4 text-[var(--accent)]" />
+                  <span>
+                    {language === 'hi'
+                      ? '४. रियल-टाइम परीक्षण ओटीपी भेजें'
+                      : '4. Real-Time Diagnostic OTP Dispatcher'}
+                  </span>
+                </h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/30">
+                  Live Dispatch Test
+                </span>
+              </div>
+              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                {language === 'hi'
+                  ? 'किसी भी भारतीय मोबाइल नंबर पर तुरंत एक परीक्षण व्हाट्सएप संदेश भेजें और वास्तविक डिलीवरी विलंबता (latency) मापें।'
+                  : 'Dispatch a live test verification OTP code to your WhatsApp number to verify deliverability, network latency, and payload formatting.'}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="relative flex-1">
+                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold text-[var(--text-tertiary)]">
+                  +91
+                </span>
+                <input
+                  type="tel"
+                  value={testPhone}
+                  onChange={(e) => setTestPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                  placeholder="9876543210"
+                  maxLength={10}
+                  className="w-full pl-12 pr-4 py-2.5 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs text-[var(--text-primary)] font-mono focus:outline-none focus:border-[var(--accent)]"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={handleTestDispatch}
+                disabled={isTestingDispatch || !testPhone.trim()}
+                className="py-2.5 px-5 rounded-xl bg-[var(--accent)] hover:opacity-90 text-xs font-bold text-white transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95 disabled:opacity-60 shadow-md whitespace-nowrap"
+              >
+                <Send className={`w-3.5 h-3.5 ${isTestingDispatch ? 'animate-spin' : ''}`} />
+                <span>
+                  {isTestingDispatch
+                    ? language === 'hi'
+                      ? 'संदेश भेजा जा रहा है...'
+                      : 'Dispatching Test OTP...'
+                    : language === 'hi'
+                    ? 'परीक्षण ओटीपी भेजें'
+                    : 'Send Test OTP'}
+                </span>
+              </button>
+            </div>
+
+            {/* Test Results Output */}
+            {testDispatchResult && (
+              <div
+                className={`p-4 rounded-xl border text-xs space-y-2.5 ${
+                  testDispatchResult.success
+                    ? 'bg-emerald-500/5 border-emerald-500/30 text-[var(--text-primary)]'
+                    : 'bg-red-500/5 border-red-500/30 text-red-400'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2">
+                    {testDispatchResult.success ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-red-500" />
+                    )}
+                    <span className="font-bold">
+                      {testDispatchResult.success
+                        ? language === 'hi'
+                          ? 'ओटीपी सफलतापूर्वक प्रेषित!'
+                          : 'OTP Successfully Dispatched!'
+                        : language === 'hi'
+                        ? 'ओटीपी भेजने में विफलता'
+                        : 'Dispatch Test Failed'}
+                    </span>
+                  </div>
+
+                  {typeof testDispatchResult.latencyMs === 'number' && (
+                    <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-[var(--bg-surface)] border border-[var(--border-glass)] text-[var(--text-secondary)]">
+                      Roundtrip: {testDispatchResult.latencyMs}ms
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
+                  <div className="p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+                    <span className="text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] block">
+                      Dispatched Code
+                    </span>
+                    <span className="text-sm font-bold text-[var(--accent)] tracking-widest">
+                      {testDispatchResult.testCode || 'N/A'}
+                    </span>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+                    <span className="text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] block">
+                      Delivered Via
+                    </span>
+                    <span className="font-semibold text-[var(--text-primary)] capitalize">
+                      {testDispatchResult.deliveredVia || 'N/A'}
+                    </span>
+                  </div>
+
+                  <div className="p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-glass)]">
+                    <span className="text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] block">
+                      Message ID / Ref
+                    </span>
+                    <span className="text-[10px] text-[var(--text-secondary)] truncate block">
+                      {testDispatchResult.messageId || 'simulated-ref'}
+                    </span>
+                  </div>
+                </div>
+
+                {testDispatchResult.error && (
+                  <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-[11px]">
+                    <span className="font-bold">Diagnostic Error: </span>
+                    <span>{testDispatchResult.error}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </GlassCard>
+
+          {/* Section 5: Self-Hosting Guide & 1-Minute Baileys Deployment */}
+          <GlassCard className="p-5 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-2">
+                <Terminal className="w-4 h-4 text-[var(--accent)]" />
+                <span>
+                  {language === 'hi'
+                    ? '५. Baileys गेटवे को निःशुल्क कैसे होस्ट करें (1-मिनट सेटअप)'
+                    : '5. Free Baileys 1-Minute Self-Hosting Quickstart'}
+                </span>
+              </h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/30">
+                100% Free
+              </span>
+            </div>
+
+            <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
+              Baileys is an open-source WhatsApp Web socket library. You can run it on your local server, Render (Free Tier), Railway, or a VPS with Docker in 3 steps:
+            </p>
+
+            <div className="p-3.5 rounded-xl bg-black/40 border border-[var(--border-glass)] font-mono text-[11px] text-emerald-400 space-y-2 overflow-x-auto">
+              <div className="text-[var(--text-tertiary)] text-[10px]">
+                # Option A: Run lightweight Baileys HTTP Bridge with Docker:
+              </div>
+              <code>
+                docker run -d -p 8000:8000 -e PORT=8000 -e API_KEY=my_secret_key meravote/baileys-gw
+              </code>
+              <div className="text-[var(--text-tertiary)] text-[10px] pt-1">
+                # Option B: Run locally on your machine with Node.js:
+              </div>
+              <code>
+                git clone https://github.com/WhiskeySockets/Baileys.git &amp;&amp; npm install &amp;&amp; npm start
+              </code>
+            </div>
+
+            <p className="text-[11px] text-[var(--text-tertiary)]">
+              Once started on port 8000, simply enter <span className="font-mono text-[var(--text-secondary)]">http://localhost:8000</span> in Section 2 above and click &quot;Save Gateway Settings&quot;. Your voting app will immediately start sending free WhatsApp OTPs!
+            </p>
+          </GlassCard>
         </div>
       )}
 

@@ -160,10 +160,35 @@ export interface AuditEvent {
     | 'admin_poll_create'
     | 'admin_poll_delete'
     | 'admin_user_created'
-    | 'admin_user_deleted';
+    | 'admin_user_deleted'
+    | 'whatsapp_gateway_updated';
   poll_id?: string;
   timestamp: string;
   metadata_sanitized: Record<string, unknown>; // STRICTLY NO EPIC, NO PII, NO VOTE CHOICE
+}
+
+export type WhatsAppGatewayProvider =
+  | 'baileys_gateway'
+  | 'meta_cloud_api'
+  | 'ultramsg_cloud'
+  | 'greenapi_cloud'
+  | 'dev_simulator';
+
+export interface WhatsAppGatewayConfig {
+  provider: WhatsAppGatewayProvider;
+  baileysGatewayUrl?: string;
+  baileysApiKey?: string;
+  metaCloudToken?: string;
+  metaPhoneNumberId?: string;
+  ultraMsgInstanceId?: string;
+  ultraMsgToken?: string;
+  greenApiInstanceId?: string;
+  greenApiToken?: string;
+  senderPhone?: string;
+  fallbackToSimulator: boolean;
+  status?: 'CONNECTED' | 'DISCONNECTED' | 'PAIRING_QR_READY' | 'STANDBY' | 'ERROR';
+  lastPing?: string;
+  lastPingMs?: number;
 }
 
 export interface SiteSettings {
@@ -179,6 +204,7 @@ export interface SiteSettings {
   allowVoting: boolean;
   rateLimitPerHour: number;
   lastUpdated: string;
+  whatsappGateway?: WhatsAppGatewayConfig;
 }
 
 export interface AdminAccount {

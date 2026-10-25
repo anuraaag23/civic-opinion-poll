@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { normalizePhone, generatePhoneFingerprint } from '../crypto';
 import { generateOtp, verifyOtp } from './otp';
-import { sendWhatsAppOtp, formatWhatsAppJid, cleanIndianPhone } from '../whatsapp/baileys';
+import { sendWhatsAppOtp, formatWhatsAppJid, cleanIndianPhone, pingBaileysGateway } from '../whatsapp/baileys';
 import { db } from '../db';
 
 describe('WhatsApp OTP Verification & Baileys Dispatch', () => {
@@ -62,5 +62,36 @@ describe('WhatsApp OTP Verification & Baileys Dispatch', () => {
     // Subsequent vote from same phone should be blocked
     const hasVoted = await db.hasParticipated(pollId, fingerprint);
     expect(hasVoted).toBe(true);
+  });
+
+  it('allows admin to dynamically switch WhatsApp gateway settings in db', async () => {
+    // 1. Update gateway settings
+    await db.updateSiteSettings({
+      whatsappGateway: {
+        provider: 'dev_simulator',
+        baileysGatewayUrl: 'http://localhost:8000',
+        baileysApiKey: 'test-admin-secret-key',
+        fallbackToSimulator: true,
+      },
+    });
+
+    // 2. Fetch and verify persistence
+    const settings = await db.getSiteSettings();
+    expect(settings.whatsappGateway).toBeDefined();
+    expect(settings.whatsappGateway?.provider).toBe('dev_simulator');
+    expect(settings.whatsappGateway?.baileysGatewayUrl).toBe('http://localhost:8000');
+    expect(settings.whatsappGateway?.baileysApiKey).toBe('test-admin-secret-key');
+
+    // 3. Dispatch works dynamically
+    const dispatch = await sendWhatsAppOtp(cleanPhone, '123456', 'Admin Test Verification');
+    expect(dispatch.success).toBe(true);
+    expect(dispatch.deliveredVia).toBe('dev_simulator');
+  });
+
+  it('pingBaileysGateway gracefully handles unreachable endpoints', async () => {
+    const ping = await pingBaileysGateway('http://127.0.0.1:54321', 'test');
+    expect(ping.online).toBe(false);
+    expect(ping.status).toBeDefined();
+    expect(ping.error).toBeDefined();
   });
 });
