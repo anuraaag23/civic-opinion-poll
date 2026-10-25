@@ -15,13 +15,15 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { GlassBadge } from '@/components/ui/GlassBadge';
 import { GlassButton } from '@/components/ui/GlassButton';
 import { PollSkeleton } from '@/components/ui/PollSkeleton';
-import { ShieldCheck, Vote, BarChart3, Lock, ArrowRight, MapPin, Building2, Calendar } from 'lucide-react';
+import { IndiaMap } from '@/components/results/IndiaMap';
+import { ShieldCheck, Vote, BarChart3, Lock, ArrowRight, MapPin, Building2, Calendar, Map, ListFilter } from 'lucide-react';
 
 type FlowStep = 'RULES' | 'VERIFY' | 'VOTE' | 'SUCCESS' | 'DUPLICATE';
 
 export function CMClient() {
   const { language } = useI18n();
   const [selectedStateId, setSelectedStateId] = useState<string>('uttar-pradesh');
+  const [selectorMode, setSelectorMode] = useState<'LIST' | 'MAP'>('LIST');
   const [rawPoll, setRawPoll] = useState<Poll | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [step, setStep] = useState<FlowStep>('RULES');
@@ -128,25 +130,62 @@ export function CMClient() {
       <DisclaimerBanner />
 
       {/* ── STATE SELECTION COMPONENT ────────────────────────────────────── */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           <label className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider flex items-center gap-1.5">
             <MapPin className="w-4 h-4 text-[var(--accent)]" />
             <span>{language === 'hi' ? '1. अपना राज्य / केंद्र शासित प्रदेश चुनें:' : '1. Select Your State or Union Territory:'}</span>
           </label>
-          <span className="text-xs text-[var(--text-tertiary)] font-mono">
-            {currentState.assemblySeats ? `${currentState.assemblySeats} Assembly Seats` : currentState.type}
-          </span>
+
+          {/* Toggle between Fast Capsule Scroll & Interactive SVG Map */}
+          <div className="flex items-center p-1 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-glass)] text-xs">
+            <button
+              type="button"
+              onClick={() => setSelectorMode('LIST')}
+              className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                selectorMode === 'LIST'
+                  ? 'bg-[var(--accent)] text-white shadow-xs'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <ListFilter className="w-3.5 h-3.5" />
+              <span>{language === 'hi' ? 'सूची' : 'List'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectorMode('MAP')}
+              className={`px-3 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                selectorMode === 'MAP'
+                  ? 'bg-[var(--accent)] text-white shadow-xs'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+              }`}
+            >
+              <Map className="w-3.5 h-3.5" />
+              <span>{language === 'hi' ? 'भारत नक्शा' : 'India Map'}</span>
+            </button>
+          </div>
         </div>
 
-        <StateSelector
-          selectedStateId={selectedStateId}
-          onSelectState={(id) => {
-            setSelectedStateId(id);
-            setStep('RULES');
-            setAnonymousToken(null);
-          }}
-        />
+        {selectorMode === 'LIST' ? (
+          <StateSelector
+            selectedStateId={selectedStateId}
+            onSelectState={(id) => {
+              setSelectedStateId(id);
+              setStep('RULES');
+              setAnonymousToken(null);
+            }}
+          />
+        ) : (
+          <IndiaMap
+            selectedStateId={selectedStateId}
+            onSelectState={(id) => {
+              setSelectedStateId(id);
+              setStep('RULES');
+              setAnonymousToken(null);
+            }}
+            showLinkToCM={false}
+          />
+        )}
       </div>
 
       {isLoading ? (

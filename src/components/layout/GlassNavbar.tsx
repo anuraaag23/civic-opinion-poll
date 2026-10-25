@@ -9,7 +9,7 @@ import { LanguageSwitcher } from './LanguageSwitcher';
 import { ThemeSwitcher } from './ThemeSwitcher';
 import { SupportButton } from '@/components/support/SupportButton';
 import { InstallAppNavButton } from '@/components/pwa/InstallAppPrompt';
-import { BarChart3, HelpCircle, HeartHandshake, Globe, Building2, Vote, Mail } from 'lucide-react';
+import { BarChart3, HelpCircle, HeartHandshake, Globe, Building2, Vote, Mail, ShieldCheck } from 'lucide-react';
 
 export function GlassNavbar() {
   const { t, language } = useI18n();
@@ -38,6 +38,7 @@ export function GlassNavbar() {
     { href: '/cm', label: language === 'hi' ? 'CM जनमत' : 'CM Poll', icon: Building2 },
     { href: '/polls', label: language === 'hi' ? 'सभी जनमत' : 'All Polls', icon: Vote },
     { href: '/polls/national-opinion-poll-2029/results', label: t.nav.results, icon: BarChart3 },
+    { href: '/audit', label: language === 'hi' ? 'ऑडिट लेजर' : 'Audit', icon: ShieldCheck },
     { href: '/how-it-works', label: t.nav.howItWorks, icon: HelpCircle },
     { href: '/about', label: language === 'hi' ? 'निर्माता' : 'About Creator', icon: HeartHandshake },
   ];

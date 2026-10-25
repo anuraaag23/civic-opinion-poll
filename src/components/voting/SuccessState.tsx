@@ -130,6 +130,16 @@ export function SuccessState({ pollSlug }: SuccessStateProps) {
               ? 'यह डिजिटल रसीद प्रमाणित करती है कि आपका मत सार्वजनिक लेजर में बिना आपकी पहचान के शामिल कर लिया गया है।'
               : 'This digital audit receipt mathematically proves your vote is securely counted without storing your identity.'}
           </p>
+
+          <div className="pt-1 flex items-center justify-between text-[11px] border-t border-slate-200/50 dark:border-white/5">
+            <Link
+              href={`/audit?receipt=${encodeURIComponent(receiptHash)}`}
+              className="text-[var(--accent)] font-semibold hover:underline inline-flex items-center gap-1 cursor-pointer"
+            >
+              <span>{language === 'hi' ? 'सार्वजनिक लेजर में रसीद जांचें' : 'Verify in Public Audit Explorer'}</span>
+              <span>&rarr;</span>
+            </Link>
+          </div>
         </div>
 
         {/* Share Button with Live Feedback */}

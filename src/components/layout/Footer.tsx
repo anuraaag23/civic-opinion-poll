@@ -90,6 +90,15 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link
+                  href="/audit"
+                  className="hover:text-[var(--accent)] transition-colors inline-flex items-center gap-1.5 py-1 touch-manipulation cursor-pointer text-emerald-500 font-semibold"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>{language === 'hi' ? 'सार्वजनिक वोट ऑडिट लेजर' : 'Public Vote Audit Explorer'}</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/how-to-use" className="hover:text-[var(--accent)] transition-colors inline-flex items-center gap-1.5 font-medium py-1 touch-manipulation cursor-pointer">
                   <span>{language === 'hi' ? 'उपयोग कैसे करें (गाइड)' : 'How to Use Guide'}</span>
                 </Link>
